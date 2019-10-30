@@ -1,0 +1,20 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: apimanagers.apim.wso2.com
+spec:
+  group: apim.wso2.com
+  version: v1alpha1
+  names:
+    kind: Apimanager
+    plural: apimanagers
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          properties:
+            replicas:
+              type: integer
+              minimum: 1
+              maximum: 10
