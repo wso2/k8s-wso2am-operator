@@ -9,3 +9,4 @@ spec:
   servType: NodePort
   externalIps:
     - 192.168.99.101
+    
