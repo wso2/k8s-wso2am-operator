@@ -1,0 +1,11 @@
+apiVersion: apim.wso2.com/v1alpha1
+kind: Foo
+metadata:
+  name: example-foo
+spec:
+  deploymentName: wso2-apim2
+  serviceName: wso2-apim-service2
+  replicas: 1
+  servType: NodePort
+  externalIps:
+    - 192.168.99.101
