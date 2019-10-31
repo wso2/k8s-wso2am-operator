@@ -55,20 +55,20 @@ import (
 const controllerAgentName = "wso2am-controller"
 
 const (
-	// SuccessSynced is used as part of the Event 'reason' when a Foo is synced
+	// SuccessSynced is used as part of the Event 'reason' when a Apimanager is synced
 	SuccessSynced = "Synced"
-	// ErrResourceExists is used as part of the Event 'reason' when a Foo fails
+	// ErrResourceExists is used as part of the Event 'reason' when a Apimanager fails
 	// to sync due to a Deployment of the same name already existing.
 	ErrResourceExists = "ErrResourceExists"
 	// MessageResourceExists is the message used for Events when a resource
 	// fails to sync due to a Deployment already existing
 	MessageResourceExists = "Resource %q already exists and is not managed by Apimanager"
-	// MessageResourceSynced is the message used for an Event fired when a Foo
+	// MessageResourceSynced is the message used for an Event fired when a Apimanager
 	// is synced successfully
 	MessageResourceSynced = "Apimanager synced successfully"
 )
 
-// Controller is the controller implementation for Foo resources
+// Controller is the controller implementation for Apimanager resources
 type Controller struct {
 	// kubeclientset is a standard kubernetes clientset
 	kubeclientset kubernetes.Interface
@@ -81,8 +81,7 @@ type Controller struct {
 	servicesSynced    cache.InformerSynced
 	apimanagerslister  listers.ApimanagerLister
 	apimanagersSynced   cache.InformerSynced
-	//foosLister        listers.FooLister
-	//foosSynced        cache.InformerSynced
+
 
 	// workqueue is a rate limited work queue. This is used to queue work to be
 	// processed instead of performing it as soon as a change happens. This
@@ -102,7 +101,6 @@ func NewController(
 	deploymentInformer appsinformers.DeploymentInformer,
 	serviceInformer apps2informers.ServiceInformer,
 	apimanagerInformer informers.ApimanagerInformer) *Controller {
-		//fooInformer informers.FooInformer) *Controller {
 
 	// Create event broadcaster
 	// Add apim-controller types to the default Kubernetes Scheme so Events can be
@@ -128,7 +126,7 @@ func NewController(
 	}
 
 	klog.Info("Setting up event handlers")
-	// Set up an event handler for when Foo resources change
+	// Set up an event handler for when Apimanager resources change
 	apimanagerInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: controller.enqueueApimanager,
 		UpdateFunc: func(old, new interface{}) {
@@ -137,7 +135,7 @@ func NewController(
 	})
 	// Set up an event handler for when Deployment resources change. This
 	// handler will lookup the owner of the given Deployment, and if it is
-	// owned by a Foo resource will enqueue that Foo resource for
+	// owned by a Apimanager resource will enqueue that Apimanager resource for
 	// processing. This way, we don't need to implement custom logic for
 	// handling Deployment resources. More info on this pattern:
 	// https://github.com/kubernetes/community/blob/8cafef897a22026d42f5e5bb3f104febe7e29830/contributors/devel/controllers.md
@@ -192,7 +190,7 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) error {
 	}
 
 	klog.Info("Starting workers")
-	// Launch two workers to process Foo resources
+	// Launch two workers to process Apimanager resources
 	for i := 0; i < threadiness; i++ {
 		go wait.Until(c.runWorker, time.Second, stopCh)
 	}
@@ -246,7 +244,7 @@ func (c *Controller) processNextWorkItem() bool {
 			return nil
 		}
 		// Run the syncHandler, passing it the namespace/name string of the
-		// Foo resource to be synced.
+		// Apimanager resource to be synced.
 		if err := c.syncHandler(key); err != nil {
 			// Put the item back on the workqueue to handle any transient errors.
 			c.workqueue.AddRateLimited(key)
@@ -268,7 +266,7 @@ func (c *Controller) processNextWorkItem() bool {
 }
 
 // syncHandler compares the actual state with the desired, and attempts to
-// converge the two. It then updates the Status block of the Foo resource
+// converge the two. It then updates the Status block of the Apimanager resource
 // with the current status of the resource.
 func (c *Controller) syncHandler(key string) error {
 	// Convert the namespace/name string into a distinct namespace and name
@@ -278,10 +276,10 @@ func (c *Controller) syncHandler(key string) error {
 		return nil
 	}
 
-	// Get the Foo resource with this namespace/name
+	// Get the Apimanager resource with this namespace/name
 	apimanager, err := c.apimanagerslister.Apimanagers(namespace).Get(name)
 	if err != nil {
-		// The Foo resource may no longer exist, in which case we stop
+		// The Apimanager resource may no longer exist, in which case we stop
 		// processing.
 		if errors.IsNotFound(err) {
 			utilruntime.HandleError(fmt.Errorf("apimanager '%s' in work queue no longer exists", key))
@@ -309,14 +307,14 @@ func (c *Controller) syncHandler(key string) error {
 		return nil
 	}
 
-	// Get the deployment with the name specified in Foo.spec
+	// Get the deployment with the name specified in wso2-apim spec
 	deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(newDeployment(apimanager))
 	}
 
-	// Get the service with the name specified in Foo.spec
+	// Get the service with the name specified in wso2-apim spec
 	service, err := c.servicesLister.Services(apimanager.Namespace).Get(serviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
@@ -330,7 +328,7 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	// If the Deployment is not controlled by this Foo resource, we should log
+	// If the Deployment is not controlled by this Apimanager resource, we should log
 	// a warning to the event recorder and ret
 	if !metav1.IsControlledBy(deployment, apimanager) {
 		msg := fmt.Sprintf(MessageResourceExists, deployment.Name)
@@ -338,7 +336,7 @@ func (c *Controller) syncHandler(key string) error {
 		return fmt.Errorf(msg)
 	}
 
-	// If the Service is not controlled by this Foo resource, we should log
+	// If the Service is not controlled by this Apimanager resource, we should log
 	// a warning to the event recorder and ret
 	if !metav1.IsControlledBy(service, apimanager) {
 		msg := fmt.Sprintf(MessageResourceExists, service.Name)
@@ -346,7 +344,7 @@ func (c *Controller) syncHandler(key string) error {
 		return fmt.Errorf(msg)
 	}
 
-	// If this number of the replicas on the Foo resource is specified, and the
+	// If this number of the replicas on the Apimanager resource is specified, and the
 	// number does not equal the current desired replicas on the Deployment, we
 	// should update the Deployment resource.
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
@@ -361,7 +359,7 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	// Finally, we update the status block of the Foo resource to reflect the
+	// Finally, we update the status block of the Apimanager resource to reflect the
 	// current state of the world
 	err = c.updateApimanagerStatus(apimanager, deployment)
 	if err != nil {
@@ -379,16 +377,16 @@ func (c *Controller) updateApimanagerStatus(apimanager *apimv1alpha1.Apimanager,
 	apimanagerCopy := apimanager.DeepCopy()
 	apimanagerCopy.Status.AvailableReplicas = deployment.Status.AvailableReplicas
 	// If the CustomResourceSubresources feature gate is not enabled,
-	// we must use Update instead of UpdateStatus to update the Status block of the Foo resource.
+	// we must use Update instead of UpdateStatus to update the Status block of the Apimanager resource.
 	// UpdateStatus will not allow changes to the Spec of the resource,
 	// which is ideal for ensuring nothing other than resource status has been updated.
 	_, err := c.sampleclientset.ApimV1alpha1().Apimanagers(apimanager.Namespace).Update(apimanagerCopy)
 	return err
 }
 
-// enqueueFoo takes a Foo resource and converts it into a namespace/name
+// enqueueApimanager takes a Apimanager resource and converts it into a namespace/name
 // string which is then put onto the work queue. This method should *not* be
-// passed resources of any type other than Foo.
+// passed resources of any type other than Apimanager.
 func (c *Controller) enqueueApimanager(obj interface{}) {
 	var key string
 	var err error
@@ -400,9 +398,9 @@ func (c *Controller) enqueueApimanager(obj interface{}) {
 }
 
 // handleObject will take any resource implementing metav1.Object and attempt
-// to find the Foo resource that 'owns' it. It does this by looking at the
+// to find the Apimanager resource that 'owns' it. It does this by looking at the
 // objects metadata.ownerReferences field for an appropriate OwnerReference.
-// It then enqueues that Foo resource to be processed. If the object does not
+// It then enqueues that Apimanager resource to be processed. If the object does not
 // have an appropriate OwnerReference, it will simply be skipped.
 func (c *Controller) handleObject(obj interface{}) {
 	var object metav1.Object
@@ -422,7 +420,7 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 	klog.V(4).Infof("Processing object: %s", object.GetName())
 	if ownerRef := metav1.GetControllerOf(object); ownerRef != nil {
-		// If this object is not owned by a Foo, we should not do anything more
+		// If this object is not owned by a Apimanager, we should not do anything more
 		// with it.
 		if ownerRef.Kind != "Apimanager" {
 			return
@@ -439,9 +437,9 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 }
 
-// newDeployment creates a new Deployment for a Foo resource. It also sets
+// newDeployment creates a new Deployment for a Apimanager resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
-// the Foo resource that 'owns' it.
+// the Apimanager resource that 'owns' it.
 func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	labels := map[string]string{
 		"app":        "wso2am",
@@ -477,6 +475,8 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	}
 }
 
+// newService creates a new Service for a Apimanager resource.
+// It expose the service with Nodeport type with minikube ip as the externel ip.
 func newService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 	labels := map[string]string{
 		"app":        "wso2am",
@@ -492,7 +492,7 @@ func newService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			//Type:     "NodePort",    values are fetched from example-foo.yaml file
+			//Type:     "NodePort",    values are fetched from wso2-apim.yaml file
 			Type: apimanager.Spec.ServType,
 			//ExternalIPs: []string{"192.168.99.101"},
 			ExternalIPs: apimanager.Spec.ExternalIps,
@@ -501,21 +501,18 @@ func newService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 					Name:     "port1",
 					Protocol: corev1.ProtocolTCP,
 					Port:     9443,
-					//NodePort:   foo.Spec.NodePort,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
 				},
 				{
 					Name:     "port2",
 					Protocol: corev1.ProtocolTCP,
 					Port:     8280,
-					//NodePort:   30181,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
 				},
 				{
 					Name:     "port3",
 					Protocol: corev1.ProtocolTCP,
 					Port:     8243,
-					//NodePort:   30182,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
 				},
 			},
