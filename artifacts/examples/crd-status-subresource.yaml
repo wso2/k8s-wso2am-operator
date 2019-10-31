@@ -11,3 +11,4 @@ spec:
   scope: Namespaced
   subresources:
     status: {}
+    
