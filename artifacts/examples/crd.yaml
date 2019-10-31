@@ -9,3 +9,4 @@ spec:
     kind: Apimanager
     plural: apimanagers
   scope: Namespaced
+  
