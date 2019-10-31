@@ -1,0 +1,11 @@
+apiVersion: apim.wso2.com/v1alpha1
+kind: Apimanager
+metadata:
+  name: wso2-apim
+spec:
+  deploymentName: wso2-apim-deployment
+  serviceName: wso2-apim-service
+  replicas: 1
+  servType: NodePort
+  externalIps:
+    - 192.168.99.101
