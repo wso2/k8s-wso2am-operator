@@ -91,7 +91,7 @@ type Controller struct {
 	recorder record.EventRecorder
 }
 
-// NewController returns a new sample controller
+// NewController returns a new wso2-apim controller
 func NewController(
 	kubeclientset kubernetes.Interface,
 	sampleclientset clientset.Interface,
@@ -288,25 +288,39 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	//deploymentName := apimanager.Spec.DeploymentName
-	//if deploymentName == "" {
-	//	// We choose to absorb the error here as the worker would requeue the
-	//	// resource otherwise. Instead, the next time the resource is updated
-	//	// the resource will be queued again.
-	//	utilruntime.HandleError(fmt.Errorf("%s: deployment name must be specified", key))
-	//	return nil
-	//}
 
-	//deploymentName2 = "wso2-am-deploy-2"
+	// deploymentName := apimanager.Spec.DeploymentName
+	deploymentName := "wso2-am-deploy-1"
+	deploymentName2 := "wso2-am-deploy-2"
 
-	//serviceName := apimanager.Spec.ServiceName
-	//if serviceName == "" {
-	//	// We choose to absorb the error here as the worker would requeue the
-	//	// resource otherwise. Instead, the next time the resource is updated
-	//	// the resource will be queued again.
-	//	utilruntime.HandleError(fmt.Errorf("%s: service name must be specified", key))
-	//	return nil
-	//}
+// 	if deploymentName == "" {
+// 		// We choose to absorb the error here as the worker would requeue the
+// 		// resource otherwise. Instead, the next time the resource is updated
+// 		// the resource will be queued again.
+// 		utilruntime.HandleError(fmt.Errorf("%s: deployment name must be specified", key))
+// 		return nil
+// 	}
+
+	// serviceName := apimanager.Spec.ServiceName
+	serviceName := "wso2-am-service-1"
+	serviceName2 := "wso2-am-service-2"
+
+// 	if serviceName == "" {
+// 		// We choose to absorb the error here as the worker would requeue the
+// 		// resource otherwise. Instead, the next time the resource is updated
+// 		// the resource will be queued again.
+// 		utilruntime.HandleError(fmt.Errorf("%s: service name must be specified", key))
+// 		return nil
+// 	}
+
+
+	if serviceName2 == "" {
+		// We choose to absorb the error here as the worker would requeue the
+		// resource otherwise. Instead, the next time the resource is updated
+		// the resource will be queued again.
+		utilruntime.HandleError(fmt.Errorf("%s: service name must be specified", key))
+		return nil
+	}
 
 	// Get the deployment using hardcoded deployment name wso2-am-deploy-1
 	deploymentName :="wso2-am-deploy-1"
@@ -325,15 +339,15 @@ func (c *Controller) syncHandler(key string) error {
 	//	}
 	//}
 
-	//// Get the deployment using hardcoded deployment name wso2-am-deploy-2
-	//deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(deploymentName)
-	//// If the resource doesn't exist, we'll create it
-	//if errors.IsNotFound(err) {
-	//	deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(newDeployment2(apimanager))
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
+	// Get the deployment using hardcoded deployment name wso2-am-deploy-2
+	deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(deploymentName2)
+	// If the resource doesn't exist, we'll create it
+	if errors.IsNotFound(err) {
+		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(newDeployment2(apimanager))
+		if err != nil {
+			return err
+		}
+	}
 
 	// Get the service with the name hardcoded
 	serviceName := "wso2-apim-service"
@@ -341,6 +355,13 @@ func (c *Controller) syncHandler(key string) error {
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(newService(apimanager))
+	}
+
+	// Get the service with the name specified in wso2-apim spec
+	service2, err := c.servicesLister.Services(apimanager.Namespace).Get(serviceName2)
+	// If the resource doesn't exist, we'll create it
+	if errors.IsNotFound(err) {
+		service2, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(newService2(apimanager))
 	}
 
 	// If an error occurs during Get/Create, we'll requeue the item so we can
@@ -358,18 +379,27 @@ func (c *Controller) syncHandler(key string) error {
 		return fmt.Errorf(msg)
 	}
 
-	////for instance 2
-	//// If the Deployment2 is not controlled by this Apimanager resource, we should log
-	//// a warning to the event recorder and ret
-	//if !metav1.IsControlledBy(deployment2, apimanager) {
-	//	msg := fmt.Sprintf("Deployment2 %q already exists and is not managed by Apimanager", deployment2.Name)
-	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
-	//	return fmt.Errorf(msg)
-	//}
+	//for instance 2
+	// If the Deployment2 is not controlled by this Apimanager resource, we should log
+	// a warning to the event recorder and ret
+	if !metav1.IsControlledBy(deployment2, apimanager) {
+		msg := fmt.Sprintf("Deployment2 %q already exists and is not managed by Apimanager", deployment2.Name)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		return fmt.Errorf(msg)
+	}
 
 	// If the Service is not controlled by this Apimanager resource, we should log
 	// a warning to the event recorder and ret
 	if !metav1.IsControlledBy(service, apimanager) {
+		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", service.Name)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		return fmt.Errorf(msg)
+	}
+
+	//for instance 2
+	// If the Service is not controlled by this Apimanager resource, we should log
+	// a warning to the event recorder and ret
+	if !metav1.IsControlledBy(service2, apimanager) {
 		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", service.Name)
 		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
 		return fmt.Errorf(msg)
@@ -383,14 +413,14 @@ func (c *Controller) syncHandler(key string) error {
 		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(newDeployment(apimanager))
 	}
 
-	////for instance 2 also
-	//// If this number of the replicas on the Apimanager resource is specified, and the
-	//// number does not equal the current desired replicas on the Deployment2, we
-	//// should update the Deployment2 resource.
-	//if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
-	//	klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
-	//	deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(newDeployment2(apimanager))
-	//}
+	//for instance 2 also
+	// If this number of the replicas on the Apimanager resource is specified, and the
+	// number does not equal the current desired replicas on the Deployment2, we
+	// should update the Deployment2 resource.
+	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
+		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
+		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(newDeployment2(apimanager))
+	}
 
 	// If an error occurs during Update, we'll requeue the item so we can
 	// attempt processing again later. THis could have been caused by a
@@ -406,13 +436,13 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	////for instance 2 also
-	//// Finally, we update the status block of the Apimanager resource to reflect the
-	//// current state of the world
-	//err = c.updateApimanagerStatus(apimanager, deployment2)
-	//if err != nil {
-	//	return err
-	//}
+	//for instance 2 also
+	// Finally, we update the status block of the Apimanager resource to reflect the
+	// current state of the world
+	err = c.updateApimanagerStatus(apimanager, deployment2)
+	if err != nil {
+		return err
+	}
 
 	c.recorder.Event(apimanager, corev1.EventTypeNormal, SuccessSynced, MessageResourceSynced)
 	return nil
@@ -489,6 +519,7 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 }
 
+// this is for the API-M instance 1
 // newDeployment creates a new Deployment for a Apimanager resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it.
@@ -501,7 +532,9 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	}
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
+
 			//Name:      apimanager.Spec.DeploymentName,
+
 			Name:      "wso2-am-deploy-1",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
@@ -529,11 +562,22 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 							Name:  "wso2am1",
 							Image: "wso2/wso2am:3.0.0",
 							VolumeMounts: []corev1.VolumeMount{
+
+								// {
+								// 	Name:      "wso2am-configmap-instance1",
+								// 	MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
+								// 	SubPath:   "deployment.toml
+                
+                
+                
+								// },
+
 								{
 									Name:      "wso2am-configmap-instance1",
 									MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 									SubPath:   "deployment.toml",
 								},
+
 								{
 									Name: "pvclaimvol",
 									//MountPath:"/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
@@ -593,6 +637,23 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 									},
 								},
 							},
+
+							Env: []corev1.EnvVar{
+								// {
+								// 	Name:  "HOST_NAME",
+								// 	Value: "foo-am",
+								// },
+								{
+									Name: "NODE_IP",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											FieldPath: "status.podIP",
+										},
+									},
+								},
+							},
+
+
 						},
 					},
 					HostAliases: []corev1.HostAlias{
@@ -607,16 +668,17 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 					InitContainers:
 
 					Volumes: []corev1.Volume{
-						{
-							Name: "wso2am-configmap-instance1",
-							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: "newinstance1",
-									},
-								},
-							},
-						},
+
+						// {
+						// 	Name: "wso2am-configmap-instance1",
+						// 	VolumeSource: corev1.VolumeSource{
+						// 		ConfigMap: &corev1.ConfigMapVolumeSource{
+						// 			LocalObjectReference: corev1.LocalObjectReference{
+						// 				Name: "wso2am-configmap-instance1",
+						// 			},
+						// 		},
+						// 	},
+						// },
 						{
 							Name: "pvclaimvol",
 							VolumeSource: corev1.VolumeSource{
@@ -632,7 +694,133 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	}
 }
 
+// this is for the API-M instance 2
+// newDeployment2 creates a new Deployment for a Apimanager resource. It also sets
+// the appropriate OwnerReferences on the resource so handleObject can discover
+// the Apimanager resource that 'owns' it.
+func newDeployment2(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
+	labels := map[string]string{
+		"app":        "wso2am2",
+		"
+    
+    oller": apimanager.Name,
+	}
+	return &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			// Name:      apimanager.Spec.DeploymentName,
+			Name:      "wso2-am-deploy-2",
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: apimanager.Spec.Replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: labels,
+			},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: labels,
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "wso2am2",
+							Image: "wso2/wso2am:3.0.0",
+							VolumeMounts: []corev1.VolumeMount{
+								// {
+								// 	Name:      "wso2am-configmap-instance2",
+								// 	MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
+								// 	SubPath:   "deployment.toml",
+								// },
+								{
+									Name: "pvclaimvol",
+									//MountPath:"/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
+									//ReadOnly:true,
+									MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/synapse-configs",
+								},
+							},
+							Ports: []corev1.ContainerPort{
+								{
+									ContainerPort: 8280,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 8243,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 9443,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 9763,
+									Protocol:      "TCP",
+								},
+// 								{
+// 									ContainerPort: 5672,
+// 									Protocol:      "TCP",
+// 								},
+// 								{
+// 									ContainerPort: 9711,
+// 									Protocol:      "TCP",
+// 								},
+// 								{
+// 									ContainerPort: 9611,
+// 									Protocol:      "TCP",
+// 								},
+// 								{
+// 									ContainerPort: 7711,
+// 									Protocol:      "TCP",
+// 								},
+// 								{
+// 									ContainerPort: 7611,
+// 									Protocol:      "TCP",
+// 								},
+							},
+						},
+					},
 
+					Volumes: []corev1.Volume{
+						// {
+						// 	Name: "wso2am-configmap-instance2",
+						// 	VolumeSource: corev1.VolumeSource{
+						// 		ConfigMap: &corev1.ConfigMapVolumeSource{
+						// 			LocalObjectReference: corev1.LocalObjectReference{
+						// 				Name: "wso2am-configmap-instance2",
+						// 			},
+						// 		},
+						// 	},
+						// },
+
+						{
+							Name: "wso2am-configmap-instance1",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "newinstance1",
+									},
+								},
+							},
+						},
+
+						{
+							Name: "pvclaimvol",
+							VolumeSource: corev1.VolumeSource{
+								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+									ClaimName: "wso2pvclaim2",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+// this is for API Manager instance-1
 // newService creates a new Service for a Apimanager resource.
 // It expose the service with Nodeport type with minikube ip as the externel ip.
 func newService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
@@ -689,4 +877,62 @@ func newService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 			},
 		},
 	}
+
+
+// newService creates a new Service for a Apimanager resource.
+// It expose the service with Nodeport type with minikube ip as the externel ip.
+func newService2(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
+	labels := map[string]string{
+		"app":        "wso2am2",
+		"controller": apimanager.Name,
+	}
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			// Name:      apimanager.Spec.ServiceName,
+			Name:      "wso2-am-service-2",
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: labels,
+			Type:     "NodePort",
+			// values are fetched from wso2-apim.yaml file
+			// Type: apimanager.Spec.ServType,
+			ExternalIPs: []string{"192.168.99.100"},
+			// ExternalIPs: apimanager.Spec.ExternalIps,
+			Ports: []corev1.ServicePort{
+				{
+					Name:       "servlet-https",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       9443,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+					NodePort:   32005,
+				},
+				{
+					Name:       "pass-through-http",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       8280,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
+					NodePort:   32006,
+				},
+				{
+					Name:       "pass-through-https",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       8243,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+					NodePort:   32007,
+				},
+				{
+					Name:       "servlet-http",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       9763,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
+					NodePort:   32008,
+				},
+			},
+		},
+	}
 }
+
