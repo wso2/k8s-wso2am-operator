@@ -41,6 +41,15 @@ var (
 	kubeconfig string
 )
 
+
+
+//Set up the signal handlers (So a ctrl+c or SIG{X} will be handled by the controller)
+//Parse the command line flags
+//Build up two client sets, and start two informers that watch for the signal handler
+//Build the controller configuration
+//Start the newly configured controller, and again pass the signal handler
+
+
 func main() {
 	klog.InitFlags(nil)
 	flag.Parse()
