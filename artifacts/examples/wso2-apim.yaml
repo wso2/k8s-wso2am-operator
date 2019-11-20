@@ -1,12 +1,9 @@
 apiVersion: apim.wso2.com/v1alpha1
 kind: Apimanager
 metadata:
-  name: wso2-apim
+  name: wso2-apim-cluster-1
 spec:
-  deploymentName: wso2-apim-deployment
-  serviceName: wso2-apim-service
+  pattern: Pattern-1
   replicas: 1
-  servType: NodePort
-  externalIps:
-    - 192.168.99.101
+
     
