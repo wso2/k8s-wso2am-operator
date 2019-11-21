@@ -835,6 +835,7 @@ func newService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 			},
 		},
 	}
+}
 
 // this is for API Manager instance-2
 // newService creates a new Service for a Apimanager resource.
