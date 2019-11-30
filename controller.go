@@ -20,8 +20,8 @@ package main
 
 import (
 	"fmt"
+	//"k8s.io/apimachinery/pkg/api/resource"
 	"time"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -32,7 +32,6 @@ import (
 	apps2informers "k8s.io/client-go/informers/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
-
 	"k8s.io/apimachinery/pkg/util/intstr"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	appslisters "k8s.io/client-go/listers/apps/v1"
@@ -40,9 +39,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
-
 	app2listers "k8s.io/client-go/listers/core/v1"
-
 	apimv1alpha1 "github.com/keshiha96/wso2am-k8s-controller/pkg/apis/apim/v1alpha1"
 	clientset "github.com/keshiha96/wso2am-k8s-controller/pkg/generated/clientset/versioned"
 	samplescheme "github.com/keshiha96/wso2am-k8s-controller/pkg/generated/clientset/versioned/scheme"
@@ -64,6 +61,7 @@ const (
 	// MessageResourceSynced is the message used for an Event fired when a Apimanager
 	// is synced successfully
 	MessageResourceSynced = "Apimanager synced successfully"
+
 )
 
 // Controller is the controller implementation for Apimanager resources
@@ -287,78 +285,109 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	// deploymentName := apimanager.Spec.DeploymentName
-	deploymentName := "wso2-am-deploy-1"
-	deploymentName2 := "wso2-am-deploy-2"
+	//////////////////////////////////////////////////////////////
 
-	//if deploymentName == "" {
-	//	// We choose to absorb the error here as the worker would requeue the
-	//	// resource otherwise. Instead, the next time the resource is updated
-	//	// the resource will be queued again.
-	//	utilruntime.HandleError(fmt.Errorf("%s: deployment name must be specified", key))
-	//	return nil
+
+	apim1deploymentName := "apim-1-deploy"
+	apim2deploymentName := "apim-2-deploy"
+	apim1serviceName := "apim-1-svc"
+	apim2serviceName := "apim-2-svc"
+	mysqldeploymentName :="mysql-deploy"
+	mysqlserviceName := "wso2am-mysql-db-service"
+	//dashboardDeploymentName := "analytics-dash-deploy"
+	//dashboardServiceName := "analytics-dash-svc"
+	//workerDeploymentName := "analytics-worker-deploy"
+	//workerServiceName := "analytics-worker-svc"
+
+
+
+	/////////check whether resourecs already exits, else create one
+
+	// Get the deployment using hardcoded deployment name wso2-apim-1-deploy
+	deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
+	// If the resource doesn't exist, we'll create it
+	if errors.IsNotFound(err) {
+		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(apim1Deployment(apimanager))
+		if err != nil {
+			return err
+		}
+	}
+
+	// Get the deployment using hardcoded deployment name wso2-apim-1-deploy2
+	deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
+	// If the resource doesn't exist, we'll create it
+	if errors.IsNotFound(err) {
+		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(apim2Deployment(apimanager))
+		if err != nil {
+			return err
+		}
+	}
+
+	//// Get the dashboard deployment using hardcoded deployment name wso2-apim-1-deploy
+	//dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
+	//// If the resource doesn't exist, we'll create it
+	//if errors.IsNotFound(err) {
+	//	dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(dashboardDeployment(apimanager))
+	//	if err != nil {
+	//		return err
+	//	}
 	//}
 	//
-	//if deploymentName2 == "" {
-	//	// We choose to absorb the error here as the worker would requeue the
-	//	// resource otherwise. Instead, the next time the resource is updated
-	//	// the resource will be queued again.
-	//	utilruntime.HandleError(fmt.Errorf("%s: deployment name must be specified", key))
-	//	return nil
+	//// Get the dashboard deployment using hardcoded deployment name wso2-apim-1-deploy
+	//workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+	//// If the resource doesn't exist, we'll create it
+	//if errors.IsNotFound(err) {
+	//	workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(workerDeployment(apimanager))
+	//	if err != nil {
+	//		return err
+	//	}
 	//}
 
-	// serviceName := apimanager.Spec.ServiceName
-	serviceName := "wso2-am-service-1"
-	serviceName2 := "wso2-am-service-2"
-
-	//if serviceName == "" {
-	//	// We choose to absorb the error here as the worker would requeue the
-	//	// resource otherwise. Instead, the next time the resource is updated
-	//	// the resource will be queued again.
-	//	utilruntime.HandleError(fmt.Errorf("%s: service name must be specified", key))
-	//	return nil
-	//}
-
-	//if serviceName2 == "" {
-	//	// We choose to absorb the error here as the worker would requeue the
-	//	// resource otherwise. Instead, the next time the resource is updated
-	//	// the resource will be queued again.
-	//	utilruntime.HandleError(fmt.Errorf("%s: service name must be specified", key))
-	//	return nil
-	//}
-
-	// Get the deployment using hardcoded deployment name wso2-am-deploy-1
-	deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(deploymentName)
+	// Get the deployment using hardcoded deployment name mysqldeployment
+	mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(newDeployment(apimanager))
+		mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysqlDeployment(apimanager))
 		if err != nil {
 			return err
 		}
 	}
 
-	// Get the deployment using hardcoded deployment name wso2-am-deploy-2
-	deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(deploymentName2)
+
+
+	// Get the service with the name specified in wso2-apim spec
+	service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(newDeployment2(apimanager))
-		if err != nil {
-			return err
-		}
+		service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(apim1Service(apimanager))
 	}
 
 	// Get the service with the name specified in wso2-apim spec
-	service, err := c.servicesLister.Services(apimanager.Namespace).Get(serviceName)
+	service2, err := c.servicesLister.Services(apimanager.Namespace).Get(apim2serviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(newService(apimanager))
+		service2, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(apim2Service(apimanager))
 	}
 
+	//// Get the service with the name specified in wso2-apim spec
+	//dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
+	//// If the resource doesn't exist, we'll create it
+	//if errors.IsNotFound(err) {
+	//	dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(dashboardService(apimanager))
+	//}
+	//
+	//// Get the service with the name specified in wso2-apim spec
+	//workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
+	//// If the resource doesn't exist, we'll create it
+	//if errors.IsNotFound(err) {
+	//	workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(workerService(apimanager))
+	//}
+
 	// Get the service with the name specified in wso2-apim spec
-	service2, err := c.servicesLister.Services(apimanager.Namespace).Get(serviceName2)
+	mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		service2, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(newService2(apimanager))
+		mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysqlService(apimanager))
 	}
 
 	// If an error occurs during Get/Create, we'll requeue the item so we can
@@ -367,6 +396,8 @@ func (c *Controller) syncHandler(key string) error {
 	if err != nil {
 		return err
 	}
+
+	/////////////check whether resources are controlled by apimanager with same owner reference
 
 	// If the Deployment is not controlled by this Apimanager resource, we should log
 	// a warning to the event recorder and ret
@@ -385,7 +416,34 @@ func (c *Controller) syncHandler(key string) error {
 		return fmt.Errorf(msg)
 	}
 
-	// If the Service is not controlled by this Apimanager resource, we should log
+	////for analytics dashboard
+	//// If the Deployment2 is not controlled by this Apimanager resource, we should log
+	//// a warning to the event recorder and ret
+	//if !metav1.IsControlledBy(dashdeployment, apimanager) {
+	//	msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", dashdeployment.Name)
+	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+	//	return fmt.Errorf(msg)
+	//}
+	//
+	////for analytics worker
+	//// If the Deployment2 is not controlled by this Apimanager resource, we should log
+	//// a warning to the event recorder and ret
+	//if !metav1.IsControlledBy(workerdeployment, apimanager) {
+	//	msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", workerdeployment.Name)
+	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+	//	return fmt.Errorf(msg)
+	//}
+
+	//for mysql deployment
+	// If the mysql Deployment is not controlled by this Apimanager resource, we should log
+	// a warning to the event recorder and ret
+	if !metav1.IsControlledBy(mysqldeployment, apimanager) {
+		msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		return fmt.Errorf(msg)
+	}
+
+	// If the instance 1 Service is not controlled by this Apimanager resource, we should log
 	// a warning to the event recorder and ret
 	if !metav1.IsControlledBy(service, apimanager) {
 		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", service.Name)
@@ -393,21 +451,50 @@ func (c *Controller) syncHandler(key string) error {
 		return fmt.Errorf(msg)
 	}
 
-	//for instance 2
+	//for instance 2 service
 	// If the Service is not controlled by this Apimanager resource, we should log
 	// a warning to the event recorder and ret
 	if !metav1.IsControlledBy(service2, apimanager) {
-		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", service.Name)
+		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", service2.Name)
 		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
 		return fmt.Errorf(msg)
 	}
+
+	////for analytics dashboard service
+	//// If the Service is not controlled by this Apimanager resource, we should log
+	//// a warning to the event recorder and ret
+	//if !metav1.IsControlledBy(dashservice, apimanager) {
+	//	msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", dashservice.Name)
+	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+	//	return fmt.Errorf(msg)
+	//}
+	//
+	////for analytics dashboard service
+	//// If the Service is not controlled by this Apimanager resource, we should log
+	//// a warning to the event recorder and ret
+	//if !metav1.IsControlledBy(workerservice, apimanager) {
+	//	msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", workerservice.Name)
+	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+	//	return fmt.Errorf(msg)
+	//}
+
+	//for mysql service
+	// If the Service is not controlled by this Apimanager resource, we should log
+	// a warning to the event recorder and ret
+	if !metav1.IsControlledBy(mysqlservice, apimanager) {
+		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", mysqlservice.Name)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		return fmt.Errorf(msg)
+	}
+
+	///////////check replicas are same as defined for deployments
 
 	// If this number of the replicas on the Apimanager resource is specified, and the
 	// number does not equal the current desired replicas on the Deployment, we
 	// should update the Deployment resource.
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(newDeployment(apimanager))
+		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim1Deployment(apimanager))
 	}
 
 	//for instance 2 also
@@ -416,7 +503,34 @@ func (c *Controller) syncHandler(key string) error {
 	// should update the Deployment2 resource.
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
-		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(newDeployment2(apimanager))
+		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim2Deployment(apimanager))
+	}
+
+	////for analytics dashboard deployment
+	//// If this number of the replicas on the Apimanager resource is specified, and the
+	//// number does not equal the current desired replicas on the Deployment2, we
+	//// should update the Deployment2 resource.
+	//if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
+	//	klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
+	//	dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(dashboardDeployment(apimanager))
+	//}
+	//
+	////for analytics worker deployment
+	//// If this number of the replicas on the Apimanager resource is specified, and the
+	//// number does not equal the current desired replicas on the Deployment2, we
+	//// should update the Deployment2 resource.
+	//if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
+	//	klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
+	//	dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(workerDeployment(apimanager))
+	//}
+
+	//for instance mysql deployment
+	// If this number of the replicas on the Apimanager resource is specified, and the
+	// number does not equal the current desired replicas on the mysql deployment, we
+	// should update the mysql Deployment resource.
+	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
+		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
+		mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysqlDeployment(apimanager))
 	}
 
 	// If an error occurs during Update, we'll requeue the item so we can
@@ -425,6 +539,9 @@ func (c *Controller) syncHandler(key string) error {
 	if err != nil {
 		return err
 	}
+
+
+	//////////finally update the deployment resources after done checking
 
 	// Finally, we update the status block of the Apimanager resource to reflect the
 	// current state of the world
@@ -437,6 +554,30 @@ func (c *Controller) syncHandler(key string) error {
 	// Finally, we update the status block of the Apimanager resource to reflect the
 	// current state of the world
 	err = c.updateApimanagerStatus(apimanager, deployment2)
+	if err != nil {
+		return err
+	}
+
+	////for analytics dashboard deployment
+	//// Finally, we update the status block of the Apimanager resource to reflect the
+	//// current state of the world
+	//err = c.updateApimanagerStatus(apimanager, dashdeployment)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	////for analytics worker deployment
+	//// Finally, we update the status block of the Apimanager resource to reflect the
+	//// current state of the world
+	//err = c.updateApimanagerStatus(apimanager, workerdeployment)
+	//if err != nil {
+	//	return err
+	//}
+
+	//for mysql deployment
+	// Finally, we update the status block of the Apimanager resource to reflect the
+	// current state of the world
+	err = c.updateApimanagerStatus(apimanager, mysqldeployment)
 	if err != nil {
 		return err
 	}
@@ -513,18 +654,24 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 }
 
-// newDeployment creates a new Deployment for a Apimanager resource. It also sets
+// apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it.
-func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
+func apim1Deployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
+	//apim1cpu, _ :=resource.ParseQuantity("2000m")
+	//apim1mem, _ := resource.ParseQuantity("2Gi")
+	//apim1cpu2, _ :=resource.ParseQuantity("3000m")
+	//apim1mem2, _ := resource.ParseQuantity("3Gi")
 	labels := map[string]string{
-		"app":        "wso2am",
-		"controller": apimanager.Name,
+		"deployment": "wso2am-pattern-1-am",
+		"node": "wso2am-pattern-1-am-1",
 	}
+
+	//defaultmode := int32(0407)
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			// Name: apimanager.Spec.DeploymentName,
-			Name:      "wso2-am-deploy-1",
+			Name:      "apim-1-deploy",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -532,20 +679,20 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: apimanager.Spec.Replicas,
-			//MinReadySeconds:240,
-			//Strategy: appsv1.DeploymentStrategy{
-			//	Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
-			//	RollingUpdate: &appsv1.RollingUpdateDeployment{
-			//		MaxSurge: &intstr.IntOrString{
-			//			Type:   intstr.Int,
-			//			IntVal: 1,
-			//		},
-			//		MaxUnavailable: &intstr.IntOrString{
-			//			Type:   intstr.Int,
-			//			IntVal: 0,
-			//		},
-			//	},
-			//},
+			MinReadySeconds:240,
+			Strategy: appsv1.DeploymentStrategy{
+				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
+				RollingUpdate: &appsv1.RollingUpdateDeployment{
+					MaxSurge: &intstr.IntOrString{
+						Type:   intstr.Int,
+						IntVal: 1,
+					},
+					MaxUnavailable: &intstr.IntOrString{
+						Type:   intstr.Int,
+						IntVal: 0,
+					},
+				},
+			},
 
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
@@ -555,6 +702,15 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
+					HostAliases: []corev1.HostAlias{
+						{
+							IP: "127.0.0.1",
+							Hostnames: []string{
+								"wso2-am",
+								"wso2-gateway",
+							},
+						},
+					},
 					//InitContainers: []corev1.Container{
 					//	{
 					//		Name: "init-apim-analytics-db",
@@ -578,51 +734,62 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 					//},
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2am1",
+							Name:  "wso2-pattern-1-am",
 							Image: "wso2/wso2am:3.0.0",
-							//LivenessProbe: &corev1.Probe{
-							//	Handler: corev1.Handler{
-							//		TCPSocket: &corev1.TCPSocketAction{
-							//			Port: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-							//		},
-							//	},
-							//	//Exec
-							//	InitialDelaySeconds: 240,
-							//	PeriodSeconds:       10,
-							//
-							//
-							//},
-							//ReadinessProbe: &corev1.Probe{
-							//	Handler: corev1.Handler{
-							//		TCPSocket: &corev1.TCPSocketAction{
-							//			Port: intstr.IntOrString{
-							//				Type:   intstr.Int,
-							//				IntVal: 9443,
-							//			},
-							//		},
-							//	},
-							//	//Exec
-							//	InitialDelaySeconds: 240,
-							//	PeriodSeconds:       10,
-							//
-							//},
-
-							//Lifecycle:
-							//Resources:
-							ImagePullPolicy: "Always",
-							VolumeMounts: []corev1.VolumeMount{
-								{
-									Name:      "wso2am-configmap-instance1",
-									MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
-									SubPath:   "deployment.toml",
+							LivenessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec:&corev1.ExecAction{
+										Command:[]string{
+											"/bin/sh",
+											"-c",
+											"nc -z localhost 9443",
+										},
+									},
 								},
-								{
-									Name: "pvclaimvol",
-									//MountPath:"/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
-									//ReadOnly:true,
-									MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/synapse-configs",
+								InitialDelaySeconds: 240,
+								PeriodSeconds:       10,
+							},
+							ReadinessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec:&corev1.ExecAction{
+										Command:[]string{
+											"/bin/sh",
+											"-c",
+											"nc -z localhost 9443",
+										},
+									},
+								},
+
+								InitialDelaySeconds: 240,
+								PeriodSeconds:       10,
+
+							},
+
+							Lifecycle: &corev1.Lifecycle{
+								PreStop:&corev1.Handler{
+									Exec:&corev1.ExecAction{
+										Command:[]string{
+											"sh",
+											"-c",
+											"${WSO2_SERVER_HOME}/bin/worker.sh stop",
+										},
+									},
 								},
 							},
+
+							//Resources:corev1.ResourceRequirements{
+							//	Requests:corev1.ResourceList{
+							//		corev1.ResourceCPU:apim1cpu,
+							//		corev1.ResourceMemory:apim1mem,
+							//	},
+							//	Limits:corev1.ResourceList{
+							//		corev1.ResourceCPU:apim1cpu2,
+							//		corev1.ResourceMemory:apim1mem2,
+							//	},
+							//},
+
+							ImagePullPolicy: "Always",
+
 							Ports: []corev1.ContainerPort{
 								{
 									ContainerPort: 8280,
@@ -633,13 +800,14 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 									Protocol:      "TCP",
 								},
 								{
-									ContainerPort: 9443,
-									Protocol:      "TCP",
-								},
-								{
 									ContainerPort: 9763,
 									Protocol:      "TCP",
 								},
+								{
+									ContainerPort: 9443,
+									Protocol:      "TCP",
+								},
+
 
 							},
 							Env: []corev1.EnvVar{
@@ -656,37 +824,85 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 									},
 								},
 							},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
+									MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs",
+								},
+								{
+									Name: "wso2am-pattern-1-am-volume-claim-executionplans",
+									MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
+								},
+								{
+									Name: "wso2am-pattern-1-am-1-conf",
+									MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
+									SubPath:"deployment.toml",
+								},
+								{
+									Name: "mysql-jdbc-driver",
+									MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/components/lib",
+								},
+								//{
+								//	Name: "wso2am-pattern-1-am-conf-entrypoint",
+								//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
+								//	SubPath:"docker-entrypoint.sh",
+								//},
+							},
 						},
 					},
-					//ServiceAccountName: "wso2am-pattern-1-svc-account",
-					////ImagePullSecrets:
-					////	Name: "wso2am-pattern-1-creds",
-					//HostAliases: []corev1.HostAlias{
-					//	{
-					//		IP: "127.0.0.1",
-					//		Hostnames: []string{
-					//			"wso2-am",
-					//			"wso2-gateway",
-					//		},
-					//	},
-					//},
+
+					ServiceAccountName: "wso2am-pattern-1-svc-account",
+					ImagePullSecrets:[]corev1.LocalObjectReference{
+						{
+							Name:"wso2am-pattern-1-creds",
+						},
+					},
 
 					Volumes: []corev1.Volume{
 						{
-							Name: "wso2am-configmap-instance1",
+							Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
 							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-				 					LocalObjectReference: corev1.LocalObjectReference{
-										Name: "newinstance1",
-									},
+								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+									ClaimName:"pvc-synapse-configs",
 								},
 							},
 						},
 						{
-							Name: "pvclaimvol",
+							Name: "wso2am-pattern-1-am-volume-claim-executionplans",
 							VolumeSource: corev1.VolumeSource{
 								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName: "wso2pvclaim2",
+									ClaimName: "pvc-execution-plans",
+								},
+							},
+						},
+						{
+							Name: "wso2am-pattern-1-am-1-conf",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "wso2am-pattern-1-am-1-conf",
+									},
+								},
+							},
+						},
+						//{
+						//	Name: "wso2am-pattern-1-am-conf-entrypoint",
+						//	VolumeSource: corev1.VolumeSource{
+						//		ConfigMap: &corev1.ConfigMapVolumeSource{
+						//			LocalObjectReference: corev1.LocalObjectReference{
+						//				Name: "wso2am-pattern-1-am-conf-entrypoint",
+						//			},
+						//			DefaultMode:&defaultmode,
+						//		},
+						//	},
+						//},
+						{
+							Name: "mysql-jdbc-driver",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "mysql-jdbc-driver-cm",
+									},
 								},
 							},
 						},
@@ -697,19 +913,333 @@ func newDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	}
 }
 
-// this is for the API-M instance 2
-// newDeployment2 creates a new Deployment for a Apimanager resource. It also sets
+
+// newService creates a new Service for a Apimanager resource.
+// It expose the service with Nodeport type with minikube ip as the externel ip.
+func apim1Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
+	labels := map[string]string{
+		"deployment": "wso2am-pattern-1-am",
+		"node": "wso2am-pattern-1-am-1",
+	}
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			// Name: apimanager.Spec.ServiceName,
+			Name:      "apim-1-svc",
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: labels,
+			Type:     "NodePort",
+			// values are fetched from wso2-apim.yaml file
+			// Type: apimanager.Spec.ServType,
+			ExternalIPs: []string{"192.168.99.101"},
+			// ExternalIPs: apimanager.Spec.ExternalIps,
+			Ports: []corev1.ServicePort{
+				{
+					Name:       "binary",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       9611,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
+					NodePort:   32002,
+				},
+				{
+					Name:       "binary-secure",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       9711,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
+					NodePort:   32003,
+				},
+				{
+					Name:       "jms-tcp",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       5672,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
+					NodePort:   32004,
+				},
+				{
+					Name:       "servlet-https",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       9443,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+					NodePort:   32001,
+				},
+			},
+		},
+	}
+}
+
+
+// apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it.
-func newDeployment2(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
+func apim2Deployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
+	////apim2cpu, _ :=resource.ParseQuantity("2000m")
+	////apim2mem, _ := resource.ParseQuantity("2Gi")
+	////apim2cpu2, _ :=resource.ParseQuantity("3000m")
+	////apim2mem2, _ := resource.ParseQuantity("3Gi")
+	//
+	//labels := map[string]string{
+	//	//"app":        "wso2am",
+	//	//"controller": apimanager.Name,
+	//	"deployment": "wso2am-pattern-1-am",
+	//	"node": "wso2am-pattern-1-am-2",
+	//}
+	//return &appsv1.Deployment{
+	//	ObjectMeta: metav1.ObjectMeta{
+	//		// Name: apimanager.Spec.DeploymentName,
+	//		Name:      "apim-2-deploy",
+	//		Namespace: apimanager.Namespace,
+	//		OwnerReferences: []metav1.OwnerReference{
+	//			*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+	//		},
+	//	},
+	//	Spec: appsv1.DeploymentSpec{
+	//		Replicas: apimanager.Spec.Replicas,
+	//		MinReadySeconds:240,
+	//		Strategy: appsv1.DeploymentStrategy{
+	//			Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
+	//			RollingUpdate: &appsv1.RollingUpdateDeployment{
+	//				MaxSurge: &intstr.IntOrString{
+	//					Type:   intstr.Int,
+	//					IntVal: 1,
+	//				},
+	//				MaxUnavailable: &intstr.IntOrString{
+	//					Type:   intstr.Int,
+	//					IntVal: 0,
+	//				},
+	//			},
+	//		},
+	//
+	//		Selector: &metav1.LabelSelector{
+	//			MatchLabels: labels,
+	//		},
+	//		Template: corev1.PodTemplateSpec{
+	//			ObjectMeta: metav1.ObjectMeta{
+	//				Labels: labels,
+	//			},
+	//			Spec: corev1.PodSpec{
+	//				HostAliases: []corev1.HostAlias{
+	//					{
+	//						IP: "127.0.0.1",
+	//						Hostnames: []string{
+	//							"wso2-am",
+	//							"wso2-gateway",
+	//						},
+	//					},
+	//				},
+	//				//InitContainers: []corev1.Container{
+	//				//	{
+	//				//		Name: "init-apim-analytics-db",
+	//				//		Image: "busybox:1.31",
+	//				//		Command: []string {
+	//				//			//"sh", "-c", "echo -e \"Checking for the availability of MySQL Server deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-mysql-db-service \"3306; do sleep 1; printf \"-\" ;done; echo -e \" >> MySQL Server has started \"; ",
+	//				//			"sh",
+	//				//			"-c",
+	//				//			"echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"wso2am-mysql-db-service\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";",
+	//				//		},
+	//				//
+	//				//	},
+	//				//	{
+	//				//		Name: "init-am-analytics-worker",
+	//				//		Image: "busybox:1.31",
+	//				//		Command: []string {
+	//				//			"sh", "-c", "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-pattern-1-analytics-worker-service 7712; do sleep 1; printf \"-\" ;done; echo -e \" >> WSO2 API Manager Analytics Worker has started \"; ",
+	//				//		},
+	//				//
+	//				//	},
+	//				//},
+	//				Containers: []corev1.Container{
+	//					{
+	//						Name:  "wso2-pattern-1-am",
+	//						Image: "wso2/wso2am:3.0.0",
+	//						LivenessProbe: &corev1.Probe{
+	//							Handler: corev1.Handler{
+	//								Exec:&corev1.ExecAction{
+	//									Command:[]string{
+	//										"/bin/sh",
+	//										"-c",
+	//										"nc -z localhost 9443",
+	//									},
+	//								},
+	//							},
+	//							InitialDelaySeconds: 240,
+	//							PeriodSeconds:       10,
+	//						},
+	//						ReadinessProbe: &corev1.Probe{
+	//							Handler: corev1.Handler{
+	//								Exec:&corev1.ExecAction{
+	//									Command:[]string{
+	//										"/bin/sh",
+	//										"-c",
+	//										"nc -z localhost 9443",
+	//									},
+	//								},
+	//							},
+	//
+	//							InitialDelaySeconds: 240,
+	//							PeriodSeconds:       10,
+	//
+	//						},
+	//
+	//						Lifecycle: &corev1.Lifecycle{
+	//							PreStop:&corev1.Handler{
+	//								Exec:&corev1.ExecAction{
+	//									Command:[]string{
+	//										"sh",
+	//										"-c",
+	//										"${WSO2_SERVER_HOME}/bin/wso2server.sh stop",
+	//									},
+	//								},
+	//							},
+	//						},
+	//
+	//						//Resources:corev1.ResourceRequirements{
+	//						//	Requests:corev1.ResourceList{
+	//						//		corev1.ResourceCPU:apim2cpu,
+	//						//		corev1.ResourceMemory:apim2mem,
+	//						//	},
+	//						//	Limits:corev1.ResourceList{
+	//						//		corev1.ResourceCPU:apim2cpu2,
+	//						//		corev1.ResourceMemory:apim2mem2,
+	//						//	},
+	//						//},
+	//
+	//						ImagePullPolicy: "Always",
+	//
+	//						Ports: []corev1.ContainerPort{
+	//							{
+	//								ContainerPort: 8280,
+	//								Protocol:      "TCP",
+	//							},
+	//							{
+	//								ContainerPort: 8243,
+	//								Protocol:      "TCP",
+	//							},
+	//							{
+	//								ContainerPort: 9763,
+	//								Protocol:      "TCP",
+	//							},
+	//							{
+	//								ContainerPort: 9443,
+	//								Protocol:      "TCP",
+	//							},
+	//
+	//
+	//						},
+	//						Env: []corev1.EnvVar{
+	//							// {
+	//							// 	Name:  "HOST_NAME",
+	//							// 	Value: "foo-am",
+	//							// },
+	//							{
+	//								Name: "NODE_IP",
+	//								ValueFrom: &corev1.EnvVarSource{
+	//									FieldRef: &corev1.ObjectFieldSelector{
+	//										FieldPath: "status.podIP",
+	//									},
+	//								},
+	//							},
+	//						},
+	//						VolumeMounts: []corev1.VolumeMount{
+	//							//{
+	//							//	Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
+	//							//	MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/synapse-configs",
+	//							//},
+	//							//{
+	//							//	Name: "wso2am-pattern-1-am-volume-claim-executionplans",
+	//							//	MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
+	//							//},
+	//							//{
+	//							//	Name: "wso2am-pattern-1-am-2-conf",
+	//							//	MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
+	//							//	SubPath:"deployment.toml",
+	//							//},
+	//							//{
+	//							//	Name: "mysql-jdbc-driver",
+	//							//	MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/components/lib",
+	//							//},
+	//							//{
+	//							//	Name: "wso2am-pattern-1-am-conf-entrypoint",
+	//							//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
+	//							//	SubPath:"docker-entrypoint.sh",
+	//							//},
+	//						},
+	//					},
+	//				},
+	//
+	//				ServiceAccountName: "wso2am-pattern-1-svc-account",
+	//				ImagePullSecrets:[]corev1.LocalObjectReference{
+	//					{
+	//						Name:"wso2am-pattern-1-creds",
+	//					},
+	//				},
+	//
+	//				Volumes: []corev1.Volume{
+	//					//{
+	//					//	Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
+	//					//	VolumeSource: corev1.VolumeSource{
+	//					//		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+	//					//			ClaimName: "wso2am-pattern-1-am-volume-claim-synapse-configs",
+	//					//		},
+	//					//	},
+	//					//},
+	//					//{
+	//					//	Name: "wso2am-pattern-1-am-volume-claim-executionplans",
+	//					//	VolumeSource: corev1.VolumeSource{
+	//					//		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+	//					//			ClaimName: "wso2am-pattern-1-am-volume-claim-executionplans",
+	//					//		},
+	//					//	},
+	//					//},
+	//					//{
+	//					//	Name: "wso2am-pattern-1-am-2-conf",
+	//					//	VolumeSource: corev1.VolumeSource{
+	//					//		ConfigMap: &corev1.ConfigMapVolumeSource{
+	//					//			LocalObjectReference: corev1.LocalObjectReference{
+	//					//				Name: "wso2am-pattern-1-am-2-conf",
+	//					//			},
+	//					//		},
+	//					//	},
+	//					//},
+	//					//{
+	//					//	Name: "mysql-jdbc-driver",
+	//					//	VolumeSource: corev1.VolumeSource{
+	//					//		ConfigMap: &corev1.ConfigMapVolumeSource{
+	//					//			LocalObjectReference: corev1.LocalObjectReference{
+	//					//				Name: "mysql-jdbc-driver-cm",
+	//					//			},
+	//					//		},
+	//					//	},
+	//					//},
+	//					//{
+	//					//	Name: "wso2am-pattern-1-am-conf-entrypoint",
+	//					//	VolumeSource: corev1.VolumeSource{
+	//					//		ConfigMap: &corev1.ConfigMapVolumeSource{
+	//					//			LocalObjectReference: corev1.LocalObjectReference{
+	//					//				Name: "wso2am-pattern-1-am-conf-entrypoint",
+	//					//			},
+	//					//			//DefaultMode:0407,
+	//					//		},
+	//					//	},
+	//					//},
+	//				},
+	//			},
+	//		},
+	//	},
+	//}
 	labels := map[string]string{
-		"app":        "wso2am2",
-		"controller": apimanager.Name,
+		//"app":        "wso2am2",
+		//"controller": apimanager.Name,
+		"deployment": "wso2am-pattern-1-am",
+		"node": "wso2am-pattern-1-am-2",
 	}
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			// Name:      apimanager.Spec.DeploymentName,
-			Name:      "wso2-am-deploy-2",
+			Name:      "apim-2-deploy",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -751,16 +1281,13 @@ func newDeployment2(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 							Name:  "wso2am2",
 							Image: "wso2/wso2am:3.0.0",
 							VolumeMounts: []corev1.VolumeMount{
-								// {
-								// 	Name:      "wso2am-configmap-instance2",
-								// 	MountPath: "/home/wso2carbon/wso2-config-volume/reBack-offpository/conf/deployment.toml",
-								// 	SubPath:   "deployment.toml",
-								// },
 								{
-									Name: "pvclaimvol",
-									//MountPath:"/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
-									//ReadOnly:true,
-									MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/synapse-configs",
+									Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
+									MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs",
+								},
+								{
+									Name: "wso2am-pattern-1-am-volume-claim-executionplans",
+									MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
 								},
 							},
 							Ports: []corev1.ContainerPort{
@@ -805,21 +1332,19 @@ func newDeployment2(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 					},
 
 					Volumes: []corev1.Volume{
-						//{
-						//	Name: "wso2am-configmap-instance2",
-						//	VolumeSource: corev1.VolumeSource{
-						//		ConfigMap: &corev1.ConfigMapVolumeSource{
-						//			LocalObjectReference: corev1.LocalObjectReference{
-						//				Name: "newinstance2",
-						//			},
-						//		},
-						//	},
-						//},
 						{
-							Name: "pvclaimvol",
+							Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
 							VolumeSource: corev1.VolumeSource{
 								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName: "wso2pvclaim2",
+									ClaimName:"pvc-synapse-configs",
+								},
+							},
+						},
+						{
+							Name: "wso2am-pattern-1-am-volume-claim-executionplans",
+							VolumeSource: corev1.VolumeSource{
+								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+									ClaimName: "pvc-execution-plans",
 								},
 							},
 						},
@@ -830,17 +1355,20 @@ func newDeployment2(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	}
 }
 
+
 // newService creates a new Service for a Apimanager resource.
 // It expose the service with Nodeport type with minikube ip as the externel ip.
-func newService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
+func apim2Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 	labels := map[string]string{
-		"app":        "wso2am",
-		"controller": apimanager.Name,
+		//"app":        "wso2am",
+		//"controller": apimanager.Name,
+		"deployment": "wso2am-pattern-1-am",
+		"node": "wso2am-pattern-1-am-2",
 	}
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			// Name: apimanager.Spec.ServiceName,
-			Name:      "wso2-am-service-1",
+			Name:      "apim-2-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -851,64 +1379,7 @@ func newService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 			Type:     "NodePort",
 			// values are fetched from wso2-apim.yaml file
 			// Type: apimanager.Spec.ServType,
-			ExternalIPs: []string{"192.168.99.100"},
-			// ExternalIPs: apimanager.Spec.ExternalIps,
-			Ports: []corev1.ServicePort{
-				{
-					Name:       "servlet-https",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       9443,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-					NodePort:   32001,
-				},
-				{
-					Name:       "pass-through-http",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       8280,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
-					NodePort:   32002,
-				},
-				{
-					Name:       "pass-through-https",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       8243,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
-					NodePort:   32003,
-				},
-				{
-					Name:       "servlet-http",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       9763,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
-					NodePort:   32004,
-				},
-			},
-		},
-	}
-}
-
-// newService creates a new Service for a Apimanager resource.
-// It expose the service with Nodeport type with minikube ip as the externel ip.
-func newService2(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
-	labels := map[string]string{
-		"app":        "wso2am2",
-		"controller": apimanager.Name,
-	}
-	return &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			// Name:      apimanager.Spec.ServiceName,
-			Name:      "wso2-am-service-2",
-			Namespace: apimanager.Namespace,
-			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
-			},
-		},
-		Spec: corev1.ServiceSpec{
-			Selector: labels,
-			Type:     "NodePort",
-			// values are fetched from wso2-apim.yaml file
-			// Type: apimanager.Spec.ServType,
-			ExternalIPs: []string{"192.168.99.100"},
+			ExternalIPs: []string{"192.168.99.101"},
 			// ExternalIPs: apimanager.Spec.ExternalIps,
 			Ports: []corev1.ServicePort{
 				{
@@ -919,25 +1390,704 @@ func newService2(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 					NodePort:   32005,
 				},
 				{
-					Name:       "pass-through-http",
+					Name:       "binary",
 					Protocol:   corev1.ProtocolTCP,
-					Port:       8280,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
+					Port:       9611,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
 					NodePort:   32006,
 				},
 				{
-					Name:       "pass-through-https",
+					Name:       "binary-secure",
 					Protocol:   corev1.ProtocolTCP,
-					Port:       8243,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+					Port:       9711,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
 					NodePort:   32007,
 				},
 				{
-					Name:       "servlet-http",
+					Name:       "jms-tcp",
 					Protocol:   corev1.ProtocolTCP,
-					Port:       9763,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
+					Port:       5672,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
 					NodePort:   32008,
+				},
+			},
+		},
+	}
+}
+
+
+//// dashboardDeployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
+//// the appropriate OwnerReferences on the resource so handleObject can discover
+//// the Apimanager resource that 'owns' it.
+//func dashboardDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
+//	labels := map[string]string{
+//		"deployment": "wso2am-pattern-1-analytics-dashboard",
+//	}
+//	//defaultMode := int32(0407)
+//	runasuser := int64(802)
+//	dashcpu, _ :=resource.ParseQuantity("2000m")
+//	dashmem, _ := resource.ParseQuantity("4Gi")
+//
+//	return &appsv1.Deployment{
+//		ObjectMeta: metav1.ObjectMeta{
+//			// Name: apimanager.Spec.DeploymentName,
+//			Name:      "analytics-dash-deploy",
+//			Namespace: apimanager.Namespace,
+//			OwnerReferences: []metav1.OwnerReference{
+//				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+//			},
+//		},
+//		Spec: appsv1.DeploymentSpec{
+//			Replicas: apimanager.Spec.Replicas,
+//			MinReadySeconds:30,
+//			Strategy: appsv1.DeploymentStrategy{
+//				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
+//				RollingUpdate: &appsv1.RollingUpdateDeployment{
+//					MaxSurge: &intstr.IntOrString{
+//						Type:   intstr.Int,
+//						IntVal: 1,
+//					},
+//					MaxUnavailable: &intstr.IntOrString{
+//						Type:   intstr.Int,
+//						IntVal: 0,
+//					},
+//				},
+//			},
+//
+//			Selector: &metav1.LabelSelector{
+//				MatchLabels: labels,
+//			},
+//			Template: corev1.PodTemplateSpec{
+//				ObjectMeta: metav1.ObjectMeta{
+//					Labels: labels,
+//				},
+//				Spec: corev1.PodSpec{
+//
+//					//InitContainers: []corev1.Container{
+//					//	{
+//					//		Name: "init-apim-analytics-db",
+//					//		Image: "busybox:1.31",
+//					//		Command: []string {
+//					//			//"sh", "-c", "echo -e \"Checking for the availability of MySQL Server deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-mysql-db-service \"3306; do sleep 1; printf \"-\" ;done; echo -e \" >> MySQL Server has started \"; ",
+//					//			"sh",
+//					//			"-c",
+//					//			"echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"wso2am-mysql-db-service\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";",
+//					//		},
+//					//
+//					//	},
+//					//	{
+//					//		Name: "init-am-analytics-worker",
+//					//		Image: "busybox:1.31",
+//					//		Command: []string {
+//					//			"sh", "-c", "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-pattern-1-analytics-worker-service 7712; do sleep 1; printf \"-\" ;done; echo -e \" >> WSO2 API Manager Analytics Worker has started \"; ",
+//					//		},
+//					//
+//					//	},
+//					//},
+//					Containers: []corev1.Container{
+//						{
+//							Name:  "wso2am-pattern-1-analytics-dashboard",
+//							Image: "wso2/wso2am-analytics-dashboard:3.0.0",
+//							LivenessProbe: &corev1.Probe{
+//								Handler: corev1.Handler{
+//									Exec:&corev1.ExecAction{
+//										Command:[]string{
+//											"/bin/sh",
+//											"-c",
+//											"nc -z localhost 9643",
+//										},
+//									},
+//								},
+//								InitialDelaySeconds: 20,
+//								PeriodSeconds:       10,
+//							},
+//							ReadinessProbe: &corev1.Probe{
+//								Handler: corev1.Handler{
+//									Exec:&corev1.ExecAction{
+//										Command:[]string{
+//											"/bin/sh",
+//											"-c",
+//											"nc -z localhost 9643",
+//										},
+//									},
+//								},
+//
+//								InitialDelaySeconds: 20,
+//								PeriodSeconds:       10,
+//
+//							},
+//
+//							Lifecycle: &corev1.Lifecycle{
+//								PreStop:&corev1.Handler{
+//									Exec:&corev1.ExecAction{
+//										Command:[]string{
+//											"sh",
+//											"-c",
+//											"${WSO2_SERVER_HOME}/bin/dashboard.sh stop",
+//										},
+//									},
+//								},
+//							},
+//
+//							Resources:corev1.ResourceRequirements{
+//								Requests:corev1.ResourceList{
+//									corev1.ResourceCPU:dashcpu,
+//									corev1.ResourceMemory:dashmem,
+//								},
+//								Limits:corev1.ResourceList{
+//									corev1.ResourceCPU:dashcpu,
+//									corev1.ResourceMemory:dashmem,
+//								},
+//							},
+//
+//							ImagePullPolicy: "Always",
+//
+//							SecurityContext: &corev1.SecurityContext{
+//								RunAsUser:&runasuser,
+//							},
+//
+//							Ports: []corev1.ContainerPort{
+//								{
+//									ContainerPort: 9713,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 9643,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 9613,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 7713,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 9091,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 7613,
+//									Protocol:      "TCP",
+//								},
+//
+//							},
+//
+//							VolumeMounts: []corev1.VolumeMount{
+//								//{
+//								//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf",
+//								//	MountPath: "/home/wso2carbon/wso2-config-volume/conf/dashboard/deployment.yaml",
+//								//	SubPath:"deployment.yaml",
+//								//},
+//								//{
+//								//	Name: "wso2am-pattern-1-am-analytics-dashboard-bin",
+//								//	MountPath: "/home/wso2carbon/wso2-config-volume/wso2/dashboard/bin/carbon.sh",
+//								//	SubPath:"carbon.sh",
+//								//},
+//								//{
+//								//	Name: "wso2am-pattern-1-am-analytics-dashboard-plugins",
+//								//	MountPath: "/home/wso2carbon/wso2-patch-volume/wso2/lib/plugins/org.wso2.analytics.apim.rest.api.proxy_3.0.0.jar",
+//								//	SubPath:"org.wso2.analytics.apim.rest.api.proxy_3.0.0.jar",
+//								//},
+//								//{
+//								//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
+//								//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
+//								//	SubPath:"docker-entrypoint.sh",
+//								//},
+//							},
+//						},
+//					},
+//
+//					ServiceAccountName: "wso2am-pattern-1-svc-account",
+//					ImagePullSecrets:[]corev1.LocalObjectReference{
+//						{
+//							Name:"wso2am-pattern-1-creds",
+//						},
+//					},
+//
+//					Volumes: []corev1.Volume{
+//						//{
+//						//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf",
+//						//	VolumeSource: corev1.VolumeSource{
+//						//		ConfigMap: &corev1.ConfigMapVolumeSource{
+//						//			LocalObjectReference: corev1.LocalObjectReference{
+//						//				Name: "wso2am-pattern-1-am-analytics-dashboard-conf",
+//						//			},
+//						//			DefaultMode:&defaultMode,
+//						//		},
+//						//	},
+//						//},
+//						//{
+//						//	Name: "wso2am-pattern-1-am-analytics-dashboard-bin",
+//						//	VolumeSource: corev1.VolumeSource{
+//						//		ConfigMap: &corev1.ConfigMapVolumeSource{
+//						//			LocalObjectReference: corev1.LocalObjectReference{
+//						//				Name: "wso2am-pattern-1-am-analytics-dashboard-bin",
+//						//			},
+//						//			DefaultMode:&defaultMode,
+//						//		},
+//						//	},
+//						//},
+//						//{
+//						//	Name: "wso2am-pattern-1-am-analytics-dashboard-plugins",
+//						//	VolumeSource: corev1.VolumeSource{
+//						//		ConfigMap: &corev1.ConfigMapVolumeSource{
+//						//			LocalObjectReference: corev1.LocalObjectReference{
+//						//				Name: "wso2am-pattern-1-am-analytics-dashboard-plugins",
+//						//			},
+//						//			DefaultMode:&defaultMode,
+//						//		},
+//						//	},
+//						//},
+//						//{
+//						//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
+//						//	VolumeSource: corev1.VolumeSource{
+//						//		ConfigMap: &corev1.ConfigMapVolumeSource{
+//						//			LocalObjectReference: corev1.LocalObjectReference{
+//						//				Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
+//						//			},
+//						//			DefaultMode:&defaultMode,
+//						//		},
+//						//	},
+//						//},
+//
+//					},
+//				},
+//			},
+//		},
+//	}
+//}
+//
+//
+//// dashboardDeployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
+//// the appropriate OwnerReferences on the resource so handleObject can discover
+//// the Apimanager resource that 'owns' it.
+//func workerDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
+//	workercpu,_ := resource.ParseQuantity("2000m")
+//	workermem,_ := resource.ParseQuantity("4Gi")
+//	labels := map[string]string{
+//		"deployment": "wso2am-pattern-1-analytics-worker",
+//	}
+//	//defaultMode := int32(0407)
+//	runasuser := int64(802)
+//	return &appsv1.Deployment{
+//		ObjectMeta: metav1.ObjectMeta{
+//			// Name: apimanager.Spec.DeploymentName,
+//			Name:      "analytics-worker-deploy",
+//			Namespace: apimanager.Namespace,
+//			OwnerReferences: []metav1.OwnerReference{
+//				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+//			},
+//		},
+//		Spec: appsv1.DeploymentSpec{
+//			Replicas: apimanager.Spec.Replicas,
+//			MinReadySeconds:30,
+//			Strategy: appsv1.DeploymentStrategy{
+//				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
+//				RollingUpdate: &appsv1.RollingUpdateDeployment{
+//					MaxSurge: &intstr.IntOrString{
+//						Type:   intstr.Int,
+//						IntVal: 1,
+//					},
+//					MaxUnavailable: &intstr.IntOrString{
+//						Type:   intstr.Int,
+//						IntVal: 0,
+//					},
+//				},
+//			},
+//
+//			Selector: &metav1.LabelSelector{
+//				MatchLabels: labels,
+//			},
+//			Template: corev1.PodTemplateSpec{
+//				ObjectMeta: metav1.ObjectMeta{
+//					Labels: labels,
+//				},
+//				Spec: corev1.PodSpec{
+//
+//					//InitContainers: []corev1.Container{
+//					//	{
+//					//		Name: "init-apim-analytics-db",
+//					//		Image: "busybox:1.31",
+//					//		Command: []string {
+//					//			//"sh", "-c", "echo -e \"Checking for the availability of MySQL Server deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-mysql-db-service \"3306; do sleep 1; printf \"-\" ;done; echo -e \" >> MySQL Server has started \"; ",
+//					//			"sh",
+//					//			"-c",
+//					//			"echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"wso2am-mysql-db-service\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";",
+//					//		},
+//					//
+//					//	},
+//					//	{
+//					//		Name: "init-am-analytics-worker",
+//					//		Image: "busybox:1.31",
+//					//		Command: []string {
+//					//			"sh", "-c", "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-pattern-1-analytics-worker-service 7712; do sleep 1; printf \"-\" ;done; echo -e \" >> WSO2 API Manager Analytics Worker has started \"; ",
+//					//		},
+//					//
+//					//	},
+//					//},
+//					Containers: []corev1.Container{
+//						{
+//							Name:  "wso2am-pattern-1-analytics-worker",
+//							Image: "wso2/wso2am-analytics-worker:3.0.0",
+//							LivenessProbe: &corev1.Probe{
+//								Handler: corev1.Handler{
+//									Exec:&corev1.ExecAction{
+//										Command:[]string{
+//											"/bin/sh",
+//											"-c",
+//											"nc -z localhost 9444",
+//										},
+//									},
+//								},
+//								InitialDelaySeconds: 20,
+//								PeriodSeconds:       10,
+//							},
+//							ReadinessProbe: &corev1.Probe{
+//								Handler: corev1.Handler{
+//									Exec:&corev1.ExecAction{
+//										Command:[]string{
+//											"/bin/sh",
+//											"-c",
+//											"nc -z localhost 9444",
+//										},
+//									},
+//								},
+//
+//								InitialDelaySeconds: 20,
+//								PeriodSeconds:       10,
+//
+//							},
+//
+//							Lifecycle: &corev1.Lifecycle{
+//								PreStop:&corev1.Handler{
+//									Exec:&corev1.ExecAction{
+//										Command:[]string{
+//											"sh",
+//											"-c",
+//											"${WSO2_SERVER_HOME}/bin/worker.sh stop",
+//										},
+//									},
+//								},
+//							},
+//
+//							Resources:corev1.ResourceRequirements{
+//								Requests:corev1.ResourceList{
+//									corev1.ResourceCPU:workercpu,
+//									corev1.ResourceMemory:workermem,
+//								},
+//								Limits:corev1.ResourceList{
+//									corev1.ResourceCPU:workercpu,
+//									corev1.ResourceMemory:workermem,
+//								},
+//							},
+//
+//							ImagePullPolicy: "Always",
+//
+//							SecurityContext: &corev1.SecurityContext{
+//								RunAsUser:&runasuser,
+//							},
+//
+//							Ports: []corev1.ContainerPort{
+//								{
+//									ContainerPort: 9764,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 9444,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 7612,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 7712,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 9091,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 7071,
+//									Protocol:      "TCP",
+//								},
+//								{
+//									ContainerPort: 7444,
+//									Protocol:      "TCP",
+//								},
+//							},
+//
+//							VolumeMounts: []corev1.VolumeMount{
+//								//{
+//								//	Name: "wso2am-pattern-1-am-analytics-worker-conf",
+//								//	MountPath: "/home/wso2carbon/wso2-config-volume/conf/worker/deployment.yaml",
+//								//	SubPath:"deployment.yaml",
+//								//},
+//
+//							},
+//						},
+//					},
+//
+//					ServiceAccountName: "wso2am-pattern-1-svc-account",
+//					ImagePullSecrets:[]corev1.LocalObjectReference{
+//						{
+//							Name:"wso2am-pattern-1-creds",
+//						},
+//					},
+//
+//					Volumes: []corev1.Volume{
+//						//{
+//						//	Name: "wso2am-pattern-1-am-analytics-worker-conf",
+//						//	VolumeSource: corev1.VolumeSource{
+//						//		ConfigMap: &corev1.ConfigMapVolumeSource{
+//						//			LocalObjectReference: corev1.LocalObjectReference{
+//						//				Name: "wso2am-pattern-1-am-analytics-worker-conf",
+//						//			},
+//						//		},
+//						//	},
+//						//},
+//					},
+//				},
+//			},
+//		},
+//	}
+//}
+
+
+
+//
+//// newService creates a new Service for a Apimanager resource.
+//// It expose the service with Nodeport type with minikube ip as the externel ip.
+//func workerService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
+//	labels := map[string]string{
+//		"deployment": "wso2am-pattern-1-analytics-worker",
+//	}
+//	return &corev1.Service{
+//		ObjectMeta: metav1.ObjectMeta{
+//			// Name: apimanager.Spec.ServiceName,
+//			Name:      "analytics-worker-svc",
+//			Namespace: apimanager.Namespace,
+//			OwnerReferences: []metav1.OwnerReference{
+//				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+//			},
+//		},
+//		Spec: corev1.ServiceSpec{
+//			Selector: labels,
+//			Type:     "NodePort",
+//			// values are fetched from wso2-apim.yaml file
+//			// Type: apimanager.Spec.ServType,
+//			ExternalIPs: []string{"192.168.99.101"},
+//			// ExternalIPs: apimanager.Spec.ExternalIps,
+//			Ports: []corev1.ServicePort{
+//				{
+//					Name:       "thrift",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       7612,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7612},
+//					NodePort:   32010,
+//				},
+//				{
+//					Name:       "thrift-ssl",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       7712,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7712},
+//					NodePort:   32011,
+//				},
+//				{
+//					Name:       "rest-api-port-1",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       9444,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9444},
+//					NodePort:   32012,
+//				},
+//				{
+//					Name:       "rest-api-port-2",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       9091,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9091},
+//					NodePort:   32013,
+//				},
+//				{
+//					Name:       "rest-api-port-3",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       7071,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7071},
+//					NodePort:   32014,
+//				},
+//				{
+//					Name:       "rest-api-port-4",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       7444,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7444},
+//					NodePort:   32015,
+//				},
+//			},
+//		},
+//	}
+//}
+//
+//
+//// newService creates a new Service for a Apimanager resource.
+//// It expose the service with Nodeport type with minikube ip as the externel ip.
+//func dashboardService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
+//	labels := map[string]string{
+//		"deployment": "wso2am-pattern-1-analytics-dashboard",
+//	}
+//	return &corev1.Service{
+//		ObjectMeta: metav1.ObjectMeta{
+//			// Name: apimanager.Spec.ServiceName,
+//			Name:      "analytics-dash-svc",
+//			Namespace: apimanager.Namespace,
+//			OwnerReferences: []metav1.OwnerReference{
+//				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+//			},
+//		},
+//		Spec: corev1.ServiceSpec{
+//			Selector: labels,
+//			Type:     "NodePort",
+//			// values are fetched from wso2-apim.yaml file
+//			// Type: apimanager.Spec.ServType,
+//			ExternalIPs: []string{"192.168.99.101"},
+//			// ExternalIPs: apimanager.Spec.ExternalIps,
+//			Ports: []corev1.ServicePort{
+//				{
+//					Name:       "analytics-dashboard",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       9643,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
+//					NodePort:   32009,
+//				},
+//			},
+//		},
+//	}
+//}
+//
+
+
+func mysqlDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
+	labels := map[string]string{
+		"deployment": "wso2apim-with-analytics-mysql",
+	}
+	runasuser := int64(999)
+	mysqlreplics := int32(1)
+
+	return &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "mysql-deploy",
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: &mysqlreplics,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: labels,
+			},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: labels,
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "wso2apim-with-analytics-mysql",
+							Image: "mysql:5.7",
+							ImagePullPolicy: "IfNotPresent",
+							SecurityContext: &corev1.SecurityContext{
+								RunAsUser: &runasuser,
+							},
+							Env: []corev1.EnvVar{
+								{
+									Name:  "MYSQL_ROOT_PASSWORD",
+									Value: "root",
+								},
+								{
+									Name:  "MYSQL_USER",
+									Value: "wso2carbon",
+								},
+								{
+									Name:  "MYSQL_PASSWORD",
+									Value: "wso2carbon",
+								},
+
+							},
+							Ports: []corev1.ContainerPort{
+								{
+									ContainerPort: 3306,
+									Protocol:      "TCP",
+								},
+							},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name: "mysql-dbscripts",
+									MountPath: "/docker-entrypoint-initdb.d",
+								},
+
+								{
+									Name: "apim-rdbms-persistent-storage",
+									MountPath: "/var/lib/mysql",
+								},
+							},
+							Args: []string{
+								"--max-connections",
+								"10000",
+							},
+
+						},
+					},
+
+					Volumes: []corev1.Volume{
+						{
+							Name: "mysql-dbscripts",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "mysql-dbscripts",
+									},
+								},
+							},
+						},
+						{
+							Name: "apim-rdbms-persistent-storage",
+							VolumeSource: corev1.VolumeSource{
+								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+									ClaimName:"pvc-mysql",
+								},
+							},
+						},
+					},
+					ServiceAccountName: "wso2am-pattern-1-svc-account",
+				},
+			},
+		},
+	}
+}
+
+func mysqlService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
+	labels := map[string]string{
+		"deployment": "wso2apim-with-analytics-mysql",
+	}
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "wso2am-mysql-db-service",
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: labels,
+			Type:     "ClusterIP",
+			Ports: []corev1.ServicePort{
+				{
+					Name:       "mysql-port",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       3306,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 3306},
 				},
 			},
 		},
