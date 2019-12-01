@@ -20,49 +20,34 @@ package main
 
 import (
 	"fmt"
-	//"k8s.io/apimachinery/pkg/api/resource"
 	"time"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/wait"
 	appsinformers "k8s.io/client-go/informers/apps/v1"
-	apps2informers "k8s.io/client-go/informers/core/v1"
+	coreinformers "k8s.io/client-go/informers/core/v1"
+	appslisters "k8s.io/client-go/listers/apps/v1"
+	corelisters "k8s.io/client-go/listers/core/v1"
+	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	appslisters "k8s.io/client-go/listers/apps/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
-	app2listers "k8s.io/client-go/listers/core/v1"
+	//"k8s.io/apimachinery/pkg/api/resource"
 	apimv1alpha1 "github.com/keshiha96/wso2am-k8s-controller/pkg/apis/apim/v1alpha1"
-	clientset "github.com/keshiha96/wso2am-k8s-controller/pkg/generated/clientset/versioned"
 	samplescheme "github.com/keshiha96/wso2am-k8s-controller/pkg/generated/clientset/versioned/scheme"
+	clientset "github.com/keshiha96/wso2am-k8s-controller/pkg/generated/clientset/versioned"
 	informers "github.com/keshiha96/wso2am-k8s-controller/pkg/generated/informers/externalversions/apim/v1alpha1"
 	listers "github.com/keshiha96/wso2am-k8s-controller/pkg/generated/listers/apim/v1alpha1"
 )
 
 const controllerAgentName = "wso2am-controller"
-
-const (
-	// SuccessSynced is used as part of the Event 'reason' when a Apimanager is synced
-	SuccessSynced = "Synced"
-	// ErrResourceExists is used as part of the Event 'reason' when a Apimanager fails
-	// to sync due to a Deployment of the same name already existing.
-	ErrResourceExists = "ErrResourceExists"
-	// MessageResourceExists is the message used for Events when a resource
-	// fails to sync due to a Deployment already existing
-	MessageResourceExists = "Resource %q already exists and is not managed by Apimanager"
-	// MessageResourceSynced is the message used for an Event fired when a Apimanager
-	// is synced successfully
-	MessageResourceSynced = "Apimanager synced successfully"
-
-)
 
 // Controller is the controller implementation for Apimanager resources
 type Controller struct {
@@ -70,36 +55,30 @@ type Controller struct {
 	kubeclientset kubernetes.Interface
 	// sampleclientset is a clientset for our own API group
 	sampleclientset clientset.Interface
-
 	deploymentsLister appslisters.DeploymentLister
-	servicesLister    app2listers.ServiceLister
+	servicesLister    corelisters.ServiceLister
 	deploymentsSynced cache.InformerSynced
 	servicesSynced    cache.InformerSynced
 	apimanagerslister listers.ApimanagerLister
 	apimanagersSynced cache.InformerSynced
-
-	// workqueue is a rate limited work queue. This is used to queue work to be
-	// processed instead of performing it as soon as a change happens. This
-	// means we can ensure we only process a fixed amount of resources at a
-	// time, and makes it easy to ensure we are never processing the same item
-	// simultaneously in two different workers.
+	// workqueue is a rate limited work queue. This is used to queue work to be processed instead of performing it as
+	// soon as a change happens. This means we can ensure we only process a fixed amount of resources at a time, and
+	// makes it easy to ensure we are never processing the same item simultaneously in two different workers.
 	workqueue workqueue.RateLimitingInterface
-	// recorder is an event recorder for recording Event resources to the
-	// Kubernetes API.
+	// recorder is an event recorder for recording Event resources to the Kubernetes API.
 	recorder record.EventRecorder
 }
 
-// NewController returns a new wso2-apim controller
+// NewController returns a new wso2am controller
 func NewController(
 	kubeclientset kubernetes.Interface,
 	sampleclientset clientset.Interface,
 	deploymentInformer appsinformers.DeploymentInformer,
-	serviceInformer apps2informers.ServiceInformer,
+	serviceInformer coreinformers.ServiceInformer,
 	apimanagerInformer informers.ApimanagerInformer) *Controller {
 
-	// Create event broadcaster
-	// Add apim-controller types to the default Kubernetes Scheme so Events can be
-	// logged for apim-controller types.
+	// Create event broadcaster.
+	// Add apim-controller types to the default Kubernetes Scheme so Events can be logged for apim-controller types.
 	utilruntime.Must(samplescheme.AddToScheme(scheme.Scheme))
 	klog.V(4).Info("Creating event broadcaster")
 	eventBroadcaster := record.NewBroadcaster()
@@ -128,11 +107,9 @@ func NewController(
 			controller.enqueueApimanager(new)
 		},
 	})
-	// Set up an event handler for when Deployment resources change. This
-	// handler will lookup the owner of the given Deployment, and if it is
-	// owned by a Apimanager resource will enqueue that Apimanager resource for
-	// processing. This way, we don't need to implement custom logic for
-	// handling Deployment resources. More info on this pattern:
+	// Set up an event handler for when Deployment resources change. This handler will lookup the owner of the given
+	// Deployment, and if it is owned by a Apimanager resource will enqueue that Apimanager resource for processing.
+	// This way, we don't need to implement custom logic for handling Deployment resources. More info on this pattern:
 	// https://github.com/kubernetes/community/blob/8cafef897a22026d42f5e5bb3f104febe7e29830/contributors/devel/controllers.md
 	deploymentInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: controller.handleObject,
@@ -148,7 +125,6 @@ func NewController(
 		},
 		DeleteFunc: controller.handleObject,
 	})
-
 	serviceInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: controller.handleObject,
 		UpdateFunc: func(old, new interface{}) {
@@ -167,10 +143,9 @@ func NewController(
 	return controller
 }
 
-// Run will set up the event handlers for types we are interested in, as well
-// as syncing informer caches and starting workers. It will block until stopCh
-// is closed, at which point it will shutdown the workqueue and wait for
-// workers to finish processing their current work items.
+// Run will set up the event handlers for types we are interested in, as well as syncing informer caches and starting
+// workers. It will block until stopCh is closed, at which point it will shutdown the workqueue and wait for workers
+// to finish processing their current work items.
 func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) error {
 	defer utilruntime.HandleCrash()
 	defer c.workqueue.ShutDown()
@@ -179,6 +154,7 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) error {
 	klog.Info("Starting Apimanager controller")
 
 	// Wait for the caches to be synced before starting workers
+	//if controller is down and then once its up, controller query api server for objects, so it has to wait for objects in cache to sync
 	klog.Info("Waiting for informer caches to sync")
 	if ok := cache.WaitForCacheSync(stopCh, c.deploymentsSynced, c.apimanagersSynced); !ok {
 		return fmt.Errorf("failed to wait for caches to sync")
@@ -197,16 +173,14 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) error {
 	return nil
 }
 
-// runWorker is a long-running function that will continually call the
-// processNextWorkItem function in order to read and process a message on the
-// workqueue.
+// runWorker is a long-running function that will continually call the processNextWorkItem function in order to read
+// and process a message on the workqueue.
 func (c *Controller) runWorker() {
 	for c.processNextWorkItem() {
 	}
 }
 
-// processNextWorkItem will read a single work item off the workqueue and
-// attempt to process it, by calling the syncHandler.
+// processNextWorkItem will read a single work item off the workqueue and attempt to process it, by calling the syncHandler.
 func (c *Controller) processNextWorkItem() bool {
 	obj, shutdown := c.workqueue.Get()
 
@@ -260,23 +234,22 @@ func (c *Controller) processNextWorkItem() bool {
 	return true
 }
 
+// syncHandler compares the actual state with the desired, and attempts to converge the two.
+// It then updates the Status block of the Apimanager resource with the current status of the resource.
 // c is the Controller object type pointer as a parameter
-// syncHandler compares the actual state with the desired, and attempts to
-// converge the two. It then updates the Status block of the Apimanager resource
-// with the current status of the resource.
 func (c *Controller) syncHandler(key string) error {
-	// Convert the namespace/name string into a distinct namespace and name
+	// Split the key into a namespace & object name
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		utilruntime.HandleError(fmt.Errorf("invalid resource key: %s", key))
 		return nil
 	}
 
-	// Get the Apimanager resource with this namespace/name
+	// Get the Apimanager resource with this namespace/name from the lister
+	// Use a Lister to find the object in the API server
 	apimanager, err := c.apimanagerslister.Apimanagers(namespace).Get(name)
 	if err != nil {
-		// The Apimanager resource may no longer exist, in which case we stop
-		// processing.
+		// The Apimanager resource may no longer exist, in which case we stop processing.
 		if errors.IsNotFound(err) {
 			utilruntime.HandleError(fmt.Errorf("apimanager '%s' in work queue no longer exists", key))
 			return nil
@@ -284,9 +257,6 @@ func (c *Controller) syncHandler(key string) error {
 
 		return err
 	}
-
-	//////////////////////////////////////////////////////////////
-
 
 	apim1deploymentName := "apim-1-deploy"
 	apim2deploymentName := "apim-2-deploy"
@@ -301,9 +271,11 @@ func (c *Controller) syncHandler(key string) error {
 
 
 
-	/////////check whether resourecs already exits, else create one
+	/////////checking whether resourecs already exits, else create one
 
-	// Get the deployment using hardcoded deployment name wso2-apim-1-deploy
+	// Parse the object and look for it’s deployment
+	// Use a Lister to find the deployment object referred to in the Apimanager resource
+	// Get apim instance 1 deployment name using hardcoded value
 	deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
@@ -313,7 +285,7 @@ func (c *Controller) syncHandler(key string) error {
 		}
 	}
 
-	// Get the deployment using hardcoded deployment name wso2-apim-1-deploy2
+	// Get apim instance 2 deployment name using hardcoded value
 	deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
@@ -323,7 +295,7 @@ func (c *Controller) syncHandler(key string) error {
 		}
 	}
 
-	//// Get the dashboard deployment using hardcoded deployment name wso2-apim-1-deploy
+	//// Get analytics dashboard deployment name using hardcoded value
 	//dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
 	//// If the resource doesn't exist, we'll create it
 	//if errors.IsNotFound(err) {
@@ -333,7 +305,7 @@ func (c *Controller) syncHandler(key string) error {
 	//	}
 	//}
 	//
-	//// Get the dashboard deployment using hardcoded deployment name wso2-apim-1-deploy
+	//// Get analytics worker deployment name using hardcoded value
 	//workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
 	//// If the resource doesn't exist, we'll create it
 	//if errors.IsNotFound(err) {
@@ -343,7 +315,7 @@ func (c *Controller) syncHandler(key string) error {
 	//	}
 	//}
 
-	// Get the deployment using hardcoded deployment name mysqldeployment
+	// Get mysql deployment name using hardcoded value
 	mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
@@ -354,36 +326,35 @@ func (c *Controller) syncHandler(key string) error {
 	}
 
 
-
-	// Get the service with the name specified in wso2-apim spec
+	// Get apim instance 1 service name using hardcoded value
 	service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(apim1Service(apimanager))
 	}
 
-	// Get the service with the name specified in wso2-apim spec
+	// Get apim instance 2 service name using hardcoded value
 	service2, err := c.servicesLister.Services(apimanager.Namespace).Get(apim2serviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		service2, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(apim2Service(apimanager))
 	}
 
-	//// Get the service with the name specified in wso2-apim spec
+	//// Get analytics dashboard service name using hardcoded value
 	//dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
 	//// If the resource doesn't exist, we'll create it
 	//if errors.IsNotFound(err) {
 	//	dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(dashboardService(apimanager))
 	//}
 	//
-	//// Get the service with the name specified in wso2-apim spec
+	//// Get analytics worker service name using hardcoded value
 	//workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
 	//// If the resource doesn't exist, we'll create it
 	//if errors.IsNotFound(err) {
 	//	workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(workerService(apimanager))
 	//}
 
-	// Get the service with the name specified in wso2-apim spec
+	// Get mysql service name using hardcoded value
 	mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
@@ -397,145 +368,114 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	/////////////check whether resources are controlled by apimanager with same owner reference
+	/////////////checking whether resources are controlled by apimanager with same owner reference
 
-	// If the Deployment is not controlled by this Apimanager resource, we should log
-	// a warning to the event recorder and ret
+	// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	if !metav1.IsControlledBy(deployment, apimanager) {
 		msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by Apimanager", deployment.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 		return fmt.Errorf(msg)
 	}
 
-	//for instance 2
-	// If the Deployment2 is not controlled by this Apimanager resource, we should log
-	// a warning to the event recorder and ret
+	// If the apim instance 2 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	if !metav1.IsControlledBy(deployment2, apimanager) {
 		msg := fmt.Sprintf("Deployment2 %q already exists and is not managed by Apimanager", deployment2.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 		return fmt.Errorf(msg)
 	}
 
-	////for analytics dashboard
-	//// If the Deployment2 is not controlled by this Apimanager resource, we should log
-	//// a warning to the event recorder and ret
-	//if !metav1.IsControlledBy(dashdeployment, apimanager) {
+	//// If the analytics dashboard Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+	////if !metav1.IsControlledBy(dashdeployment, apimanager) {
 	//	msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", dashdeployment.Name)
 	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
 	//	return fmt.Errorf(msg)
 	//}
 	//
-	////for analytics worker
-	//// If the Deployment2 is not controlled by this Apimanager resource, we should log
-	//// a warning to the event recorder and ret
+	//// If the analytics worker Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	//if !metav1.IsControlledBy(workerdeployment, apimanager) {
 	//	msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", workerdeployment.Name)
 	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
 	//	return fmt.Errorf(msg)
 	//}
 
-	//for mysql deployment
-	// If the mysql Deployment is not controlled by this Apimanager resource, we should log
-	// a warning to the event recorder and ret
+	//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	if !metav1.IsControlledBy(mysqldeployment, apimanager) {
 		msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 		return fmt.Errorf(msg)
 	}
 
-	// If the instance 1 Service is not controlled by this Apimanager resource, we should log
-	// a warning to the event recorder and ret
+	// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	if !metav1.IsControlledBy(service, apimanager) {
-		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", service.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		msg := fmt.Sprintf("service %q already exists and is not managed by Apimanager", service.Name)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 		return fmt.Errorf(msg)
 	}
 
-	//for instance 2 service
-	// If the Service is not controlled by this Apimanager resource, we should log
-	// a warning to the event recorder and ret
+	// If the apim instance 2 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	if !metav1.IsControlledBy(service2, apimanager) {
-		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", service2.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		msg := fmt.Sprintf("service2 %q already exists and is not managed by Apimanager", service2.Name)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 		return fmt.Errorf(msg)
 	}
 
-	////for analytics dashboard service
-	//// If the Service is not controlled by this Apimanager resource, we should log
-	//// a warning to the event recorder and ret
+	//// If the analytics dashboard Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	//if !metav1.IsControlledBy(dashservice, apimanager) {
 	//	msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", dashservice.Name)
 	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
 	//	return fmt.Errorf(msg)
 	//}
 	//
-	////for analytics dashboard service
-	//// If the Service is not controlled by this Apimanager resource, we should log
-	//// a warning to the event recorder and ret
+	//// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	//if !metav1.IsControlledBy(workerservice, apimanager) {
 	//	msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", workerservice.Name)
 	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
 	//	return fmt.Errorf(msg)
 	//}
 
-	//for mysql service
-	// If the Service is not controlled by this Apimanager resource, we should log
-	// a warning to the event recorder and ret
+	// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 	if !metav1.IsControlledBy(mysqlservice, apimanager) {
-		msg := fmt.Sprintf("Service %q already exists and is not managed by Apimanager", mysqlservice.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, ErrResourceExists, msg)
+		msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 		return fmt.Errorf(msg)
 	}
 
 	///////////check replicas are same as defined for deployments
 
-	// If this number of the replicas on the Apimanager resource is specified, and the
-	// number does not equal the current desired replicas on the Deployment, we
-	// should update the Deployment resource.
+	// If the Apimanager resource has changed update the deployment
+	// If this number of the replicas on the Apimanager resource is specified, and the number does not equal the
+	// current desired replicas on the Deployment, we should update the Deployment resource.
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim1Deployment(apimanager))
 	}
 
-	//for instance 2 also
-	// If this number of the replicas on the Apimanager resource is specified, and the
-	// number does not equal the current desired replicas on the Deployment2, we
-	// should update the Deployment2 resource.
+	//for apim instance 2 also
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
 		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim2Deployment(apimanager))
 	}
 
 	////for analytics dashboard deployment
-	//// If this number of the replicas on the Apimanager resource is specified, and the
-	//// number does not equal the current desired replicas on the Deployment2, we
-	//// should update the Deployment2 resource.
 	//if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
 	//	klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
 	//	dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(dashboardDeployment(apimanager))
 	//}
 	//
 	////for analytics worker deployment
-	//// If this number of the replicas on the Apimanager resource is specified, and the
-	//// number does not equal the current desired replicas on the Deployment2, we
-	//// should update the Deployment2 resource.
 	//if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
 	//	klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
 	//	dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(workerDeployment(apimanager))
 	//}
 
 	//for instance mysql deployment
-	// If this number of the replicas on the Apimanager resource is specified, and the
-	// number does not equal the current desired replicas on the mysql deployment, we
-	// should update the mysql Deployment resource.
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
 		mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysqlDeployment(apimanager))
 	}
 
-	// If an error occurs during Update, we'll requeue the item so we can
-	// attempt processing again later. THis could have been caused by a
-	// temporary network failure, or any other transient reason.
+	// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
+	// This could have been caused by a temporary network failure, or any other transient reason.
 	if err != nil {
 		return err
 	}
@@ -543,46 +483,37 @@ func (c *Controller) syncHandler(key string) error {
 
 	//////////finally update the deployment resources after done checking
 
-	// Finally, we update the status block of the Apimanager resource to reflect the
-	// current state of the world
+	// Finally, we update the status block of the Apimanager resource to reflect the current state of the world
 	err = c.updateApimanagerStatus(apimanager, deployment)
 	if err != nil {
 		return err
 	}
 
 	//for instance 2 also
-	// Finally, we update the status block of the Apimanager resource to reflect the
-	// current state of the world
 	err = c.updateApimanagerStatus(apimanager, deployment2)
 	if err != nil {
 		return err
 	}
 
 	////for analytics dashboard deployment
-	//// Finally, we update the status block of the Apimanager resource to reflect the
-	//// current state of the world
 	//err = c.updateApimanagerStatus(apimanager, dashdeployment)
 	//if err != nil {
 	//	return err
 	//}
 	//
 	////for analytics worker deployment
-	//// Finally, we update the status block of the Apimanager resource to reflect the
-	//// current state of the world
 	//err = c.updateApimanagerStatus(apimanager, workerdeployment)
 	//if err != nil {
 	//	return err
 	//}
 
 	//for mysql deployment
-	// Finally, we update the status block of the Apimanager resource to reflect the
-	// current state of the world
 	err = c.updateApimanagerStatus(apimanager, mysqldeployment)
 	if err != nil {
 		return err
 	}
 
-	c.recorder.Event(apimanager, corev1.EventTypeNormal, SuccessSynced, MessageResourceSynced)
+	c.recorder.Event(apimanager, corev1.EventTypeNormal,"synced","Apimanager synced successfully")
 	return nil
 }
 
@@ -635,10 +566,10 @@ func (c *Controller) handleObject(obj interface{}) {
 		}
 		klog.V(4).Infof("Recovered deleted object '%s' from tombstone", object.GetName())
 	}
+
 	klog.V(4).Infof("Processing object: %s", object.GetName())
 	if ownerRef := metav1.GetControllerOf(object); ownerRef != nil {
-		// If this object is not owned by a Apimanager, we should not do anything more
-		// with it.
+		// If this object is not owned by a Apimanager, we should not do anything more with it.
 		if ownerRef.Kind != "Apimanager" {
 			return
 		}
@@ -662,15 +593,13 @@ func apim1Deployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	//apim1mem, _ := resource.ParseQuantity("2Gi")
 	//apim1cpu2, _ :=resource.ParseQuantity("3000m")
 	//apim1mem2, _ := resource.ParseQuantity("3Gi")
+	//defaultmode := int32(0407)
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-1",
 	}
-
-	//defaultmode := int32(0407)
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			// Name: apimanager.Spec.DeploymentName,
 			Name:      "apim-1-deploy",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
@@ -807,13 +736,11 @@ func apim1Deployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 									ContainerPort: 9443,
 									Protocol:      "TCP",
 								},
-
-
 							},
 							Env: []corev1.EnvVar{
 								// {
 								// 	Name:  "HOST_NAME",
-								// 	Value: "foo-am",
+								// 	Value: "wso2-am",
 								// },
 								{
 									Name: "NODE_IP",
@@ -933,10 +860,7 @@ func apim1Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
 			Type:     "NodePort",
-			// values are fetched from wso2-apim.yaml file
-			// Type: apimanager.Spec.ServType,
 			ExternalIPs: []string{"192.168.99.101"},
-			// ExternalIPs: apimanager.Spec.ExternalIps,
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "binary",
@@ -972,273 +896,14 @@ func apim1Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 }
 
 
-// apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
-// the appropriate OwnerReferences on the resource so handleObject can discover
-// the Apimanager resource that 'owns' it.
+// apim instance 2 Deployment creates a new Deployment for a Apimanager instance 2 resource.
 func apim2Deployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
-	////apim2cpu, _ :=resource.ParseQuantity("2000m")
-	////apim2mem, _ := resource.ParseQuantity("2Gi")
-	////apim2cpu2, _ :=resource.ParseQuantity("3000m")
-	////apim2mem2, _ := resource.ParseQuantity("3Gi")
-	//
-	//labels := map[string]string{
-	//	//"app":        "wso2am",
-	//	//"controller": apimanager.Name,
-	//	"deployment": "wso2am-pattern-1-am",
-	//	"node": "wso2am-pattern-1-am-2",
-	//}
-	//return &appsv1.Deployment{
-	//	ObjectMeta: metav1.ObjectMeta{
-	//		// Name: apimanager.Spec.DeploymentName,
-	//		Name:      "apim-2-deploy",
-	//		Namespace: apimanager.Namespace,
-	//		OwnerReferences: []metav1.OwnerReference{
-	//			*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
-	//		},
-	//	},
-	//	Spec: appsv1.DeploymentSpec{
-	//		Replicas: apimanager.Spec.Replicas,
-	//		MinReadySeconds:240,
-	//		Strategy: appsv1.DeploymentStrategy{
-	//			Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
-	//			RollingUpdate: &appsv1.RollingUpdateDeployment{
-	//				MaxSurge: &intstr.IntOrString{
-	//					Type:   intstr.Int,
-	//					IntVal: 1,
-	//				},
-	//				MaxUnavailable: &intstr.IntOrString{
-	//					Type:   intstr.Int,
-	//					IntVal: 0,
-	//				},
-	//			},
-	//		},
-	//
-	//		Selector: &metav1.LabelSelector{
-	//			MatchLabels: labels,
-	//		},
-	//		Template: corev1.PodTemplateSpec{
-	//			ObjectMeta: metav1.ObjectMeta{
-	//				Labels: labels,
-	//			},
-	//			Spec: corev1.PodSpec{
-	//				HostAliases: []corev1.HostAlias{
-	//					{
-	//						IP: "127.0.0.1",
-	//						Hostnames: []string{
-	//							"wso2-am",
-	//							"wso2-gateway",
-	//						},
-	//					},
-	//				},
-	//				//InitContainers: []corev1.Container{
-	//				//	{
-	//				//		Name: "init-apim-analytics-db",
-	//				//		Image: "busybox:1.31",
-	//				//		Command: []string {
-	//				//			//"sh", "-c", "echo -e \"Checking for the availability of MySQL Server deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-mysql-db-service \"3306; do sleep 1; printf \"-\" ;done; echo -e \" >> MySQL Server has started \"; ",
-	//				//			"sh",
-	//				//			"-c",
-	//				//			"echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"wso2am-mysql-db-service\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";",
-	//				//		},
-	//				//
-	//				//	},
-	//				//	{
-	//				//		Name: "init-am-analytics-worker",
-	//				//		Image: "busybox:1.31",
-	//				//		Command: []string {
-	//				//			"sh", "-c", "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-pattern-1-analytics-worker-service 7712; do sleep 1; printf \"-\" ;done; echo -e \" >> WSO2 API Manager Analytics Worker has started \"; ",
-	//				//		},
-	//				//
-	//				//	},
-	//				//},
-	//				Containers: []corev1.Container{
-	//					{
-	//						Name:  "wso2-pattern-1-am",
-	//						Image: "wso2/wso2am:3.0.0",
-	//						LivenessProbe: &corev1.Probe{
-	//							Handler: corev1.Handler{
-	//								Exec:&corev1.ExecAction{
-	//									Command:[]string{
-	//										"/bin/sh",
-	//										"-c",
-	//										"nc -z localhost 9443",
-	//									},
-	//								},
-	//							},
-	//							InitialDelaySeconds: 240,
-	//							PeriodSeconds:       10,
-	//						},
-	//						ReadinessProbe: &corev1.Probe{
-	//							Handler: corev1.Handler{
-	//								Exec:&corev1.ExecAction{
-	//									Command:[]string{
-	//										"/bin/sh",
-	//										"-c",
-	//										"nc -z localhost 9443",
-	//									},
-	//								},
-	//							},
-	//
-	//							InitialDelaySeconds: 240,
-	//							PeriodSeconds:       10,
-	//
-	//						},
-	//
-	//						Lifecycle: &corev1.Lifecycle{
-	//							PreStop:&corev1.Handler{
-	//								Exec:&corev1.ExecAction{
-	//									Command:[]string{
-	//										"sh",
-	//										"-c",
-	//										"${WSO2_SERVER_HOME}/bin/wso2server.sh stop",
-	//									},
-	//								},
-	//							},
-	//						},
-	//
-	//						//Resources:corev1.ResourceRequirements{
-	//						//	Requests:corev1.ResourceList{
-	//						//		corev1.ResourceCPU:apim2cpu,
-	//						//		corev1.ResourceMemory:apim2mem,
-	//						//	},
-	//						//	Limits:corev1.ResourceList{
-	//						//		corev1.ResourceCPU:apim2cpu2,
-	//						//		corev1.ResourceMemory:apim2mem2,
-	//						//	},
-	//						//},
-	//
-	//						ImagePullPolicy: "Always",
-	//
-	//						Ports: []corev1.ContainerPort{
-	//							{
-	//								ContainerPort: 8280,
-	//								Protocol:      "TCP",
-	//							},
-	//							{
-	//								ContainerPort: 8243,
-	//								Protocol:      "TCP",
-	//							},
-	//							{
-	//								ContainerPort: 9763,
-	//								Protocol:      "TCP",
-	//							},
-	//							{
-	//								ContainerPort: 9443,
-	//								Protocol:      "TCP",
-	//							},
-	//
-	//
-	//						},
-	//						Env: []corev1.EnvVar{
-	//							// {
-	//							// 	Name:  "HOST_NAME",
-	//							// 	Value: "foo-am",
-	//							// },
-	//							{
-	//								Name: "NODE_IP",
-	//								ValueFrom: &corev1.EnvVarSource{
-	//									FieldRef: &corev1.ObjectFieldSelector{
-	//										FieldPath: "status.podIP",
-	//									},
-	//								},
-	//							},
-	//						},
-	//						VolumeMounts: []corev1.VolumeMount{
-	//							//{
-	//							//	Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-	//							//	MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/synapse-configs",
-	//							//},
-	//							//{
-	//							//	Name: "wso2am-pattern-1-am-volume-claim-executionplans",
-	//							//	MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
-	//							//},
-	//							//{
-	//							//	Name: "wso2am-pattern-1-am-2-conf",
-	//							//	MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
-	//							//	SubPath:"deployment.toml",
-	//							//},
-	//							//{
-	//							//	Name: "mysql-jdbc-driver",
-	//							//	MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/components/lib",
-	//							//},
-	//							//{
-	//							//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-	//							//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
-	//							//	SubPath:"docker-entrypoint.sh",
-	//							//},
-	//						},
-	//					},
-	//				},
-	//
-	//				ServiceAccountName: "wso2am-pattern-1-svc-account",
-	//				ImagePullSecrets:[]corev1.LocalObjectReference{
-	//					{
-	//						Name:"wso2am-pattern-1-creds",
-	//					},
-	//				},
-	//
-	//				Volumes: []corev1.Volume{
-	//					//{
-	//					//	Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-	//					//	VolumeSource: corev1.VolumeSource{
-	//					//		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-	//					//			ClaimName: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-	//					//		},
-	//					//	},
-	//					//},
-	//					//{
-	//					//	Name: "wso2am-pattern-1-am-volume-claim-executionplans",
-	//					//	VolumeSource: corev1.VolumeSource{
-	//					//		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-	//					//			ClaimName: "wso2am-pattern-1-am-volume-claim-executionplans",
-	//					//		},
-	//					//	},
-	//					//},
-	//					//{
-	//					//	Name: "wso2am-pattern-1-am-2-conf",
-	//					//	VolumeSource: corev1.VolumeSource{
-	//					//		ConfigMap: &corev1.ConfigMapVolumeSource{
-	//					//			LocalObjectReference: corev1.LocalObjectReference{
-	//					//				Name: "wso2am-pattern-1-am-2-conf",
-	//					//			},
-	//					//		},
-	//					//	},
-	//					//},
-	//					//{
-	//					//	Name: "mysql-jdbc-driver",
-	//					//	VolumeSource: corev1.VolumeSource{
-	//					//		ConfigMap: &corev1.ConfigMapVolumeSource{
-	//					//			LocalObjectReference: corev1.LocalObjectReference{
-	//					//				Name: "mysql-jdbc-driver-cm",
-	//					//			},
-	//					//		},
-	//					//	},
-	//					//},
-	//					//{
-	//					//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-	//					//	VolumeSource: corev1.VolumeSource{
-	//					//		ConfigMap: &corev1.ConfigMapVolumeSource{
-	//					//			LocalObjectReference: corev1.LocalObjectReference{
-	//					//				Name: "wso2am-pattern-1-am-conf-entrypoint",
-	//					//			},
-	//					//			//DefaultMode:0407,
-	//					//		},
-	//					//	},
-	//					//},
-	//				},
-	//			},
-	//		},
-	//	},
-	//}
 	labels := map[string]string{
-		//"app":        "wso2am2",
-		//"controller": apimanager.Name,
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-2",
 	}
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			// Name:      apimanager.Spec.DeploymentName,
 			Name:      "apim-2-deploy",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
@@ -1255,27 +920,6 @@ func apim2Deployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
-					//InitContainers: []corev1.Container{
-					//	{
-					//		Name: "init-apim-analytics-db",
-					//		Image: "busybox:1.31",
-					//		Command: []string {
-					//			//"sh", "-c", "echo -e \"Checking for the availability of MySQL Server deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-mysql-db-service \"3306; do sleep 1; printf \"-\" ;done; echo -e \" >> MySQL Server has started \"; ",
-					//			"sh",
-					//			"-c",
-					//			"echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"wso2am-mysql-db-service\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";",
-					//		},
-					//
-					//	},
-					//	//{
-					//	//	Name: "init-am-analytics-worker",
-					//	//	Image: "busybox:1.31",
-					//	//	Command: []string {
-					//	//		"sh", "-c", "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-pattern-1-analytics-worker-service 7712; do sleep 1; printf \"-\" ;done; echo -e \" >> WSO2 API Manager Analytics Worker has started \"; ",
-					//	//	},
-					//	//
-					//	//},
-					//},
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am2",
@@ -1307,26 +951,6 @@ func apim2Deployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 									ContainerPort: 9763,
 									Protocol:      "TCP",
 								},
-								{
-									ContainerPort: 5672,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9711,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9611,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7711,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7611,
-									Protocol:      "TCP",
-								},
 							},
 						},
 					},
@@ -1356,18 +980,15 @@ func apim2Deployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 }
 
 
-// newService creates a new Service for a Apimanager resource.
+// newService creates a new Service for a Apimanager instance 1 resource.
 // It expose the service with Nodeport type with minikube ip as the externel ip.
 func apim2Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 	labels := map[string]string{
-		//"app":        "wso2am",
-		//"controller": apimanager.Name,
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-2",
 	}
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			// Name: apimanager.Spec.ServiceName,
 			Name:      "apim-2-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
@@ -1377,10 +998,7 @@ func apim2Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
 			Type:     "NodePort",
-			// values are fetched from wso2-apim.yaml file
-			// Type: apimanager.Spec.ServType,
 			ExternalIPs: []string{"192.168.99.101"},
-			// ExternalIPs: apimanager.Spec.ExternalIps,
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "servlet-https",
@@ -1416,9 +1034,8 @@ func apim2Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 }
 
 
-//// dashboardDeployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
-//// the appropriate OwnerReferences on the resource so handleObject can discover
-//// the Apimanager resource that 'owns' it.
+//// dashboardDeployment creates a new Deployment for a Apimanager analytics dashboard resource. It also sets the
+//// appropriate OwnerReferences on the resource so handleObject can discover the Apimanager resource that 'owns' it.
 //func dashboardDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 //	labels := map[string]string{
 //		"deployment": "wso2am-pattern-1-analytics-dashboard",
@@ -1855,9 +1472,6 @@ func apim2Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 //		},
 //	}
 //}
-
-
-
 //
 //// newService creates a new Service for a Apimanager resource.
 //// It expose the service with Nodeport type with minikube ip as the externel ip.
@@ -1966,7 +1580,7 @@ func apim2Service(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 //}
 //
 
-
+// mysqlDeployment creates a new Deployment for a MySQL
 func mysqlDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	labels := map[string]string{
 		"deployment": "wso2apim-with-analytics-mysql",
@@ -2067,6 +1681,7 @@ func mysqlDeployment(apimanager *apimv1alpha1.Apimanager) *appsv1.Deployment {
 	}
 }
 
+// mysqlService creates a new Service for a MySQL
 func mysqlService(apimanager *apimv1alpha1.Apimanager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2apim-with-analytics-mysql",

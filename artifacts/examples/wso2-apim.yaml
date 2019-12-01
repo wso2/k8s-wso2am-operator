@@ -5,5 +5,3 @@ metadata:
 spec:
   pattern: Pattern-1
   replicas: 1
-
-    
