@@ -1,7 +1,0 @@
-apiVersion: apim.wso2.com/v1alpha1
-kind: Apimanager
-metadata:
-  name: cluster-1
-spec:
-  pattern: Pattern-1
-  replicas: 1
