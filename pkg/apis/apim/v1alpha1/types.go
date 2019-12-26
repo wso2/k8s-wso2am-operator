@@ -84,7 +84,7 @@ type Profiles struct {
 // APIManagerSpec is the spec for a APIManager resource
 type APIManagerSpec struct {
 	Pattern        string             `json:"pattern"`
-	//Replicas       *int32             `json:"replicas"`
+	Replicas       *int32             `json:"replicas"`
 	Profiles 		Profiles 		  `json:"profiles"`
 	
 	
