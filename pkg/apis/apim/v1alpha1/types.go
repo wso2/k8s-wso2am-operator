@@ -36,14 +36,62 @@ type APIManager struct {
 	Status APIManagerStatus `json:"status"`
 }
 
-// FooSpec is the spec for a Foo resource
-type APIManagerSpec struct {
-	Pattern        string             `json:"pattern"`
-	Replicas       *int32             `json:"replicas"`
+
+
+type ApiManagerInstance struct {
+	ApimDeployment   ApimDeployment   `json:"apim-deployment"`
+	Deployment     Deployment         `json:"deployment"`
+	DeploymentConfigmap string `json:"deployment-configmap"`
+	PersistentVolumeClaimServer string `json:"persistent-volume-claim-server"`
+}
+
+type Storage struct {
+	Memory string `json:"memory"`
+	CPU string `json:"cpu"`
+}
+
+type Resources struct {
+	Requests Storage `json:"requests"`
+	Limits Storage `json:"limits"`
+}
+
+type ApimDeployment struct {
+	Resources Resources `json:"resources"`
+	Image string `json:"image"`
+}
+
+type Probe struct {
+	InitialDelaySeconds int32 		`json:"initialDelaySeconds"`
+	FailureThreshold    int32		`json:"failureThreshold"`
+	PeriodSeconds		int32		`json:"periodSeconds"`
+}
+
+
+type Deployment struct {
+	Replicas *int32 `json:"replicas"`
+	LivenessProbe Probe `json:"livenessProbe"`
+	ReadinessProbe Probe `json:"readinessProbe"`
+	
+}
+
+type Profiles struct {
+	ApiManager1    ApiManagerInstance		  `json:"api-manager-1"`
+	ApiManager2   ApiManagerInstance		  `json:"api-manager-2"`
+
 
 }
 
-// FooStatus is the status for a Foo resource
+// APIManagerSpec is the spec for a APIManager resource
+type APIManagerSpec struct {
+	Pattern        string             `json:"pattern"`
+	//Replicas       *int32             `json:"replicas"`
+	Profiles 		Profiles 		  `json:"profiles"`
+	
+	
+
+}
+
+// APIManagerStatus is the status for a APIManager resource
 type APIManagerStatus struct {
 	AvailableReplicas int32 `json:"availableReplicas"`
 }

@@ -201,7 +201,7 @@ kind: ConfigMap
 metadata:
   creationTimestamp: "2019-12-12T09:15:03Z"
   name: wso2am-pattern-1-am-2-conf
-  namespace: keshi
+  namespace: keshi2
   resourceVersion: "1794592"
   selfLink: /api/v1/namespaces/wso2-system/configmap/wso2am-pattern-1-am-2-conf
   uid: a21becd0-8644-4ea3-8e61-b7c8ffc4318d

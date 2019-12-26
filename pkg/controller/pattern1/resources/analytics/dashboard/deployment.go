@@ -24,14 +24,47 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"strconv"
+
 	//"k8s.io/apimachinery/pkg/api/resource"
 	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 )
 
 // dashboardDeployment creates a new Deployment for a Apimanager analytics dashboard resource. It also sets the
 // appropriate OwnerReferences on the resource so handleObject can discover the Apimanager resource that 'owns' it.
-func DashboardDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
+func DashboardDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap) *appsv1.Deployment {
+
+	ControlConfigData := configMap.Data
+
+	analyticsMinReadySeconds:= "analyticsMinReadySeconds"
+	maxSurge:= "maxSurge"
+	maxUnavailable:= "maxUnavailable"
+	analyticsProbeInitialDelaySeconds := "analyticsProbeInitialDelaySeconds"
+	periodSeconds:= "periodSeconds"
+	imagePullPolicy:= "imagePullPolicy"
+	//analyticsCPU:= "analyticsCPU"
+	//analyticsMemory:= "analyticsMemory"
+
+
+	minReadySec,_ := strconv.ParseInt(ControlConfigData[analyticsMinReadySeconds], 10, 32)
+	maxSurges,_ := strconv.ParseInt(ControlConfigData[maxSurge], 10, 32)
+	maxUnavail,_ := strconv.ParseInt(ControlConfigData[maxUnavailable], 10, 32)
+	liveDelay,_ := strconv.ParseInt(ControlConfigData[analyticsProbeInitialDelaySeconds], 10, 32)
+	livePeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
+	readyDelay,_ := strconv.ParseInt(ControlConfigData[analyticsProbeInitialDelaySeconds], 10, 32)
+	readyPeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
+	imagePull,_ := ControlConfigData[imagePullPolicy]
+	//reqCPU := ControlConfigData[analyticsCPU]
+	//reqMem := ControlConfigData[analyticsMemory]
+	//limitCPU := ControlConfigData[analyticsCPU]
+	//limitMem := ControlConfigData[analyticsMemory]
+
+
+
+
+
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
@@ -52,17 +85,17 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:30,
+			MinReadySeconds:int32(minReadySec),
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
 					MaxSurge: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: 1,
+						IntVal: int32(maxSurges),
 					},
 					MaxUnavailable: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: 0,
+						IntVal: int32(maxUnavail),
 					},
 				},
 			},
@@ -111,8 +144,8 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment
 										},
 									},
 								},
-								InitialDelaySeconds: 20,
-								PeriodSeconds:       10,
+								InitialDelaySeconds: int32(liveDelay),
+								PeriodSeconds:       int32(livePeriod),
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -124,8 +157,9 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment
 										},
 									},
 								},
-								InitialDelaySeconds: 20,
-								PeriodSeconds:       10,
+
+								InitialDelaySeconds: int32(readyDelay),
+								PeriodSeconds:       int32(readyPeriod),
 
 							},
 
@@ -152,7 +186,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment
 							//	},
 							//},
 
-							ImagePullPolicy: "Always",
+							ImagePullPolicy:corev1.PullPolicy(imagePull),
 
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser:&runasuser,
@@ -202,6 +236,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment
 								//	ContainerPort: 30169,
 								//	Protocol:      "TCP",
 								//},
+								//{
 								//{
 								//	ContainerPort: 9713,
 								//	Protocol:      "TCP",

@@ -81,6 +81,7 @@ func main() {
 	controller := controller.NewController(kubeClient, exampleClient,
 		kubeInformerFactory.Apps().V1().Deployments(),
 		kubeInformerFactory.Core().V1().Services(),
+		kubeInformerFactory.Core().V1().ConfigMaps(),
 		exampleInformerFactory.Apim().V1alpha1().APIManagers())
 
 	// notice that there is no need to run Start methods in a separate goroutine. (i.e. go kubeInformerFactory.Start(stopCh)

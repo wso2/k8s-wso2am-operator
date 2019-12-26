@@ -314,7 +314,7 @@ kind: ConfigMap
 metadata:
   creationTimestamp: "2019-12-13T04:25:27Z"
   name: wso2am-pattern-1-am-analytics-dashboard-bin
-  namespace: keshi
+  namespace: keshi2
   resourceVersion: "1821536"
   selfLink: /api/v1/namespaces/wso2-system/configmap/wso2am-pattern-1-am-analytics-dashboard-bin
   uid: 1db69562-dd3a-473e-a5ed-04fbd42c0501

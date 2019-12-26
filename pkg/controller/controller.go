@@ -43,6 +43,7 @@ import (
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	appslisters "k8s.io/client-go/listers/apps/v1"
 	corelisters "k8s.io/client-go/listers/core/v1"
+	corev1listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
@@ -68,6 +69,7 @@ type Controller struct {
 	servicesSynced    cache.InformerSynced
 	apimanagerslister listers.APIManagerLister
 	apimanagersSynced cache.InformerSynced
+	configMapLister   corev1listers.ConfigMapLister
 	recorder record.EventRecorder          			// recorder is an event recorder for recording Event resources to the Kubernetes API.
 	workqueue workqueue.RateLimitingInterface
 	// workqueue is a rate limited work queue. This is used to queue work to be processed instead of performing it as
@@ -75,12 +77,17 @@ type Controller struct {
 	// makes it easy to ensure we are never processing the same item simultaneously in two different workers.
 }
 
+
+
+
+
 // NewController returns a new wso2am controller
 func NewController(
 	kubeclientset kubernetes.Interface,
 	sampleclientset clientset.Interface,
 	deploymentInformer appsinformers.DeploymentInformer,
 	serviceInformer coreinformers.ServiceInformer,
+	configmapInformer coreinformers.ConfigMapInformer,
 	apimanagerInformer informers.APIManagerInformer) *Controller {
 
 	// Create event broadcaster.
@@ -99,6 +106,7 @@ func NewController(
 		deploymentsSynced: deploymentInformer.Informer().HasSynced,
 		servicesLister:    serviceInformer.Lister(),
 		servicesSynced:    serviceInformer.Informer().HasSynced,
+		configMapLister:   configmapInformer.Lister(),
 		apimanagerslister: apimanagerInformer.Lister(),
 		apimanagersSynced: apimanagerInformer.Informer().HasSynced,
 		workqueue:         workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Apimanagers"),
@@ -278,13 +286,23 @@ func (c *Controller) syncHandler(key string) error {
 
 	/////////checking whether resourecs already exits, else create one
 
+
+	configMapName := "controller-config"
+	configmap, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
+
+
+
+
+
+
+
 	// Parse the object and look for it’s deployment
 	// Use a Lister to find the deployment object referred to in the Apimanager resource
 	// Get apim instance 1 deployment name using hardcoded value
 	deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(apim1.Apim1Deployment(apimanager))
+		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(apim1.Apim1Deployment(apimanager,configmap))
 		if err != nil {
 			return err
 		}
@@ -294,7 +312,7 @@ func (c *Controller) syncHandler(key string) error {
 	deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(apim2.Apim2Deployment(apimanager))
+		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(apim2.Apim2Deployment(apimanager,configmap))
 		if err != nil {
 			return err
 		}
@@ -304,7 +322,7 @@ func (c *Controller) syncHandler(key string) error {
 	dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(dashboard.DashboardDeployment(apimanager))
+		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(dashboard.DashboardDeployment(apimanager,configmap))
 		if err != nil {
 			return err
 		}
@@ -314,7 +332,7 @@ func (c *Controller) syncHandler(key string) error {
 	workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(worker.WorkerDeployment(apimanager))
+		workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(worker.WorkerDeployment(apimanager,configmap))
 		if err != nil {
 			return err
 		}
@@ -452,25 +470,25 @@ func (c *Controller) syncHandler(key string) error {
 	// current desired replicas on the Deployment, we should update the Deployment resource.
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim1.Apim1Deployment(apimanager))
+		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim1.Apim1Deployment(apimanager,configmap))
 	}
 
 	//for apim instance 2 also
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
-		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim2.Apim2Deployment(apimanager))
+		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim2.Apim2Deployment(apimanager,configmap))
 	}
 
 	//for analytics dashboard deployment
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
-		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(dashboard.DashboardDeployment(apimanager))
+		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(dashboard.DashboardDeployment(apimanager,configmap))
 	}
 
 	//for analytics worker deployment
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
 		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
-		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(worker.WorkerDeployment(apimanager))
+		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(worker.WorkerDeployment(apimanager,configmap))
 	}
 
 	//for instance mysql deployment

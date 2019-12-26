@@ -22,11 +22,13 @@ package apim2
 
 import (
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"strconv"
 )
 import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/core/v1"
 	//"k8s.io/apimachinery/pkg/api/resource"
 	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 )
@@ -34,12 +36,42 @@ import (
 // apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it.
-func Apim2Deployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
+func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap) *appsv1.Deployment {
 	//apim1cpu, _ :=resource.ParseQuantity("2000m")
 	//apim1mem, _ := resource.ParseQuantity("2Gi")
 	//apim1cpu2, _ :=resource.ParseQuantity("3000m")
 	//apim1mem2, _ := resource.ParseQuantity("3Gi")
 	//defaultmode := int32(0407)
+
+	ControlConfigData := configMap.Data
+
+
+	amMinReadySeconds:= "amMinReadySeconds"
+	maxSurge:= "maxSurge"
+	maxUnavailable:= "amMaxUnavailable"
+	amProbeInitialDelaySeconds := "amProbeInitialDelaySeconds"
+	periodSeconds:= "periodSeconds"
+	imagePullPolicy:= "imagePullPolicy"
+	//amRequestsCPU:= "amRequestsCPU"
+	//amRequestsMemory:= "amRequestsMemory"
+	//amLimitsCPU:= "amLimitsCPU"
+	//amLimitsMemory:= "amLimitsMemory"
+
+
+	minReadySec,_ := strconv.ParseInt(ControlConfigData[amMinReadySeconds], 10, 32)
+	maxSurges,_ := strconv.ParseInt(ControlConfigData[maxSurge], 10, 32)
+	maxUnavail,_ := strconv.ParseInt(ControlConfigData[maxUnavailable], 10, 32)
+	liveDelay,_ := strconv.ParseInt(ControlConfigData[amProbeInitialDelaySeconds], 10, 32)
+	livePeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
+	readyDelay,_ := strconv.ParseInt(ControlConfigData[amProbeInitialDelaySeconds], 10, 32)
+	readyPeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
+	imagePull,_ := ControlConfigData[imagePullPolicy]
+	//reqCPU := ControlConfigData[amRequestsCPU]
+	//reqMem := ControlConfigData[amRequestsMemory]
+	//limitCPU := ControlConfigData[amLimitsCPU]
+	//limitMem := ControlConfigData[amLimitsMemory]
+
+
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-2",
@@ -54,17 +86,17 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:240,
+			MinReadySeconds:int32(minReadySec),
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
 					MaxSurge: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: 1,
+						IntVal: int32(maxSurges),
 					},
 					MaxUnavailable: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: 0,
+						IntVal: int32(maxUnavail),
 					},
 				},
 			},
@@ -121,8 +153,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 										},
 									},
 								},
-								InitialDelaySeconds: 240,
-								PeriodSeconds:       10,
+								InitialDelaySeconds: int32(liveDelay),
+								PeriodSeconds:       int32(livePeriod),
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -135,9 +167,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 									},
 								},
 
-								InitialDelaySeconds: 240,
-								PeriodSeconds:       10,
-
+								InitialDelaySeconds: int32(readyDelay),
+								PeriodSeconds:       int32(readyPeriod),
 							},
 
 							Lifecycle: &corev1.Lifecycle{
@@ -163,7 +194,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 							//	},
 							//},
 
-							ImagePullPolicy: "Always",
+							ImagePullPolicy: corev1.PullPolicy(imagePull),
 
 							Ports: []corev1.ContainerPort{
 								{
@@ -253,7 +284,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
 									LocalObjectReference: corev1.LocalObjectReference{
-										Name: "wso2am-pattern-1-am-2-conf",
+										Name: apimanager.Spec.Profiles.ApiManager2.DeploymentConfigmap,//"wso2am-pattern-1-am-2-conf",
 									},
 								},
 							},
