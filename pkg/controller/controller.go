@@ -21,6 +21,7 @@
 package controller
 
 import (
+	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim1"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/dashboard"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/worker"
@@ -28,10 +29,12 @@ import (
 import "github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim2"
 import "github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/mysql"
 
+
 import (
 	"fmt"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	//v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -153,7 +156,6 @@ func NewController(
 		},
 		DeleteFunc: controller.handleObject,
 	})
-
 	return controller
 }
 
@@ -248,6 +250,8 @@ func (c *Controller) processNextWorkItem() bool {
 	return true
 }
 
+
+
 // syncHandler compares the actual state with the desired, and attempts to converge the two.
 // It then updates the Status block of the Apimanager resource with the current status of the resource.
 // c is the Controller object type pointer as a parameter
@@ -287,13 +291,8 @@ func (c *Controller) syncHandler(key string) error {
 	/////////checking whether resourecs already exits, else create one
 
 
-	configMapName := "controller-config"
-	configmap, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
-
-
-
-
-
+		configMapName := "controller-config"
+		configmap, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
 
 
 	// Parse the object and look for it’s deployment
@@ -463,6 +462,13 @@ func (c *Controller) syncHandler(key string) error {
 		return fmt.Errorf(msg)
 	}
 
+	//If the apim instance 2 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+	//if !metav1.IsControlledBy(rcm, apimanager) {
+	//	msg := fmt.Sprintf("rough configmap %q already exists and is not managed by Apimanager", rcm.Name)
+	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+	//	return fmt.Errorf(msg)
+	//}
+
 	///////////check replicas are same as defined for deployments
 
 	// If the Apimanager resource has changed update the deployment
@@ -539,6 +545,22 @@ func (c *Controller) syncHandler(key string) error {
 	c.recorder.Event(apimanager, corev1.EventTypeNormal,"synced","Apimanager synced successfully")
 	return nil
 }
+
+
+/*// createConfigMap creates a config file with the given data
+func createConfigMap(apiConfigMapRef string, key string, value string, ns string, owner []metav1.OwnerReference) *corev1.ConfigMap {
+
+	return &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            apiConfigMapRef,
+			Namespace:       ns,
+			OwnerReferences: owner,
+		},
+		Data: map[string]string{
+			key: value,
+		},
+	}
+}*/
 
 func (c *Controller) updateApimanagerStatus(apimanager *apimv1alpha1.APIManager, deployment *appsv1.Deployment) error {
 	// NEVER modify objects from the store. It's a read-only, local cache.

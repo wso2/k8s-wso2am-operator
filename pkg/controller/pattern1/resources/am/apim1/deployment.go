@@ -24,8 +24,6 @@ import (
 	//"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"strconv"
-)
-import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -45,44 +43,103 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMa
 	//apim1mem1, _ := resource.ParseQuantity(apimanager.Spec.ApimDeployment.Resources.Requests.Memory)
 	//apim1cpu2, _ :=resource.ParseQuantity(apimanager.Spec.ApimDeployment.Resources.Limits.CPU)
 	//apim1mem2, _ := resource.ParseQuantity(apimanager.Spec.ApimDeployment.Resources.Limits.Memory)
-	liveDelay := apimanager.Spec.Profiles.ApiManager1.Deployment.LivenessProbe.InitialDelaySeconds
-	livePeriod := apimanager.Spec.Profiles.ApiManager1.Deployment.LivenessProbe.PeriodSeconds
-	liveThres := apimanager.Spec.Profiles.ApiManager1.Deployment.LivenessProbe.FailureThreshold
-	readyDelay := apimanager.Spec.Profiles.ApiManager1.Deployment.ReadinessProbe.InitialDelaySeconds
-	readyPeriod := apimanager.Spec.Profiles.ApiManager1.Deployment.ReadinessProbe.PeriodSeconds
-	readyThres := apimanager.Spec.Profiles.ApiManager1.Deployment.ReadinessProbe.FailureThreshold
-
-
 
 	ControlConfigData := configMap.Data
-
+	amProbeInitialDelaySeconds := "amProbeInitialDelaySeconds"
 	amMinReadySeconds:= "amMinReadySeconds"
 	maxSurge:= "maxSurge"
 	maxUnavailable:= "amMaxUnavailable"
-	//amProbeInitialDelaySeconds := "amProbeInitialDelaySeconds"
-	//periodSeconds:= "periodSeconds"
+	periodSeconds:= "periodSeconds"
 	imagePullPolicy:= "imagePullPolicy"
+	failureThreshold:= "failureThreshold"
 	//amRequestsCPU:= "amRequestsCPU"
 	//amRequestsMemory:= "amRequestsMemory"
 	//amLimitsCPU:= "amLimitsCPU"
 	//amLimitsMemory:= "amLimitsMemory"
 
+	amImage:="wso2/wso2am:3.0.0"
+	imageFromYaml:= apimanager.Spec.Profiles.ApiManager1.ApimDeployment.Image
+	if imageFromYaml != ""{
+		amImage=imageFromYaml
+	}
+
+	liveDelay,_ := strconv.ParseInt(ControlConfigData[amProbeInitialDelaySeconds], 10, 32)
+	liveDelayFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.LivenessProbe.InitialDelaySeconds
+	if liveDelayFromYaml != 0{
+		liveDelay = int64(liveDelayFromYaml)
+		//utilruntime.HandleError(fmt.Errorf("Live delay not present"))
+	}
+
+	livePeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
+	livePeriodFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.LivenessProbe.PeriodSeconds
+	if livePeriodFromYaml != 0{
+		livePeriod = int64(liveDelayFromYaml)
+	}
+
+	liveThres,_ := strconv.ParseInt(ControlConfigData[failureThreshold], 10, 32)
+	liveThresFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.LivenessProbe.FailureThreshold
+	if liveThresFromYaml != 0{
+		liveThres = int64(liveThresFromYaml)
+	}
+
+
+	readyDelay,_ := strconv.ParseInt(ControlConfigData[amProbeInitialDelaySeconds], 10, 32)
+	readyDelayFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.ReadinessProbe.InitialDelaySeconds
+	if readyDelayFromYaml != 0{
+		readyDelay = int64(readyDelayFromYaml)
+		//utilruntime.HandleError(fmt.Errorf("Live delay not present"))
+	}
+
+	readyPeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
+	readyPeriodFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.ReadinessProbe.PeriodSeconds
+	if readyPeriodFromYaml != 0{
+		readyPeriod = int64(readyPeriodFromYaml)
+	}
+
+	readyThres,_ := strconv.ParseInt(ControlConfigData[failureThreshold], 10, 32)
+	readyThresFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.ReadinessProbe.FailureThreshold
+	if readyThresFromYaml != 0{
+		readyThres = int64(readyThresFromYaml)
+	}
 
 	minReadySec,_ := strconv.ParseInt(ControlConfigData[amMinReadySeconds], 10, 32)
+	minReadySecFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.MinReadySeconds
+	if minReadySecFromYaml != 0{
+		minReadySec = int64(minReadySecFromYaml)
+	}
+
 	maxSurges,_ := strconv.ParseInt(ControlConfigData[maxSurge], 10, 32)
+	maxSurgeFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.Strategy.RollingUpdate.MaxSurge
+	if maxSurgeFromYaml !=0{
+		maxSurges = int64(maxSurgeFromYaml)
+	}
+
 	maxUnavail,_ := strconv.ParseInt(ControlConfigData[maxUnavailable], 10, 32)
-	//liveDelay,_ := strconv.ParseInt(ControlConfigData[amProbeInitialDelaySeconds], 10, 32)
-	//livePeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
-	//readyDelay,_ := strconv.ParseInt(ControlConfigData[amProbeInitialDelaySeconds], 10, 32)
-	//readyPeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
+	maxUnavailFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.Strategy.RollingUpdate.MaxUnavailable
+	if maxUnavailFromYaml !=0{
+		maxUnavail = int64(maxUnavailFromYaml)
+	}
+
 	imagePull,_ := ControlConfigData[imagePullPolicy]
-	//reqCPU := ControlConfigData[amRequestsCPU]
+	imagePullFromYaml := apimanager.Spec.Profiles.ApiManager1.Deployment.ImagePullPolicy
+	if imagePullFromYaml != ""{
+		imagePull = imagePullFromYaml
+	}
+
+
+
+
+
+	//reqCPU,_ := resource.ParseQuantity(ControlConfigData[amRequestsCPU])
+	////reqCPU,_ := resource.ParseQuantity(ControlConfigData[amRequestsCPU])
+	//apim1cpu1FromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles.ApiManager1.ApimDeployment.Resources.Requests.CPU)
+	//if apim1cpu1FromYaml != resource.MustParse(""){
+	//	reqCPU = apim1cpu1FromYaml
+	//}
+
 	//reqMem := ControlConfigData[amRequestsMemory]
 	//limitCPU := ControlConfigData[amLimitsCPU]
 	//limitMem := ControlConfigData[amLimitsMemory]
-
-
-
 
 
 
@@ -90,7 +147,11 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMa
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-1",
 	}
-
+	am1ConfigMap := "wso2am-pattern-1-am-1-conf"
+	am1ConfigMapFromYaml := apimanager.Spec.Profiles.ApiManager1.DeploymentConfigmap
+	if am1ConfigMapFromYaml != ""{
+		am1ConfigMap = am1ConfigMapFromYaml
+	}
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "apim-1-deploy",
@@ -157,7 +218,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMa
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2-pattern-1-am",
-							Image: apimanager.Spec.Profiles.ApiManager1.ApimDeployment.Image,//"wso2/wso2am:3.0.0",
+							Image: amImage,//apimanager.Spec.Profiles.ApiManager1.ApimDeployment.Image,//"wso2/wso2am:3.0.0",
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -168,9 +229,9 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMa
 										},
 									},
 								},
-								InitialDelaySeconds: liveDelay, //int32(liveDelay)
-								PeriodSeconds:      livePeriod, //int32(livePeriod),
-								FailureThreshold: liveThres,
+								InitialDelaySeconds: int32(liveDelay),
+								PeriodSeconds:      int32(livePeriod),
+								FailureThreshold: int32(liveThres),
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -183,9 +244,9 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMa
 									},
 								},
 
-								InitialDelaySeconds: readyDelay,//int32(readyDelay),
-								PeriodSeconds:  readyPeriod,     //int32(readyPeriod),
-								FailureThreshold: readyThres,
+								InitialDelaySeconds: int32(readyDelay),
+								PeriodSeconds:  int32(readyPeriod),
+								FailureThreshold: int32(readyThres),
 
 							},
 
@@ -203,13 +264,13 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMa
 
 							//Resources:corev1.ResourceRequirements{
 							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:apim1cpu1,
-							//		corev1.ResourceMemory:apim1mem1,
+							//		corev1.ResourceCPU:reqCPU,
+							//		//corev1.ResourceMemory:apim1mem1,
 							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:apim1cpu2,
-							//		corev1.ResourceMemory:apim1mem2,
-							//	},
+							//	//Limits:corev1.ResourceList{
+							//		//corev1.ResourceCPU:apim1cpu2,
+							//		//corev1.ResourceMemory:apim1mem2,
+							//	//},
 							//},
 
 							ImagePullPolicy:corev1.PullPolicy(imagePull),
@@ -299,7 +360,8 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMa
 								ConfigMap: &corev1.ConfigMapVolumeSource{
 									LocalObjectReference: corev1.LocalObjectReference{
 										//Name: "wso2am-pattern-1-am-1-conf",
-										Name:apimanager.Spec.Profiles.ApiManager1.DeploymentConfigmap,
+
+										Name:am1ConfigMap,
 									},
 								},
 							},

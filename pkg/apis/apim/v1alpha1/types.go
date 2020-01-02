@@ -66,17 +66,29 @@ type Probe struct {
 	PeriodSeconds		int32		`json:"periodSeconds"`
 }
 
+type RollUpdate struct {
+	MaxSurge int32 `json:"maxSurge"`
+	MaxUnavailable int32 `json:"maxUnavailable"`
+}
+
+type Strategy struct {
+	RollingUpdate RollUpdate `json:"rollingUpdate"`
+}
 
 type Deployment struct {
 	Replicas *int32 `json:"replicas"`
 	LivenessProbe Probe `json:"livenessProbe"`
 	ReadinessProbe Probe `json:"readinessProbe"`
+	MinReadySeconds int32 `json:"minReadySeconds"`
+	Strategy Strategy `json:"strategy"`
+	ImagePullPolicy string `json:"imagePullPolicy"`
+	
 	
 }
 
 type Profiles struct {
 	ApiManager1    ApiManagerInstance		  `json:"api-manager-1"`
-	ApiManager2   ApiManagerInstance		  `json:"api-manager-2"`
+	ApiManager2    ApiManagerInstance		  `json:"api-manager-2"`
 
 
 }

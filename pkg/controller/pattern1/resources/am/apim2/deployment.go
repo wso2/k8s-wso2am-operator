@@ -76,6 +76,11 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-2",
 	}
+	am2ConfigMap := "wso2am-pattern-1-am-2-conf"
+	am2ConfigMapFromYaml := apimanager.Spec.Profiles.ApiManager2.DeploymentConfigmap
+	if am2ConfigMapFromYaml != ""{
+		am2ConfigMap = am2ConfigMapFromYaml
+	}
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "apim-2-deploy",
@@ -84,6 +89,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
 			},
 		},
+
 		Spec: appsv1.DeploymentSpec{
 			Replicas: apimanager.Spec.Replicas,
 			MinReadySeconds:int32(minReadySec),
@@ -284,7 +290,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 							VolumeSource: corev1.VolumeSource{
 								ConfigMap: &corev1.ConfigMapVolumeSource{
 									LocalObjectReference: corev1.LocalObjectReference{
-										Name: apimanager.Spec.Profiles.ApiManager2.DeploymentConfigmap,//"wso2am-pattern-1-am-2-conf",
+										Name: am2ConfigMap,//apimanager.Spec.Profiles.ApiManager2.DeploymentConfigmap,//"wso2am-pattern-1-am-2-conf",
 									},
 								},
 							},
