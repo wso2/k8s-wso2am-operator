@@ -77,7 +77,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 		"node": "wso2am-pattern-1-am-2",
 	}
 	am2ConfigMap := "wso2am-pattern-1-am-2-conf"
-	am2ConfigMapFromYaml := apimanager.Spec.Profiles.ApiManager2.DeploymentConfigmap
+	am2ConfigMapFromYaml := apimanager.Spec.Profiles[1].DeploymentConfigmap
 	if am2ConfigMapFromYaml != ""{
 		am2ConfigMap = am2ConfigMapFromYaml
 	}

@@ -11,3 +11,23 @@ spec:
   subresources:
     status: {}
   scope: Namespaced
+  additionalPrinterColumns:
+    - name: Type
+      type: string
+      description: Type of this component
+      JSONPath: .status.componentType
+    - name: Status
+      type: string
+      description: Status of this component
+      JSONPath: .status.status
+    - name: Service-Name
+      type: string
+      description: Service name of this component
+      JSONPath: .status.serviceName
+    - name: Ready-Replicas
+      type: integer
+      description: Number of replicas available for this component
+      JSONPath: .status.availableReplicas
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp

@@ -1,0 +1,21 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: wso2am-controller
+  namespace: wso2-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wso2am-controller
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: wso2am-controller
+    spec:
+      containers:
+        - name: wso2am-controller
+          image: wso2cellery/wso2am-controller:latest
+      serviceAccountName: wso2am-pattern-1-svc-account

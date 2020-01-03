@@ -21,10 +21,16 @@
 package controller
 
 import (
+	//"github.com/sirupsen/logrus"
+	//"sigs.k8s.io/controller-runtime/pkg/log"
+
+	//"github.com/wso2-incubator/wso2am-k8s-operator/artifacts/resources"
 	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim1"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/dashboard"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/worker"
+	//"k8s.io/apimachinery/pkg/types"
+	//"sigs.k8s.io/controller-runtime/pkg/client"
 )
 import "github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim2"
 import "github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/mysql"
@@ -289,10 +295,31 @@ func (c *Controller) syncHandler(key string) error {
 
 
 	/////////checking whether resourecs already exits, else create one
+	configMapName := "controller-config"
+	configmap, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
 
 
-		configMapName := "controller-config"
-		configmap, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
+	//configMapName := "controller-config"
+	//configmap, err := c.configMapLister.ConfigMaps("ka5").Get(configMapName)
+	//if errors.IsNotFound(err) {
+	//	configmap.Namespace=apimanager.Namespace
+	//	configmap, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(configmap)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
+
+	//configmap, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(configmap)
+
+	//if err != nil {
+	//	fmt.Println("error in creating configmap")
+	//
+	//	//c.logger.Errorf("Failed to create ConfigMap %q: %v", configMapName, err)
+	//	//c.recorder.Eventf(tokenService, corev1.EventTypeWarning, "CreationFailed", "Failed to create ConfigMap %q: %v", configMapName, err)
+	//	return err
+	//}
+
+
 
 
 	// Parse the object and look for it’s deployment
@@ -547,20 +574,6 @@ func (c *Controller) syncHandler(key string) error {
 }
 
 
-/*// createConfigMap creates a config file with the given data
-func createConfigMap(apiConfigMapRef string, key string, value string, ns string, owner []metav1.OwnerReference) *corev1.ConfigMap {
-
-	return &corev1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:            apiConfigMapRef,
-			Namespace:       ns,
-			OwnerReferences: owner,
-		},
-		Data: map[string]string{
-			key: value,
-		},
-	}
-}*/
 
 func (c *Controller) updateApimanagerStatus(apimanager *apimv1alpha1.APIManager, deployment *appsv1.Deployment) error {
 	// NEVER modify objects from the store. It's a read-only, local cache.

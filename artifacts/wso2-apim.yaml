@@ -6,36 +6,118 @@ metadata:
 spec:
   pattern: Pattern-1
   profiles:
-    api-manager-1:
-      apim-deployment:
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 2000m
+    #configuratiosn for apim instance 1
+    - name: apimanager1
+      resources:
+        requests:
+          memory: 2Gi
+          cpu: 2000m
           limits:
             memory: 3Gi
             cpu: 3000m
-        image: wso2/wso2am:3.0.0
-      deployment:
-        replicas: 1
-        minReadySeconds: 240
-        strategy:
-          rollingUpdate:
-            maxSurge: 1
-            maxUnavailable: 0
-        imagePullPolicy: Always
-        livenessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
-      deployment-configmap: new-deployment-toml-1
-#      persistent-volume-claim-server: new-claim
-    api-manager-2:
-      deployment-configmap: new-deployment-toml-2
+      replicas: 1
+      minReadySeconds: 240
+      strategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      imagePullPolicy: Always
+      livenessProbe:
+        initialDelaySeconds: 240
+        failureThreshold: 3
+        periodSeconds: 10
+      readinessProbe:
+        initialDelaySeconds: 240
+        failureThreshold: 3
+        periodSeconds: 10
+      deploymentConfigmap: new-deployment-toml-1
+      persistentVolumeClaimServer:
+        synapseConfigs: new-claim-1
+        executionPlans: new-claim-2
+
+      #configuratiosn for apim instance 2
+    - name: apimanager2
+      resources:
+        requests:
+          memory: 2Gi
+          cpu: 2000m
+        limits:
+          memory: 3Gi
+          cpu: 3000m
+      replicas: 1
+      minReadySeconds: 240
+      strategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      imagePullPolicy: Always
+      livenessProbe:
+        initialDelaySeconds: 240
+        failureThreshold: 3
+        periodSeconds: 10
+      readinessProbe:
+        initialDelaySeconds: 240
+        failureThreshold: 3
+        periodSeconds: 10
+      deploymentConfigmap: new-deployment-toml-2
+
+      #configurations for analytics dashboard
+    - name: analytics-dashboard
+      resources:
+        requests:
+          memory: 2Gi
+          cpu: 2000m
+        limits:
+          memory: 3Gi
+          cpu: 3000m
+      replicas: 1
+      minReadySeconds: 240
+      strategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      imagePullPolicy: Always
+      livenessProbe:
+        initialDelaySeconds: 240
+        failureThreshold: 3
+        periodSeconds: 10
+      readinessProbe:
+        initialDelaySeconds: 240
+        failureThreshold: 3
+        periodSeconds: 10
+      deploymentConfigmap: new-dashboard-toml
+
+
+    #configurations for analytics worker
+    - name: analytics-worker
+      resources:
+        requests:
+          memory: 2Gi
+          cpu: 2000m
+        limits:
+          memory: 3Gi
+          cpu: 3000m
+      replicas: 1
+      minReadySeconds: 240
+      strategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      imagePullPolicy: Always
+      livenessProbe:
+        initialDelaySeconds: 240
+        failureThreshold: 3
+        periodSeconds: 10
+      readinessProbe:
+        initialDelaySeconds: 240
+        failureThreshold: 3
+        periodSeconds: 10
+      deploymentConfigmap: new-worker-toml
+
+
+
+
+
 
 
 

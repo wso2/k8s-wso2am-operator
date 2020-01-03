@@ -12,4 +12,5 @@ require (
 	k8s.io/code-generator v0.0.0-20191121015212-c4c8f8345c7e
 	k8s.io/klog v1.0.0
 	k8s.io/utils v0.0.0-20191114200735-6ca3b61696b6 // indirect
+	sigs.k8s.io/controller-runtime v0.4.0
 )

@@ -36,14 +36,17 @@ type APIManager struct {
 	Status APIManagerStatus `json:"status"`
 }
 
-
-
-type ApiManagerInstance struct {
-	ApimDeployment   ApimDeployment   `json:"apim-deployment"`
-	Deployment     Deployment         `json:"deployment"`
-	DeploymentConfigmap string `json:"deployment-configmap"`
-	PersistentVolumeClaimServer string `json:"persistent-volume-claim-server"`
+type PVCServer struct {
+	SynapseConfigs string `json:"synapseConfigs"`
+	ExecutionPlans string `json:"executionPlans"`
 }
+
+//type ApiManagerInstance struct {
+//	//ApimDeployment   ApimDeployment   `json:"apim-deployment"`
+//	//Deployment     Deployment         `json:"deployment"`
+//	//DeploymentConfigmap string `json:"deployment-configmap"`
+//	//PersistentVolumeClaimServer PVCServer `json:"persistent-volume-claim-server"`
+//}
 
 type Storage struct {
 	Memory string `json:"memory"`
@@ -55,10 +58,9 @@ type Resources struct {
 	Limits Storage `json:"limits"`
 }
 
-type ApimDeployment struct {
-	Resources Resources `json:"resources"`
-	Image string `json:"image"`
-}
+//type ApimDeployment struct {
+//
+//}
 
 type Probe struct {
 	InitialDelaySeconds int32 		`json:"initialDelaySeconds"`
@@ -75,21 +77,30 @@ type Strategy struct {
 	RollingUpdate RollUpdate `json:"rollingUpdate"`
 }
 
-type Deployment struct {
+//type Deployment struct {
+//
+//
+//
+//}
+
+//type Profiles struct {
+//	ApiManager1    ApiManagerInstance		  `json:"api-manager-1"`
+//	ApiManager2    ApiManagerInstance		  `json:"api-manager-2"`
+//
+//}
+
+type Profile struct {
+	Name  string `json:"name"`
+	Resources Resources `json:"resources"`
+	//Image string `json:"image"`
 	Replicas *int32 `json:"replicas"`
-	LivenessProbe Probe `json:"livenessProbe"`
-	ReadinessProbe Probe `json:"readinessProbe"`
 	MinReadySeconds int32 `json:"minReadySeconds"`
 	Strategy Strategy `json:"strategy"`
 	ImagePullPolicy string `json:"imagePullPolicy"`
-	
-	
-}
-
-type Profiles struct {
-	ApiManager1    ApiManagerInstance		  `json:"api-manager-1"`
-	ApiManager2    ApiManagerInstance		  `json:"api-manager-2"`
-
+	LivenessProbe Probe `json:"livenessProbe"`
+	ReadinessProbe Probe `json:"readinessProbe"`
+	DeploymentConfigmap string `json:"deploymentConfigmap"`
+	PersistentVolumeClaimServer PVCServer `json:"persistentVolumeClaimServer"`
 
 }
 
@@ -97,8 +108,8 @@ type Profiles struct {
 type APIManagerSpec struct {
 	Pattern        string             `json:"pattern"`
 	Replicas       *int32             `json:"replicas"`
-	Profiles 		Profiles 		  `json:"profiles"`
-	
+	//Profiles 		Profiles 		  `json:"profiles"`
+	Profiles 	[]Profile  				`json:"profiles"`
 	
 
 }
