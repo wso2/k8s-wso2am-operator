@@ -297,12 +297,20 @@ func (c *Controller) syncHandler(key string) error {
 	/////////checking whether resourecs already exits, else create one
 	configMapName := "controller-config"
 	configmap, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
+	//if errors.IsNotFound(err) {
+	//	configmap.Namespace="sample"
+	//	configmap, err = c.kubeclientset.CoreV1().ConfigMaps("sample").Create(configmap)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
+
 
 
 	//configMapName := "controller-config"
 	//configmap, err := c.configMapLister.ConfigMaps("ka5").Get(configMapName)
 	//if errors.IsNotFound(err) {
-	//	configmap.Namespace=apimanager.Namespace
+	//	configmap.Namespace="sample"
 	//	configmap, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(configmap)
 	//	if err != nil {
 	//		return err

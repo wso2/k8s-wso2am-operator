@@ -113,11 +113,3 @@ spec:
         failureThreshold: 3
         periodSeconds: 10
       deploymentConfigmap: new-worker-toml
-
-
-
-
-
-
-
-

@@ -1,8 +1,8 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wso2am-controller
-  namespace: wso2-system
+  namespace: keshi2
 spec:
   replicas: 1
   selector:
@@ -10,12 +10,11 @@ spec:
       app: wso2am-controller
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
       labels:
         app: wso2am-controller
     spec:
       containers:
         - name: wso2am-controller
-          image: wso2cellery/wso2am-controller:latest
+          image: keshi96/wso2am-controller:new
+          imagePullPolicy: Always
       serviceAccountName: wso2am-pattern-1-svc-account
