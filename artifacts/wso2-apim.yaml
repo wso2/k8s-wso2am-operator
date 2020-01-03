@@ -7,7 +7,7 @@ spec:
   pattern: Pattern-1
   profiles:
     #configuratiosn for apim instance 1
-    - name: apimanager1
+    - name: api-manager1
       resources:
         requests:
           memory: 2Gi
@@ -36,7 +36,7 @@ spec:
         executionPlans: new-claim-2
 
       #configuratiosn for apim instance 2
-    - name: apimanager2
+    - name: api-manager2
       resources:
         requests:
           memory: 2Gi
@@ -65,24 +65,24 @@ spec:
     - name: analytics-dashboard
       resources:
         requests:
-          memory: 2Gi
+          memory: 4Gi
           cpu: 2000m
         limits:
-          memory: 3Gi
-          cpu: 3000m
+          memory: 4Gi
+          cpu: 2000m
       replicas: 1
-      minReadySeconds: 240
+      minReadySeconds: 30
       strategy:
         rollingUpdate:
           maxSurge: 1
           maxUnavailable: 0
       imagePullPolicy: Always
       livenessProbe:
-        initialDelaySeconds: 240
+        initialDelaySeconds: 20
         failureThreshold: 3
         periodSeconds: 10
       readinessProbe:
-        initialDelaySeconds: 240
+        initialDelaySeconds: 20
         failureThreshold: 3
         periodSeconds: 10
       deploymentConfigmap: new-dashboard-toml
@@ -92,24 +92,24 @@ spec:
     - name: analytics-worker
       resources:
         requests:
-          memory: 2Gi
+          memory: 4Gi
           cpu: 2000m
         limits:
-          memory: 3Gi
-          cpu: 3000m
+          memory: 4Gi
+          cpu: 2000m
       replicas: 1
-      minReadySeconds: 240
+      minReadySeconds: 30
       strategy:
         rollingUpdate:
           maxSurge: 1
           maxUnavailable: 0
       imagePullPolicy: Always
       livenessProbe:
-        initialDelaySeconds: 240
+        initialDelaySeconds: 20
         failureThreshold: 3
         periodSeconds: 10
       readinessProbe:
-        initialDelaySeconds: 240
+        initialDelaySeconds: 20
         failureThreshold: 3
         periodSeconds: 10
       deploymentConfigmap: new-worker-toml
