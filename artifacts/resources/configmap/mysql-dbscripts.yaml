@@ -1151,7 +1151,7 @@ kind: ConfigMap
 metadata:
   creationTimestamp: "2019-12-05T06:58:28Z"
   name: mysql-dbscripts
-  namespace: keshi2
+  namespace: wso2-system
   resourceVersion: "1612269"
   selfLink: /api/v1/namespaces/wso2-system/configmap/mysql-dbscripts
   uid: ddd002d9-f24f-4eae-9fed-9609280049d1

@@ -9,4 +9,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: wso2am-pattern-1-svc-account
-    namespace: keshi2
+    namespace: wso2-system

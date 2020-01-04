@@ -25,7 +25,7 @@ func MakeConfigMap(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap) 
 			},
 		},
 		Data: map[string]string{
-			//"deployment.toml":configMap.Data
+			//"am1-am2-deployment.toml":configMap.Data
 		},
 	}
 }

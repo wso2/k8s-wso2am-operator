@@ -2,7 +2,7 @@ apiVersion: apim.wso2.com/v1alpha1
 kind: APIManager
 metadata:
   name: cluster-1
-  namespace: keshi2
+  namespace: wso2-system
 spec:
   pattern: Pattern-1
   profiles:
@@ -30,10 +30,10 @@ spec:
         initialDelaySeconds: 240
         failureThreshold: 3
         periodSeconds: 10
-      deploymentConfigmap: new-deployment-toml-1
-      persistentVolumeClaimServer:
-        synapseConfigs: new-claim-1
-        executionPlans: new-claim-2
+#      deploymentConfigmap: new-deployment-toml-1
+#      persistentVolumeClaimServer:
+#        synapseConfigs: new-claim-1
+#        executionPlans: new-claim-2
 
       #configuratiosn for apim instance 2
     - name: api-manager2
@@ -59,7 +59,7 @@ spec:
         initialDelaySeconds: 240
         failureThreshold: 3
         periodSeconds: 10
-      deploymentConfigmap: new-deployment-toml-2
+#      deploymentConfigmap: new-deployment-toml-2
 
       #configurations for analytics dashboard
     - name: analytics-dashboard
@@ -85,7 +85,7 @@ spec:
         initialDelaySeconds: 20
         failureThreshold: 3
         periodSeconds: 10
-      deploymentConfigmap: new-dashboard-toml
+#      deploymentConfigmap: new-dashboard-toml
 
 
     #configurations for analytics worker
@@ -112,4 +112,4 @@ spec:
         initialDelaySeconds: 20
         failureThreshold: 3
         periodSeconds: 10
-      deploymentConfigmap: new-worker-toml
+#      deploymentConfigmap: new-worker-toml

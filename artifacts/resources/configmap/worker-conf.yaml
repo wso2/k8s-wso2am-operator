@@ -16,7 +16,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: worker-conf
-  namespace: keshi2
+  namespace: wso2-system
 data:
   deployment.yaml: "################################################################################\n#
     \  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved\n#\n#

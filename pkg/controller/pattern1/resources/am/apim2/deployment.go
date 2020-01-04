@@ -245,8 +245,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 								},
 								{
 									Name: "wso2am-pattern-1-am-2-conf",
-									MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
-									SubPath:"deployment.toml",
+									MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/am1-am2-deployment.toml",
+									SubPath:"am1-am2-deployment.toml",
 								},
 								//{
 								//	Name: "mysql-jdbc-driver",

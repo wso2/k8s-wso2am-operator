@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wso2am-controller
-  namespace: keshi2
+  namespace: wso2-system
 spec:
   replicas: 1
   selector:
