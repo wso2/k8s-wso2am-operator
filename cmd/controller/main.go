@@ -32,11 +32,13 @@ import (
 	// Uncomment the following line to load the gcp plugin (only required to authenticate against GKE clusters).
 	//_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 
+	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller"
+	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
+
 
 	clientset "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned"
 	informers "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/informers/externalversions"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/signals"
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller"
 )
 
 var (

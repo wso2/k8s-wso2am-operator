@@ -89,18 +89,37 @@ type Strategy struct {
 //
 //}
 
-type Profile struct {
-	Name  string `json:"name"`
+type NewConfigmap struct {
+	Name string `json:"name"`
+	MountPath string `json:"mountPath"`
+}
+
+type Configmap struct {
+	DeploymentConfigmap string `json:"deploymentConfigmap"`
+	NewConfigmap []NewConfigmap `json:"newConfigmap"`
+
+}
+
+type Deployment struct {
 	Resources Resources `json:"resources"`
-	//Image string `json:"image"`
 	Replicas *int32 `json:"replicas"`
 	MinReadySeconds int32 `json:"minReadySeconds"`
 	Strategy Strategy `json:"strategy"`
 	ImagePullPolicy string `json:"imagePullPolicy"`
 	LivenessProbe Probe `json:"livenessProbe"`
 	ReadinessProbe Probe `json:"readinessProbe"`
-	DeploymentConfigmap string `json:"deploymentConfigmap"`
-	PersistentVolumeClaimServer PVCServer `json:"persistentVolumeClaimServer"`
+	Configmaps Configmap `json:"configmaps"`
+}
+
+type Service struct {
+	Type string `json:"type"`
+}
+
+type Profile struct {
+	Name  string `json:"name"`
+	Deployment Deployment `json:"deployment"`
+	Service Service `json:"service"`
+
 
 }
 

@@ -24,19 +24,22 @@ import (
 	//"github.com/sirupsen/logrus"
 	//"sigs.k8s.io/controller-runtime/pkg/log"
 
+	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
 	//"github.com/wso2-incubator/wso2am-k8s-operator/artifacts/resources"
 	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources"
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim1"
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/dashboard"
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/worker"
+	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
+	//"k8s.io/apimachinery/pkg/api/resource"
+	//"strconv"
+	//v1 "k8s.io/api/core/v1"
+
+	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/dashboard"
+	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/worker"
 	//"k8s.io/apimachinery/pkg/types"
 	//"sigs.k8s.io/controller-runtime/pkg/client"
-)
-import "github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim2"
-import "github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/mysql"
 
+	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim2"
+	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/mysql"
 
-import (
 	"fmt"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -162,6 +165,21 @@ func NewController(
 		},
 		DeleteFunc: controller.handleObject,
 	})
+
+	configmapInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: controller.handleObject,
+		UpdateFunc: func(old, new interface{}) {
+			newConf := new.(*corev1.ConfigMap)
+			oldConf := old.(*corev1.ConfigMap)
+			newConf.ResourceVersion =""
+			oldConf.ResourceVersion =""
+
+			controller.handleObject(new)
+		},
+		DeleteFunc: controller.handleObject,
+	})
+
+
 	return controller
 }
 
@@ -282,304 +300,293 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	apim1deploymentName := "apim-1-deploy"
-	apim2deploymentName := "apim-2-deploy"
-	apim1serviceName := "apim-1-svc"
-	apim2serviceName := "apim-2-svc"
-	mysqldeploymentName :="wso2apim-with-analytics-mysql-deployment"
-	mysqlserviceName := "wso2apim-with-analytics-rdbms-service"
-	dashboardDeploymentName := "analytics-dash-deploy"
-	dashboardServiceName := "analytics-dash-svc"
-	workerDeploymentName := "analytics-worker-deploy"
-	workerServiceName := "wso2apim-analytics-service"
+	if apimanager.Spec.Pattern == "Pattern-1" {
 
+		apim1deploymentName := "apim-1-deploy"
+		apim2deploymentName := "apim-2-deploy"
+		apim1serviceName := "apim-1-svc"
+		apim2serviceName := "apim-2-svc"
+		mysqldeploymentName := "wso2apim-with-analytics-mysql-deployment"
+		mysqlserviceName := "wso2apim-with-analytics-rdbms-service"
+		dashboardDeploymentName := "analytics-dash-deploy"
+		dashboardServiceName := "analytics-dash-svc"
+		workerDeploymentName := "analytics-worker-deploy"
+		workerServiceName := "wso2apim-analytics-service"
 
-	/////////checking whether resourecs already exits, else create one
-	configMapName := "controller-config"
-	configmap, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
-	//if errors.IsNotFound(err) {
-	//	configmap.Namespace="sample"
-	//	configmap, err = c.kubeclientset.CoreV1().ConfigMaps("sample").Create(configmap)
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
+		/////////checking whether resourecs already exits, else create one
+		configMapName := "controller-config"
+		configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
 
+		if errors.IsNotFound(err) {
+			fmt.Println("configmap not found in wso2-system")
+			if err!=nil{
+				return err
+			}
+		} else {
+			configmap.Namespace="test"
+			configmap, err := c.configMapLister.ConfigMaps("test").Get(configMapName)
+			if errors.IsNotFound(err){
+				configmap, err = c.kubeclientset.CoreV1().ConfigMaps("test").Create(configmap)
+				fmt.Println("configmap creating in test ns")
+			}
+		}
 
+		// Parse the object and look for it’s deployment
+		// Use a Lister to find the deployment object referred to in the Apimanager resource
+		// Get apim instance 1 deployment name using hardcoded value
+		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			x := pattern1.AssignConfigMapValues(apimanager,configmap)
+			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x))
+			if err != nil {
+				return err
+			}
+		}
 
-	//configMapName := "controller-config"
-	//configmap, err := c.configMapLister.ConfigMaps("ka5").Get(configMapName)
-	//if errors.IsNotFound(err) {
-	//	configmap.Namespace="sample"
-	//	configmap, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(configmap)
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
+		// Get apim instance 2 deployment name using hardcoded value
+		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, configmap))
+			if err != nil {
+				return err
+			}
+		}
 
-	//configmap, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(configmap)
+		// Get analytics dashboard deployment name using hardcoded value
+		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, configmap))
+			if err != nil {
+				return err
+			}
+		}
 
-	//if err != nil {
-	//	fmt.Println("error in creating configmap")
-	//
-	//	//c.logger.Errorf("Failed to create ConfigMap %q: %v", configMapName, err)
-	//	//c.recorder.Eventf(tokenService, corev1.EventTypeWarning, "CreationFailed", "Failed to create ConfigMap %q: %v", configMapName, err)
-	//	return err
-	//}
+		// Get analytics worker deployment name using hardcoded value
+		workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, configmap))
+			if err != nil {
+				return err
+			}
+		}
 
+		// Get mysql deployment name using hardcoded value
+		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.MysqlDeployment(apimanager))
+			if err != nil {
+				return err
+			}
+		}
 
+		// Get apim instance 1 service name using hardcoded value
+		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim1Service(apimanager))
+		}
 
+		// Get apim instance 2 service name using hardcoded value
+		service2, err := c.servicesLister.Services(apimanager.Namespace).Get(apim2serviceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			service2, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim2Service(apimanager))
+		}
 
-	// Parse the object and look for it’s deployment
-	// Use a Lister to find the deployment object referred to in the Apimanager resource
-	// Get apim instance 1 deployment name using hardcoded value
-	deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(apim1.Apim1Deployment(apimanager,configmap))
+		// Get analytics dashboard service name using hardcoded value
+		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.DashboardService(apimanager))
+		}
+
+		// Get analytics worker service name using hardcoded value
+		workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerService(apimanager))
+		}
+
+		// Get mysql service name using hardcoded value
+		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.MysqlService(apimanager))
+		}
+
+		// If an error occurs during Get/Create, we'll requeue the item so we can
+		// attempt processing again later. This could have been caused by a
+		// temporary network failure, or any other transient reason.
 		if err != nil {
 			return err
 		}
-	}
 
-	// Get apim instance 2 deployment name using hardcoded value
-	deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(apim2.Apim2Deployment(apimanager,configmap))
+		/////////////checking whether resources are controlled by apimanager with same owner reference
+
+		// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(deployment, apimanager) {
+			msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by Apimanager", deployment.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the apim instance 2 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(deployment2, apimanager) {
+			msg := fmt.Sprintf("Deployment2 %q already exists and is not managed by Apimanager", deployment2.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the analytics dashboard Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(dashdeployment, apimanager) {
+			msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", dashdeployment.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the analytics worker Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(workerdeployment, apimanager) {
+			msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", workerdeployment.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(mysqldeployment, apimanager) {
+			msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(service, apimanager) {
+			msg := fmt.Sprintf("service1 %q already exists and is not managed by Apimanager", service.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the apim instance 2 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(service2, apimanager) {
+			msg := fmt.Sprintf("service2 %q already exists and is not managed by Apimanager", service2.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the analytics dashboard Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(dashservice, apimanager) {
+			msg := fmt.Sprintf("dashboard Service %q already exists and is not managed by Apimanager", dashservice.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(workerservice, apimanager) {
+			msg := fmt.Sprintf("worker Service %q already exists and is not managed by Apimanager", workerservice.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(mysqlservice, apimanager) {
+			msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		//If the apim instance 2 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		//if !metav1.IsControlledBy(rcm, apimanager) {
+		//	msg := fmt.Sprintf("rough configmap %q already exists and is not managed by Apimanager", rcm.Name)
+		//	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+		//	return fmt.Errorf(msg)
+		//}
+
+		///////////check replicas are same as defined for deployments
+
+		// If the Apimanager resource has changed update the deployment
+		// If this number of the replicas on the Apimanager resource is specified, and the number does not equal the
+		// current desired replicas on the Deployment, we should update the Deployment resource.
+		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
+			x:= pattern1.AssignConfigMapValues(apimanager,configmap)
+			klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim1Deployment(apimanager, x))
+		}
+
+		//for apim instance 2 also
+		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
+			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, configmap))
+		}
+
+		//for analytics dashboard deployment
+		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
+			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, configmap))
+		}
+
+		//for analytics worker deployment
+		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
+			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, configmap))
+		}
+
+		//for instance mysql deployment
+		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
+			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
+			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.MysqlDeployment(apimanager))
+		}
+
+		// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
+		// This could have been caused by a temporary network failure, or any other transient reason.
 		if err != nil {
 			return err
 		}
-	}
 
-	// Get analytics dashboard deployment name using hardcoded value
-	dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(dashboard.DashboardDeployment(apimanager,configmap))
+		//////////finally update the deployment resources after done checking
+
+		// Finally, we update the status block of the Apimanager resource to reflect the current state of the world
+		err = c.updateApimanagerStatus(apimanager, deployment)
 		if err != nil {
 			return err
 		}
-	}
 
-	// Get analytics worker deployment name using hardcoded value
-	workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(worker.WorkerDeployment(apimanager,configmap))
+		//for instance 2 also
+		err = c.updateApimanagerStatus(apimanager, deployment2)
 		if err != nil {
 			return err
 		}
-	}
 
-	// Get mysql deployment name using hardcoded value
-	mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
+		//for analytics dashboard deployment
+		err = c.updateApimanagerStatus(apimanager, dashdeployment)
 		if err != nil {
 			return err
 		}
+
+		//for analytics worker deployment
+		err = c.updateApimanagerStatus(apimanager, workerdeployment)
+		if err != nil {
+			return err
+		}
+
+		//for mysql deployment
+		err = c.updateApimanagerStatus(apimanager, mysqldeployment)
+		if err != nil {
+			return err
+		}
+
+		c.recorder.Event(apimanager, corev1.EventTypeNormal, "synced", "Apimanager synced successfully")
+		return nil
+
 	}
-
-
-	// Get apim instance 1 service name using hardcoded value
-	service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(apim1.Apim1Service(apimanager))
-	}
-
-	// Get apim instance 2 service name using hardcoded value
-	service2, err := c.servicesLister.Services(apimanager.Namespace).Get(apim2serviceName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		service2, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(apim2.Apim2Service(apimanager))
-	}
-
-	// Get analytics dashboard service name using hardcoded value
-	dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(dashboard.DashboardService(apimanager))
-	}
-
-	// Get analytics worker service name using hardcoded value
-	workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(worker.WorkerService(apimanager))
-	}
-
-	// Get mysql service name using hardcoded value
-	mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
-	// If the resource doesn't exist, we'll create it
-	if errors.IsNotFound(err) {
-		mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
-	}
-
-	// If an error occurs during Get/Create, we'll requeue the item so we can
-	// attempt processing again later. This could have been caused by a
-	// temporary network failure, or any other transient reason.
-	if err != nil {
-		return err
-	}
-
-	/////////////checking whether resources are controlled by apimanager with same owner reference
-
-	// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(deployment, apimanager) {
-		msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by Apimanager", deployment.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// If the apim instance 2 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(deployment2, apimanager) {
-		msg := fmt.Sprintf("Deployment2 %q already exists and is not managed by Apimanager", deployment2.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// If the analytics dashboard Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(dashdeployment, apimanager) {
-		msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", dashdeployment.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// If the analytics worker Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(workerdeployment, apimanager) {
-		msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", workerdeployment.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(mysqldeployment, apimanager) {
-		msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(service, apimanager) {
-		msg := fmt.Sprintf("service1 %q already exists and is not managed by Apimanager", service.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// If the apim instance 2 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(service2, apimanager) {
-		msg := fmt.Sprintf("service2 %q already exists and is not managed by Apimanager", service2.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// If the analytics dashboard Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(dashservice, apimanager) {
-		msg := fmt.Sprintf("dashboard Service %q already exists and is not managed by Apimanager", dashservice.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(workerservice, apimanager) {
-		msg := fmt.Sprintf("worker Service %q already exists and is not managed by Apimanager", workerservice.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(mysqlservice, apimanager) {
-		msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
-		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-		return fmt.Errorf(msg)
-	}
-
-	//If the apim instance 2 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	//if !metav1.IsControlledBy(rcm, apimanager) {
-	//	msg := fmt.Sprintf("rough configmap %q already exists and is not managed by Apimanager", rcm.Name)
-	//	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-	//	return fmt.Errorf(msg)
-	//}
-
-	///////////check replicas are same as defined for deployments
-
-	// If the Apimanager resource has changed update the deployment
-	// If this number of the replicas on the Apimanager resource is specified, and the number does not equal the
-	// current desired replicas on the Deployment, we should update the Deployment resource.
-	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-		klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-		deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim1.Apim1Deployment(apimanager,configmap))
-	}
-
-	//for apim instance 2 also
-	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
-		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
-		deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(apim2.Apim2Deployment(apimanager,configmap))
-	}
-
-	//for analytics dashboard deployment
-	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
-		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
-		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(dashboard.DashboardDeployment(apimanager,configmap))
-	}
-
-	//for analytics worker deployment
-	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
-		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
-		dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(worker.WorkerDeployment(apimanager,configmap))
-	}
-
-	//for instance mysql deployment
-	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-		klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
-		mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
-	}
-
-	// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
-	// This could have been caused by a temporary network failure, or any other transient reason.
-	if err != nil {
-		return err
-	}
-
-
-	//////////finally update the deployment resources after done checking
-
-	// Finally, we update the status block of the Apimanager resource to reflect the current state of the world
-	err = c.updateApimanagerStatus(apimanager, deployment)
-	if err != nil {
-		return err
-	}
-
-	//for instance 2 also
-	err = c.updateApimanagerStatus(apimanager, deployment2)
-	if err != nil {
-		return err
-	}
-
-	//for analytics dashboard deployment
-	err = c.updateApimanagerStatus(apimanager, dashdeployment)
-	if err != nil {
-		return err
-	}
-
-	//for analytics worker deployment
-	err = c.updateApimanagerStatus(apimanager, workerdeployment)
-	if err != nil {
-		return err
-	}
-
-	//for mysql deployment
-	err = c.updateApimanagerStatus(apimanager, mysqldeployment)
-	if err != nil {
-		return err
-	}
-
-	c.recorder.Event(apimanager, corev1.EventTypeNormal,"synced","Apimanager synced successfully")
+	//if apimanager.Spec.Pattern == "Pattern-2"{}
 	return nil
 }
+
+
 
 
 
@@ -651,3 +658,131 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 }
 
+//type configvalues struct {
+//	Livedelay   int32
+//	Liveperiod  int32
+//	Livethres   int32
+//	Readydelay  int32
+//	Readyperiod int32
+//	Readythres  int32
+//	Minreadysec int32
+//	Maxsurge    int32
+//	Maxunavail  int32
+//	Imagepull   string
+//	Amimage     string
+//	Reqcpu      resource.Quantity
+//	Reqmem      resource.Quantity
+//	Limitcpu    resource.Quantity
+//	Limitmem    resource.Quantity
+//
+//}
+//
+//func AssignConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap) *configvalues{
+//	ControlConfigData := configMap.Data
+//
+//	liveDelay,_ := strconv.ParseInt(ControlConfigData["amProbeInitialDelaySeconds"], 10, 32)
+//	liveDelayFromYaml := apimanager.Spec.Profiles[0].LivenessProbe.InitialDelaySeconds
+//	if liveDelayFromYaml != 0{
+//		liveDelay = int64(liveDelayFromYaml)
+//		//utilruntime.HandleError(fmt.Errorf("Live delay not present"))
+//	}
+//	livePeriod,_ := strconv.ParseInt(ControlConfigData["periodSeconds"], 10, 32)
+//	livePeriodFromYaml := apimanager.Spec.Profiles[0].LivenessProbe.PeriodSeconds
+//	if livePeriodFromYaml != 0{
+//		livePeriod = int64(livePeriodFromYaml)
+//	}
+//
+//	liveThres,_ := strconv.ParseInt(ControlConfigData["failureThreshold"], 10, 32)
+//	liveThresFromYaml := apimanager.Spec.Profiles[0].LivenessProbe.FailureThreshold
+//	if liveThresFromYaml != 0{
+//		liveThres = int64(liveThresFromYaml)
+//	}
+//
+//	readyDelay,_ := strconv.ParseInt(ControlConfigData["amProbeInitialDelaySeconds"], 10, 32)
+//	readyDelayFromYaml := apimanager.Spec.Profiles[0].ReadinessProbe.InitialDelaySeconds
+//	if readyDelayFromYaml != 0{
+//		readyDelay = int64(readyDelayFromYaml)
+//	}
+//
+//	readyPeriod,_ := strconv.ParseInt(ControlConfigData["periodSeconds"], 10, 32)
+//	readyPeriodFromYaml := apimanager.Spec.Profiles[0].ReadinessProbe.PeriodSeconds
+//	if readyPeriodFromYaml != 0{
+//		readyPeriod = int64(readyPeriodFromYaml)
+//	}
+//
+//	readyThres,_ := strconv.ParseInt(ControlConfigData["failureThreshold"], 10, 32)
+//	readyThresFromYaml := apimanager.Spec.Profiles[0].ReadinessProbe.FailureThreshold
+//	if readyThresFromYaml != 0{
+//		readyThres = int64(readyThresFromYaml)
+//	}
+//
+//	minReadySec,_ := strconv.ParseInt(ControlConfigData["amMinReadySeconds"], 10, 32)
+//	minReadySecFromYaml := apimanager.Spec.Profiles[0].MinReadySeconds
+//	if minReadySecFromYaml != 0{
+//		minReadySec = int64(minReadySecFromYaml)
+//	}
+//
+//	maxSurges,_ := strconv.ParseInt(ControlConfigData["maxSurge"], 10, 32)
+//	maxSurgeFromYaml := apimanager.Spec.Profiles[0].Strategy.RollingUpdate.MaxSurge
+//	if maxSurgeFromYaml !=0{
+//		maxSurges = int64(maxSurgeFromYaml)
+//	}
+//
+//	maxUnavail,_ := strconv.ParseInt(ControlConfigData["maxUnavailable"], 10, 32)
+//	maxUnavailFromYaml := apimanager.Spec.Profiles[0].Strategy.RollingUpdate.MaxUnavailable
+//	if maxUnavailFromYaml !=0{
+//		maxUnavail = int64(maxUnavailFromYaml)
+//	}
+//
+//	imagePull,_ := ControlConfigData["imagePullPolicy"]
+//	imagePullFromYaml := apimanager.Spec.Profiles[0].ImagePullPolicy
+//	if imagePullFromYaml != ""{
+//		imagePull = imagePullFromYaml
+//	}
+//
+//	amImages:=ControlConfigData["amImage"]
+//
+//
+//	reqCPU := resource.MustParse(ControlConfigData["amRequestsCPU"])
+//	reqCPUFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Resources.Requests.CPU)
+//	if reqCPUFromYaml == resource.MustParse("0"){
+//		reqCPU = 	reqCPUFromYaml
+//	}
+//
+//	reqMem := resource.MustParse(ControlConfigData["amRequestsMemory"])
+//	reqMemFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Resources.Requests.Memory)
+//	if reqMemFromYaml == resource.MustParse("0"){
+//		reqMem = reqCPUFromYaml
+//	}
+//	limitCPU := resource.MustParse(ControlConfigData["amLimitsCPU"])
+//	limitCPUFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Resources.Limits.CPU)
+//	if limitCPUFromYaml == resource.MustParse("0"){
+//		limitCPU = 	limitCPUFromYaml
+//	}
+//	limitMem := resource.MustParse(ControlConfigData["amLimitsMemory"])
+//	limitMemFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Resources.Limits.Memory)
+//	if limitMemFromYaml == resource.MustParse("0"){
+//		limitMem= 	limitMemFromYaml
+//	}
+//
+//	cmvalues := &configvalues{
+//		Livedelay:   int32(liveDelay),
+//		Liveperiod:  int32(livePeriod),
+//		Livethres:   int32(liveThres),
+//		Readydelay:  int32(readyDelay),
+//		Readyperiod: int32(readyPeriod),
+//		Readythres:  int32(readyThres),
+//		Minreadysec: int32(minReadySec),
+//		Maxsurge:    int32(maxSurges),
+//		Maxunavail:  int32(maxUnavail),
+//		Imagepull:   imagePull,
+//		Amimage:     amImages,
+//		Reqcpu:      reqCPU,
+//		Reqmem:      reqMem,
+//		Limitcpu:    limitCPU,
+//		Limitmem:    limitMem,
+//
+//	}
+//	return cmvalues
+//
+//}
