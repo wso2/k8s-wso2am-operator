@@ -118,7 +118,6 @@ type Service struct {
 type Profile struct {
 	Name  string `json:"name"`
 	Deployment Deployment `json:"deployment"`
-	Service Service `json:"service"`
 
 
 }
@@ -129,7 +128,7 @@ type APIManagerSpec struct {
 	Replicas       *int32             `json:"replicas"`
 	//Profiles 		Profiles 		  `json:"profiles"`
 	Profiles 	[]Profile  				`json:"profiles"`
-	
+	Service Service `json:"service"`
 
 }
 

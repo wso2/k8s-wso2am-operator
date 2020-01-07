@@ -49,7 +49,7 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
 			Type:     "NodePort",
-			ExternalIPs: []string{"192.168.99.101"},
+			//ExternalIPs: []string{"192.168.99.101"},
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "pass-through-http",

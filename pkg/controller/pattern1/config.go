@@ -2,10 +2,11 @@ package pattern1
 
 import (
 	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"strconv"
 	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
-
 )
 
 type configvalues struct {
@@ -151,4 +152,23 @@ func AssignConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1.Con
 	}
 	return cmvalues
 
+}
+
+
+func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.ConfigMap) *corev1.ConfigMap {
+	labels := map[string]string{
+		"deployment": "wso2am-pattern-1-am",
+		"node": "wso2am-pattern-1-am-1",
+	}
+	return &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      configMap.Name,
+			Namespace: apimanager.Namespace,
+			Labels:   labels,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Data: configMap.Data,
+	}
 }

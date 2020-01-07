@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pvc-mysql
-  namespace: wso2-system
+  namespace: test
 spec:
   storageClassName: slow
   accessModes:

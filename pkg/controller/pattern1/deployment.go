@@ -392,10 +392,6 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 									SubPath:"deployment.toml",
 								},
 								//{
-								//	Name: "mysql-jdbc-driver",
-								//	MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/components/lib",
-								//},
-								//{
 								//	Name: "wso2am-pattern-1-am-conf-entrypoint",
 								//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
 								//	SubPath:"docker-entrypoint.sh",
@@ -969,11 +965,9 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMa
 									MountPath: "/home/wso2carbon/wso2-config-volume/conf/worker",
 									//SubPath:"deployment.yaml",
 								},
-
 							},
 						},
 					},
-
 					ServiceAccountName: "wso2am-pattern-1-svc-account",
 					ImagePullSecrets:[]corev1.LocalObjectReference{
 						{

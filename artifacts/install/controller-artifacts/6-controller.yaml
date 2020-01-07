@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wso2am-controller
-  namespace: wso2-system
+  namespace: test
 spec:
   replicas: 1
   selector:

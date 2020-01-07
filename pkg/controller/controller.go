@@ -316,20 +316,99 @@ func (c *Controller) syncHandler(key string) error {
 		/////////checking whether resourecs already exits, else create one
 		configMapName := "controller-config"
 		configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
-
-		if errors.IsNotFound(err) {
-			fmt.Println("configmap not found in wso2-system")
-			if err!=nil{
+		configmap2, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
+		if errors.IsNotFound(err){
+			configmap2, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, configmap))
+			if err != nil {
+				fmt.Println("Creating controller configmap in user specified ns",configmap2)
 				return err
 			}
-		} else {
-			configmap.Namespace="test"
-			configmap, err := c.configMapLister.ConfigMaps("test").Get(configMapName)
-			if errors.IsNotFound(err){
-				configmap, err = c.kubeclientset.CoreV1().ConfigMaps("test").Create(configmap)
-				fmt.Println("configmap creating in test ns")
+		}
+
+		dashConfName := "dash-conf"
+		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
+		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfName)
+		if errors.IsNotFound(err){
+			dashConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,dashConfWso2))
+			if err!= nil{
+				fmt.Println("Creating dashboard configmap in user specified ns",dashConfUser)
 			}
 		}
+
+		mysqlDbConfName := "mysql-dbscripts"
+		mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
+		mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfName)
+		if errors.IsNotFound(err){
+			mysqlDbConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,mysqlDbConfWso2))
+			if err!= nil{
+				fmt.Println("Creating mysql dbscripts configmap in user specified ns",mysqlDbConfUser)
+			}
+		}
+
+		workerConfName := "worker-conf"
+		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
+		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfName)
+		if errors.IsNotFound(err){
+			workerConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,workerConfWso2))
+			if err!= nil{
+				fmt.Println("Creating worker configmap in user specified ns",workerConfUser)
+			}
+		}
+
+		am1ConfName := "wso2am-pattern-1-am-1-conf"
+		am1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am1ConfName)
+		am1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am1ConfName)
+		if errors.IsNotFound(err){
+			am1ConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,am1ConfWso2))
+			if err!= nil{
+				fmt.Println("Creating am1 configmap in user specified ns",am1ConfUser)
+			}
+		}
+
+		am2ConfName := "wso2am-pattern-1-am-2-conf"
+		am2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am2ConfName)
+		am2ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am2ConfName)
+		if errors.IsNotFound(err){
+			am2ConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,am2ConfWso2))
+			if err!= nil{
+				fmt.Println("Creating am2 configmap in user specified ns",am2ConfUser)
+			}
+		}
+
+		dashBinConfName := "wso2am-pattern-1-am-analytics-dashboard-bin"
+		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
+		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfName)
+		if errors.IsNotFound(err){
+			dashBinConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,dashBinConfWso2))
+			if err!= nil{
+				fmt.Println("Creating dashboard bin configmap in user specified ns",dashBinConfUser)
+			}
+		}
+
+		//newconfmap := &corev1.ConfigMap{}
+		//newconfmap.Name = configmap.Name
+		//newconfmap.Namespace ="test"
+		//newconfmap.Data=configmap.Data
+		//
+		//configmap2, err := c.configMapLister.ConfigMaps("test").Get(configMapName)
+		//	if errors.IsNotFound(err){
+		//		configmap2, err = c.kubeclientset.CoreV1().ConfigMaps("test").Create(configmap2)
+		//		fmt.Println("configmap creating in test ns")
+		//	}
+
+		//if errors.IsNotFound(err) {
+		//	fmt.Println("configmap not found in wso2-system")
+		//	if err!=nil{
+		//		return err
+		//	}
+		//} else {
+		//	configmap.Namespace="test"
+		//	configmap2, err := c.configMapLister.ConfigMaps("test").Get(configMapName)
+		//	if errors.IsNotFound(err){
+		//		configmap2, err = c.kubeclientset.CoreV1().ConfigMaps("test").Create(configmap)
+		//		fmt.Println("configmap creating in test ns",configmap2)
+		//	_}
+		//}
 
 		// Parse the object and look for it’s deployment
 		// Use a Lister to find the deployment object referred to in the Apimanager resource

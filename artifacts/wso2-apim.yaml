@@ -2,14 +2,14 @@ apiVersion: apim.wso2.com/v1alpha1
 kind: APIManager
 metadata:
   name: cluster-1
-  namespace: wso2-system
+  namespace: test
 spec:
   pattern: Pattern-1
+  service:
+    type: NodePort
   profiles:
     #configuratiosn for apim instance 1
     - name: api-manager-1
-      service:
-        type: NodePort
       deployment:
         resources:
           requests:
@@ -35,11 +35,11 @@ spec:
           periodSeconds: 10
         configmaps:
           deploymentConfigmap: wso2am-pattern-1-am-1-conf
-          newConfigmap:
-            - name: custom-sequence-in-cm
-              mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/in
-            - name: custom-sequence-out-cm
-              mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/
+#          newConfigmap:
+#            - name: custom-sequence-in-cm
+#              mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/in
+#            - name: custom-sequence-out-cm
+#              mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/
 #        persistentVolumeClaim:
 #          synapseConfig:
 #          executionPlans:
