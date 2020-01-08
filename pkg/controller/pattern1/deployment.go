@@ -21,13 +21,11 @@
 package pattern1
 
 import (
+	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"strconv"
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 )
 
 
@@ -89,7 +87,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2-pattern-1-am",
-							Image: x.Amimage,
+							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -133,16 +131,16 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 								},
 							},
 
-							Resources:corev1.ResourceRequirements{
-								//Requests:corev1.ResourceList{
-								//	corev1.ResourceCPU:x.Reqcpu,
-								//	corev1.ResourceMemory:x.Reqmem,
-								//},
-								//Limits:corev1.ResourceList{
-								//	corev1.ResourceCPU:x.Limitcpu,
-								//	corev1.ResourceMemory:x.Limitmem,
-								//},
-							},
+							//Resources:corev1.ResourceRequirements{
+							//	Requests:corev1.ResourceList{
+							//		corev1.ResourceCPU:x.Reqcpu,
+							//		corev1.ResourceMemory:x.Reqmem,
+							//	},
+							//	Limits:corev1.ResourceList{
+							//		corev1.ResourceCPU:x.Limitcpu,
+							//		corev1.ResourceMemory:x.Limitmem,
+							//	},
+							//},
 
 							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
 
@@ -198,52 +196,15 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 	}
 }
 
-// for handling apim-instance-2 deployment
-func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap) *appsv1.Deployment {
-	//apim1cpu, _ :=resource.ParseQuantity("2000m")
-	//apim1mem, _ := resource.ParseQuantity("2Gi")
-	//apim1cpu2, _ :=resource.ParseQuantity("3000m")
-	//apim1mem2, _ := resource.ParseQuantity("3Gi")
-	//defaultmode := int32(0407)
-
-	ControlConfigData := configMap.Data
-
-
-	amMinReadySeconds:= "amMinReadySeconds"
-	maxSurge:= "maxSurge"
-	maxUnavailable:= "amMaxUnavailable"
-	amProbeInitialDelaySeconds := "amProbeInitialDelaySeconds"
-	periodSeconds:= "periodSeconds"
-	imagePullPolicy:= "imagePullPolicy"
-	//amRequestsCPU:= "amRequestsCPU"
-	//amRequestsMemory:= "amRequestsMemory"
-	//amLimitsCPU:= "amLimitsCPU"
-	//amLimitsMemory:= "amLimitsMemory"
-
-
-	minReadySec,_ := strconv.ParseInt(ControlConfigData[amMinReadySeconds], 10, 32)
-	maxSurges,_ := strconv.ParseInt(ControlConfigData[maxSurge], 10, 32)
-	maxUnavail,_ := strconv.ParseInt(ControlConfigData[maxUnavailable], 10, 32)
-	liveDelay,_ := strconv.ParseInt(ControlConfigData[amProbeInitialDelaySeconds], 10, 32)
-	livePeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
-	readyDelay,_ := strconv.ParseInt(ControlConfigData[amProbeInitialDelaySeconds], 10, 32)
-	readyPeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
-	imagePull,_ := ControlConfigData[imagePullPolicy]
-	//reqCPU := ControlConfigData[amRequestsCPU]
-	//reqMem := ControlConfigData[amRequestsMemory]
-	//limitCPU := ControlConfigData[amLimitsCPU]
-	//limitMem := ControlConfigData[amLimitsMemory]
-
+func Apim2Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *appsv1.Deployment {
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-2",
 	}
-	am2ConfigMap := "wso2am-pattern-1-am-2-conf"
-	am2ConfigMapFromYaml := apimanager.Spec.Profiles[1].Deployment.Configmaps.DeploymentConfigmap
-	if am2ConfigMapFromYaml != ""{
-		am2ConfigMap = am2ConfigMapFromYaml
-	}
+
+	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager)
+
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "apim-2-deploy",
@@ -252,20 +213,19 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
 			},
 		},
-
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:int32(minReadySec),
+			Replicas: apimanager.Spec.Profiles[0].Deployment.Replicas,
+			MinReadySeconds:x.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
 					MaxSurge: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: int32(maxSurges),
+						IntVal: x.Maxsurge,
 					},
 					MaxUnavailable: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: int32(maxUnavail),
+						IntVal: x.Maxunavail,
 					},
 				},
 			},
@@ -277,7 +237,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: labels,
 				},
-				Spec: corev1.PodSpec{
+				Spec:corev1.PodSpec{
 					HostAliases: []corev1.HostAlias{
 						{
 							IP: "127.0.0.1",
@@ -291,7 +251,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2-pattern-1-am",
-							Image: "wso2/wso2am:3.0.0",
+							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -302,8 +262,9 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 										},
 									},
 								},
-								InitialDelaySeconds: int32(liveDelay),
-								PeriodSeconds:       int32(livePeriod),
+								InitialDelaySeconds: x.Livedelay,
+								PeriodSeconds:     x.Liveperiod,
+								FailureThreshold: x.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -316,8 +277,10 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 									},
 								},
 
-								InitialDelaySeconds: int32(readyDelay),
-								PeriodSeconds:       int32(readyPeriod),
+								InitialDelaySeconds: x.Readydelay,
+								PeriodSeconds:  x.Readyperiod,
+								FailureThreshold: x.Readythres,
+
 							},
 
 							Lifecycle: &corev1.Lifecycle{
@@ -334,16 +297,16 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 
 							//Resources:corev1.ResourceRequirements{
 							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:apim1cpu,
-							//		corev1.ResourceMemory:apim1mem,
+							//		corev1.ResourceCPU:x.Reqcpu,
+							//		corev1.ResourceMemory:x.Reqmem,
 							//	},
 							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:apim1cpu2,
-							//		corev1.ResourceMemory:apim1mem2,
+							//		corev1.ResourceCPU:x.Limitcpu,
+							//		corev1.ResourceMemory:x.Limitmem,
 							//	},
 							//},
 
-							ImagePullPolicy: corev1.PullPolicy(imagePull),
+							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
 
 							Ports: []corev1.ContainerPort{
 								{
@@ -377,26 +340,9 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 									},
 								},
 							},
-							VolumeMounts: []corev1.VolumeMount{
-								{
-									Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-									MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs",
-								},
-								{
-									Name: "wso2am-pattern-1-am-volume-claim-executionplans",
-									MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
-								},
-								{
-									Name: "wso2am-pattern-1-am-2-conf",
-									MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
-									SubPath:"deployment.toml",
-								},
-								//{
-								//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-								//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
-								//	SubPath:"docker-entrypoint.sh",
-								//},
-							},
+
+							VolumeMounts:apim2VolumeMount,
+
 						},
 					},
 
@@ -407,105 +353,29 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap
 						},
 					},
 
-					Volumes: []corev1.Volume{
-						{
-							Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-							VolumeSource: corev1.VolumeSource{
-								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName:"pvc-synapse-configs",
-								},
-							},
-						},
-						{
-							Name: "wso2am-pattern-1-am-volume-claim-executionplans",
-							VolumeSource: corev1.VolumeSource{
-								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName: "pvc-execution-plans",
-								},
-							},
-						},
-						{
-							Name: "wso2am-pattern-1-am-2-conf",
-							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: am2ConfigMap,//apimanager.Spec.Profiles.ApiManager2.DeploymentConfigmap,//"wso2am-pattern-1-am-2-conf",
-									},
-								},
-							},
-						},
-						//{
-						//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-						//	VolumeSource: corev1.VolumeSource{
-						//		ConfigMap: &corev1.ConfigMapVolumeSource{
-						//			LocalObjectReference: corev1.LocalObjectReference{
-						//				Name: "wso2am-pattern-1-am-conf-entrypoint",
-						//			},
-						//			DefaultMode:&defaultmode,
-						//		},
-						//	},
-						//},
-						//{
-						//	Name: "mysql-jdbc-driver",
-						//	VolumeSource: corev1.VolumeSource{
-						//		ConfigMap: &corev1.ConfigMapVolumeSource{
-						//			LocalObjectReference: corev1.LocalObjectReference{
-						//				Name: "mysql-jdbc-driver-cm",
-						//			},
-						//		},
-						//	},
-						//},
-					},
+					Volumes: apim2Volume,
 				},
 			},
 		},
 	}
 }
 
+
+
+
 // for handling analytics-dashboard deployment
-func DashboardDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap) *appsv1.Deployment {
-
-	ControlConfigData := configMap.Data
-
-	analyticsMinReadySeconds:= "analyticsMinReadySeconds"
-	maxSurge:= "maxSurge"
-	maxUnavailable:= "maxUnavailable"
-	analyticsProbeInitialDelaySeconds := "analyticsProbeInitialDelaySeconds"
-	periodSeconds:= "periodSeconds"
-	imagePullPolicy:= "imagePullPolicy"
-	//analyticsCPU:= "analyticsCPU"
-	//analyticsMemory:= "analyticsMemory"
-
-
-	minReadySec,_ := strconv.ParseInt(ControlConfigData[analyticsMinReadySeconds], 10, 32)
-	maxSurges,_ := strconv.ParseInt(ControlConfigData[maxSurge], 10, 32)
-	maxUnavail,_ := strconv.ParseInt(ControlConfigData[maxUnavailable], 10, 32)
-	liveDelay,_ := strconv.ParseInt(ControlConfigData[analyticsProbeInitialDelaySeconds], 10, 32)
-	livePeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
-	readyDelay,_ := strconv.ParseInt(ControlConfigData[analyticsProbeInitialDelaySeconds], 10, 32)
-	readyPeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
-	imagePull,_ := ControlConfigData[imagePullPolicy]
-	//reqCPU := ControlConfigData[analyticsCPU]
-	//reqMem := ControlConfigData[analyticsMemory]
-	//limitCPU := ControlConfigData[analyticsCPU]
-	//limitMem := ControlConfigData[analyticsMemory]
-
-
-
-
+func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *appsv1.Deployment {
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
 	runasuser := int64(802)
 	defaultMode := int32(0407)
-	//dashcpu, _ :=resource.ParseQuantity("2000m")
-	//dashmem, _ := resource.ParseQuantity("4Gi")
+
 
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			// Name: apimanager.Spec.DeploymentName,
 			Name:      "analytics-dash-deploy",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
@@ -514,17 +384,17 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.Confi
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:int32(minReadySec),
+			MinReadySeconds:y.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
 					MaxSurge: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: int32(maxSurges),
+						IntVal: y.Maxsurge,
 					},
 					MaxUnavailable: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: int32(maxUnavail),
+						IntVal: y.Maxunavail,
 					},
 				},
 			},
@@ -537,28 +407,6 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.Confi
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
-
-					//InitContainers: []corev1.Container{
-					//	{
-					//		Name: "init-apim-analytics-db",
-					//		Image: "busybox:1.31",
-					//		Command: []string {
-					//			//"sh", "-c", "echo -e \"Checking for the availability of MySQL Server deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-mysql-db-service \"3306; do sleep 1; printf \"-\" ;done; echo -e \" >> MySQL Server has started \"; ",
-					//			"sh",
-					//			"-c",
-					//			"echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"wso2am-mysql-db-service\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";",
-					//		},
-					//
-					//	},
-					//	{
-					//		Name: "init-am-analytics-worker",
-					//		Image: "busybox:1.31",
-					//		Command: []string {
-					//			"sh", "-c", "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-pattern-1-analytics-worker-service 7712; do sleep 1; printf \"-\" ;done; echo -e \" >> WSO2 API Manager Analytics Worker has started \"; ",
-					//		},
-					//
-					//	},
-					//},
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-dashboard",
@@ -573,8 +421,10 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.Confi
 										},
 									},
 								},
-								InitialDelaySeconds: int32(liveDelay),
-								PeriodSeconds:       int32(livePeriod),
+								InitialDelaySeconds: y.Livedelay,
+								PeriodSeconds:     y.Liveperiod,
+								FailureThreshold: y.Livethres,
+
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -587,8 +437,9 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.Confi
 									},
 								},
 
-								InitialDelaySeconds: int32(readyDelay),
-								PeriodSeconds:       int32(readyPeriod),
+								InitialDelaySeconds: y.Readydelay,
+								PeriodSeconds:  y.Readyperiod,
+								FailureThreshold: y.Readythres,
 
 							},
 
@@ -615,7 +466,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.Confi
 							//	},
 							//},
 
-							ImagePullPolicy:corev1.PullPolicy(imagePull),
+							ImagePullPolicy:corev1.PullPolicy(y.Imagepull),
 
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser:&runasuser,
@@ -762,38 +613,8 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.Confi
 }
 
 // for handling analytics-worker deployment
-func WorkerDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap) *appsv1.Deployment {
+func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *appsv1.Deployment {
 
-	ControlConfigData := configMap.Data
-
-	analyticsMinReadySeconds:= "analyticsMinReadySeconds"
-	maxSurge:= "maxSurge"
-	maxUnavailable:= "maxUnavailable"
-	analyticsProbeInitialDelaySeconds := "analyticsProbeInitialDelaySeconds"
-	periodSeconds:= "periodSeconds"
-	imagePullPolicy:= "imagePullPolicy"
-	//analyticsCPU:= "analyticsCPU"
-	//analyticsMemory:= "analyticsMemory"
-
-
-	minReadySec,_ := strconv.ParseInt(ControlConfigData[analyticsMinReadySeconds], 10, 32)
-	maxSurges,_ := strconv.ParseInt(ControlConfigData[maxSurge], 10, 32)
-	maxUnavail,_ := strconv.ParseInt(ControlConfigData[maxUnavailable], 10, 32)
-	liveDelay,_ := strconv.ParseInt(ControlConfigData[analyticsProbeInitialDelaySeconds], 10, 32)
-	livePeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
-	readyDelay,_ := strconv.ParseInt(ControlConfigData[analyticsProbeInitialDelaySeconds], 10, 32)
-	readyPeriod,_ := strconv.ParseInt(ControlConfigData[periodSeconds], 10, 32)
-	imagePull,_ := ControlConfigData[imagePullPolicy]
-	//reqCPU := ControlConfigData[analyticsCPU]
-	//reqMem := ControlConfigData[analyticsMemory]
-	//limitCPU := ControlConfigData[analyticsCPU]
-	//limitMem := ControlConfigData[analyticsMemory]
-
-
-
-
-	//workercpu,_ := resource.ParseQuantity("2000m")
-	//workermem,_ := resource.ParseQuantity("4Gi")
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-worker",
 	}
@@ -809,17 +630,17 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMa
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:int32(minReadySec),
+			MinReadySeconds:y.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
 					MaxSurge: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: int32(maxSurges),
+						IntVal: y.Maxsurge,
 					},
 					MaxUnavailable: &intstr.IntOrString{
 						Type:   intstr.Int,
-						IntVal: int32(maxUnavail),
+						IntVal: y.Maxunavail,
 					},
 				},
 			},
@@ -832,28 +653,6 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMa
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
-
-					//InitContainers: []corev1.Container{
-					//	{
-					//		Name: "init-apim-analytics-db",
-					//		Image: "busybox:1.31",
-					//		Command: []string {
-					//			//"sh", "-c", "echo -e \"Checking for the availability of MySQL Server deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-mysql-db-service \"3306; do sleep 1; printf \"-\" ;done; echo -e \" >> MySQL Server has started \"; ",
-					//			"sh",
-					//			"-c",
-					//			"echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"wso2am-mysql-db-service\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";",
-					//		},
-					//
-					//	},
-					//	{
-					//		Name: "init-am-analytics-worker",
-					//		Image: "busybox:1.31",
-					//		Command: []string {
-					//			"sh", "-c", "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\" ; while ! nc -z \"while ! nc -z \"wso2am-pattern-1-analytics-worker-service 7712; do sleep 1; printf \"-\" ;done; echo -e \" >> WSO2 API Manager Analytics Worker has started \"; ",
-					//		},
-					//
-					//	},
-					//},
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-worker",
@@ -868,8 +667,9 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMa
 										},
 									},
 								},
-								InitialDelaySeconds: int32(liveDelay),
-								PeriodSeconds:       int32(livePeriod),
+								InitialDelaySeconds: y.Livedelay,
+								PeriodSeconds:     y.Liveperiod,
+								FailureThreshold: y.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -882,8 +682,9 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMa
 									},
 								},
 
-								InitialDelaySeconds: int32(readyDelay),
-								PeriodSeconds:       int32(readyPeriod),
+								InitialDelaySeconds: y.Readydelay,
+								PeriodSeconds:  y.Readyperiod,
+								FailureThreshold: y.Readythres,
 
 							},
 
@@ -910,7 +711,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMa
 							//	},
 							//},
 
-							ImagePullPolicy: corev1.PullPolicy(imagePull),
+							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
 
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser:&runasuser,

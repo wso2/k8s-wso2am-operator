@@ -316,14 +316,14 @@ func (c *Controller) syncHandler(key string) error {
 		/////////checking whether resourecs already exits, else create one
 		configMapName := "controller-config"
 		configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
-		configmap2, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
-		if errors.IsNotFound(err){
-			configmap2, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, configmap))
-			if err != nil {
-				fmt.Println("Creating controller configmap in user specified ns",configmap2)
-				return err
-			}
-		}
+		//configmap2, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
+		//if errors.IsNotFound(err){
+		//	configmap2, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, configmap))
+		//	if err != nil {
+		//		fmt.Println("Creating controller configmap in user specified ns",configmap2)
+		//		return err
+		//	}
+		//}
 
 		dashConfName := "dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
@@ -385,6 +385,17 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
+		//pvcConfName := "pvc-config"
+		//pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
+		//pvcConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pvcConfName)
+		//if errors.IsNotFound(err){
+		//	pvcConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,pvcConfWso2))
+		//	if err!= nil{
+		//		fmt.Println("Creating default pvc configmap in user specified ns",pvcConfUser)
+		//	}
+		//}
+
+
 		//newconfmap := &corev1.ConfigMap{}
 		//newconfmap.Name = configmap.Name
 		//newconfmap.Namespace ="test"
@@ -416,7 +427,7 @@ func (c *Controller) syncHandler(key string) error {
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			x := pattern1.AssignConfigMapValues(apimanager,configmap)
+			x := pattern1.AssignApimConfigMapValues(apimanager,configmap)
 			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x))
 			if err != nil {
 				return err
@@ -427,7 +438,8 @@ func (c *Controller) syncHandler(key string) error {
 		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, configmap))
+			x := pattern1.AssignApimConfigMapValues(apimanager,configmap)
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, x))
 			if err != nil {
 				return err
 			}
@@ -437,7 +449,8 @@ func (c *Controller) syncHandler(key string) error {
 		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, configmap))
+			y:= pattern1.AssignApimAnalyticsConfigMapValues(apimanager,configmap)
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y))
 			if err != nil {
 				return err
 			}
@@ -447,7 +460,8 @@ func (c *Controller) syncHandler(key string) error {
 		workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, configmap))
+			y:= pattern1.AssignApimAnalyticsConfigMapValues(apimanager,configmap)
+			workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y))
 			if err != nil {
 				return err
 			}
@@ -590,27 +604,30 @@ func (c *Controller) syncHandler(key string) error {
 		// If this number of the replicas on the Apimanager resource is specified, and the number does not equal the
 		// current desired replicas on the Deployment, we should update the Deployment resource.
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-			x:= pattern1.AssignConfigMapValues(apimanager,configmap)
+			x:= pattern1.AssignApimConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim1Deployment(apimanager, x))
 		}
 
 		//for apim instance 2 also
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
+			x := pattern1.AssignApimConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
-			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, configmap))
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, x))
 		}
 
 		//for analytics dashboard deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
+			y:= pattern1.AssignApimAnalyticsConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, configmap))
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, y))
 		}
 
 		//for analytics worker deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
+			y:= pattern1.AssignApimAnalyticsConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, configmap))
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, y))
 		}
 
 		//for instance mysql deployment

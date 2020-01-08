@@ -68,47 +68,42 @@ type Probe struct {
 	PeriodSeconds		int32		`json:"periodSeconds"`
 }
 
-type RollUpdate struct {
-	MaxSurge int32 `json:"maxSurge"`
-	MaxUnavailable int32 `json:"maxUnavailable"`
-}
-
-type Strategy struct {
-	RollingUpdate RollUpdate `json:"rollingUpdate"`
-}
-
-//type Deployment struct {
+//type RollUpdate struct {
+//	MaxSurge int32 `json:"maxSurge"`
+//	MaxUnavailable int32 `json:"maxUnavailable"`
+//}
 //
-//
-//
+//type Strategy struct {
+//	RollingUpdate RollUpdate `json:"rollingUpdate"`
 //}
 
-//type Profiles struct {
-//	ApiManager1    ApiManagerInstance		  `json:"api-manager-1"`
-//	ApiManager2    ApiManagerInstance		  `json:"api-manager-2"`
-//
-//}
-
-type NewConfigmap struct {
+type NewVolume struct {
 	Name string `json:"name"`
 	MountPath string `json:"mountPath"`
 }
 
 type Configmap struct {
-	DeploymentConfigmap string `json:"deploymentConfigmap"`
-	NewConfigmap []NewConfigmap `json:"newConfigmap"`
+	DeploymentConfigmap string `json:"deploymentConfigMap"`
+	NewConfigmap []NewVolume `json:"newConfigMap"`
 
+}
+
+type PVC struct {
+	SynapseConfigs string `json:"synapseConfigs"`
+	ExecutionPlans string `json:"executionPlans"`
+	NewClaim []NewVolume `json:"newClaim"`
 }
 
 type Deployment struct {
 	Resources Resources `json:"resources"`
 	Replicas *int32 `json:"replicas"`
 	MinReadySeconds int32 `json:"minReadySeconds"`
-	Strategy Strategy `json:"strategy"`
+	//Strategy Strategy `json:"strategy"`
 	ImagePullPolicy string `json:"imagePullPolicy"`
 	LivenessProbe Probe `json:"livenessProbe"`
 	ReadinessProbe Probe `json:"readinessProbe"`
-	Configmaps Configmap `json:"configmaps"`
+	Configmaps Configmap `json:"configMaps"`
+	PersistentVolumeClaim PVC `json:"persistentVolumeClaim"`
 }
 
 type Service struct {
@@ -126,7 +121,6 @@ type Profile struct {
 type APIManagerSpec struct {
 	Pattern        string             `json:"pattern"`
 	Replicas       *int32             `json:"replicas"`
-	//Profiles 		Profiles 		  `json:"profiles"`
 	Profiles 	[]Profile  				`json:"profiles"`
 	Service Service `json:"service"`
 

@@ -233,7 +233,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
 			Type:     "NodePort",
-			// values are fetched from wso2-apim.yaml file
+			// values are fetched from 6-wso2-apim.yaml file
 			// Type: apimanager.Spec.ServType,
 			ExternalIPs: []string{"192.168.99.101"},
 			// ExternalIPs: apimanager.Spec.ExternalIps,
@@ -274,7 +274,7 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
 			Type:     "NodePort",
-			// values are fetched from wso2-apim.yaml file
+			// values are fetched from 6-wso2-apim.yaml file
 			// Type: apimanager.Spec.ServType,
 			ExternalIPs: []string{"192.168.99.101"},
 			// ExternalIPs: apimanager.Spec.ExternalIps,
