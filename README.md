@@ -4,7 +4,7 @@ Deploying WSO2 APIM Patterns in kubernetes through a simple command. Introducing
 
 ![alt text](https://lh3.googleusercontent.com/-SDgiNAZzsD4/XhbH_LXDBRI/AAAAAAAADOI/Ani2mUSrfMI6yqJcIlYoXoQxmtKMdyxtwCLcBGAsYHQ/s0/pic1.png "K8S CRD workflow")
 
-### Quick Start Guide
+## Quick Start Guide
 
 In this document, we will walk through the following.
 * Deploy a default pattern in Kubernetes
@@ -16,7 +16,7 @@ In this document, we will walk through the following.
 * Invoke the API
 
 ### Installation Prerequisites
-* Golang v1.12+
-* Kubernetes cluster and client v1.12 or above
-* Docker & DockerHub / private docker registry account
-* GCP / Minikube
+* [Golang](https://golang.org/doc/install) v1.12+ 
+* [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
+* [Docker](https://docs.docker.com/install/) & [DockerHub](https://hub.docker.com/) / private docker registry account
+* [GCP](https://cloud.google.com/) / [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
