@@ -30,7 +30,8 @@ git clone https://github.com/wso2-incubator/wso2am-k8s-operator.git
 
 2. Setup the required Storage
 
-    [setting up nfs](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
+    [GCP users](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
+    [Minikube users](https://docs.google.com/document/d/1ILIQKGqZ53y2cMhS731RRZMKsdbY3C-OSi4M10g7i8Q/edit?usp=sharing)
    
 3. Go inside wso2am-k8s-operator/artifacts/install/controller-artifacts/ folder. Open the below set of files and replace <USER-NAMESPACE> with any name you like.
     1-namespace.yaml 
