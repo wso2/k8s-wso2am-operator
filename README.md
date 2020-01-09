@@ -30,7 +30,7 @@ git clone https://github.com/wso2-incubator/wso2am-k8s-operator.git
 
 2. Setup the required Storage
 
-    [GCP users](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
+    [GKE users](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
     
     [Minikube users](https://docs.google.com/document/d/1ILIQKGqZ53y2cMhS731RRZMKsdbY3C-OSi4M10g7i8Q/edit?usp=sharing)
    
@@ -79,7 +79,15 @@ wso2apim-with-analytics-mysql-deployment-5fccb54d6-p29z5   1/1     Running   0  
 ```
 kubectl logs apim-1-deploy-7fcd974f8-m7ghq -n <USER-NAMESPACE>
 ```
+*Note*: To access the API portal, add host mapping entries to the /etc/hosts file. As we have exposed the API portal service in Node Port type, you can use the IP address of any Kubernetes node.
 
+<Any K8s Node IP>  wso2apim
+<Any K8s Node IP>  wso2apim-analytics
+For Docker for Mac use "localhost" for the K8s node IP
+
+For Minikube, use minikube ip command to get the K8s node IP
+
+For GKE, it will assign the external ip.
 
 
 
