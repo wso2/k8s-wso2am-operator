@@ -58,12 +58,7 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		Name:             execPlan,
 		MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
 	})
-	//adding docker entrypoint
-	//am1volumemounts=append(am1volumemounts,corev1.VolumeMount{
-	//	Name:             "wso2am-pattern-1-am-conf-entrypoint",
-	//	MountPath:			"/home/wso2carbon/docker-entrypoint.sh",
-	//	SubPath:			"docker-entrypoint.sh",
-	//})
+
 
 	var am1volume []corev1.Volume
 	for _,c:= range apimanager.Spec.Profiles[0].Deployment.Configmaps.NewConfigmap{
@@ -116,19 +111,6 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 			},
 		},
 	})
-	//defaultmode := int32(0407)
-	//am1volume =append(am1volume,corev1.Volume{
-	//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-	//	VolumeSource: corev1.VolumeSource{
-	//		ConfigMap: &corev1.ConfigMapVolumeSource{
-	//			LocalObjectReference: corev1.LocalObjectReference{
-	//				Name: "wso2am-pattern-1-am-conf-entrypoint",
-	//			},
-	//			DefaultMode:&defaultmode,
-	//		},
-	//	},
-	//})
-	//
 
 	return am1volumemounts, am1volume
 
@@ -185,12 +167,7 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		Name:             execPlan,
 		MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
 	})
-	//adding docker entrypoint
-	//am1volumemounts=append(am1volumemounts,corev1.VolumeMount{
-	//	Name:             "wso2am-pattern-1-am-conf-entrypoint",
-	//	MountPath:			"/home/wso2carbon/docker-entrypoint.sh",
-	//	SubPath:			"docker-entrypoint.sh",
-	//})
+
 
 	var am2volume []corev1.Volume
 	for _,c:= range apimanager.Spec.Profiles[1].Deployment.Configmaps.NewConfigmap{
@@ -243,19 +220,6 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 			},
 		},
 	})
-	//defaultmode := int32(0407)
-	//am1volume =append(am1volume,corev1.Volume{
-	//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-	//	VolumeSource: corev1.VolumeSource{
-	//		ConfigMap: &corev1.ConfigMapVolumeSource{
-	//			LocalObjectReference: corev1.LocalObjectReference{
-	//				Name: "wso2am-pattern-1-am-conf-entrypoint",
-	//			},
-	//			DefaultMode:&defaultmode,
-	//		},
-	//	},
-	//})
-	//
 
 	return am2volumemounts, am2volume
 

@@ -145,12 +145,12 @@ func AssignApimAnalyticsConfigMapValues(apimanager *apimv1alpha1.APIManager,conf
 	ControlConfigData := configMap.Data
 
 	replicas,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-replicas"], 10, 32)
-	replicasFromYaml := apimanager.Spec.Profiles[0].Deployment.MinReadySeconds
+	replicasFromYaml := apimanager.Spec.Profiles[2].Deployment.MinReadySeconds
 	if replicasFromYaml != 0{
 		replicas = int64(replicasFromYaml)
 	}
 	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
-	minReadySecFromYaml := apimanager.Spec.Profiles[0].Deployment.MinReadySeconds
+	minReadySecFromYaml := apimanager.Spec.Profiles[2].Deployment.MinReadySeconds
 	if minReadySecFromYaml != 0{
 		minReadySec = int64(minReadySecFromYaml)
 	}
@@ -161,70 +161,70 @@ func AssignApimAnalyticsConfigMapValues(apimanager *apimv1alpha1.APIManager,conf
 	amImages:=ControlConfigData["p1-apim-analytics-deployment-image"]
 
 	imagePull,_ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
-	imagePullFromYaml := apimanager.Spec.Profiles[0].Deployment.ImagePullPolicy
+	imagePullFromYaml := apimanager.Spec.Profiles[2].Deployment.ImagePullPolicy
 	if imagePullFromYaml != ""{
 		imagePull = imagePullFromYaml
 	}
 
 	reqCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-cpu"])
 	reqCPUFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Deployment.Resources.Requests.CPU)
-	lenreqcpu,_ := len(apimanager.Spec.Profiles[0].Deployment.Resources.Requests.CPU),""
+	lenreqcpu,_ := len(apimanager.Spec.Profiles[2].Deployment.Resources.Requests.CPU),""
 	if lenreqcpu != 0{
 		reqCPU = reqCPUFromYaml
 	}
 
 	reqMem := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-memory"])
 	reqMemFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Deployment.Resources.Requests.Memory)
-	lenreqmem,_ := len(apimanager.Spec.Profiles[0].Deployment.Resources.Requests.Memory),""
+	lenreqmem,_ := len(apimanager.Spec.Profiles[2].Deployment.Resources.Requests.Memory),""
 	if lenreqmem != 0{
 		reqMem = reqMemFromYaml
 	}
 
 	limitCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-limits-cpu"])
 	limitCPUFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Deployment.Resources.Limits.CPU)
-	lenlimcpu,_ := len(apimanager.Spec.Profiles[0].Deployment.Resources.Limits.CPU),""
+	lenlimcpu,_ := len(apimanager.Spec.Profiles[2].Deployment.Resources.Limits.CPU),""
 	if lenlimcpu != 0{
 		limitCPU = limitCPUFromYaml
 	}
 
 	limitMem := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-limits-memory"])
 	limitMemFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Deployment.Resources.Limits.Memory)
-	lenlimmem,_ := len(apimanager.Spec.Profiles[0].Deployment.Resources.Limits.Memory),""
+	lenlimmem,_ := len(apimanager.Spec.Profiles[2].Deployment.Resources.Limits.Memory),""
 	if lenlimmem != 0{
 		limitMem = limitMemFromYaml
 	}
 
 	liveDelay,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
-	liveDelayFromYaml := apimanager.Spec.Profiles[0].Deployment.LivenessProbe.InitialDelaySeconds
+	liveDelayFromYaml := apimanager.Spec.Profiles[2].Deployment.LivenessProbe.InitialDelaySeconds
 	if liveDelayFromYaml != 0{
 		liveDelay = int64(liveDelayFromYaml)
 	}
 	livePeriod,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-periodSeconds"], 10, 32)
-	livePeriodFromYaml := apimanager.Spec.Profiles[0].Deployment.LivenessProbe.PeriodSeconds
+	livePeriodFromYaml := apimanager.Spec.Profiles[2].Deployment.LivenessProbe.PeriodSeconds
 	if livePeriodFromYaml != 0{
 		livePeriod = int64(livePeriodFromYaml)
 	}
 
 	liveThres,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-failureThreshold"], 10, 32)
-	liveThresFromYaml := apimanager.Spec.Profiles[0].Deployment.LivenessProbe.FailureThreshold
+	liveThresFromYaml := apimanager.Spec.Profiles[2].Deployment.LivenessProbe.FailureThreshold
 	if liveThresFromYaml != 0{
 		liveThres = int64(liveThresFromYaml)
 	}
 
 	readyDelay,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
-	readyDelayFromYaml := apimanager.Spec.Profiles[0].Deployment.ReadinessProbe.InitialDelaySeconds
+	readyDelayFromYaml := apimanager.Spec.Profiles[2].Deployment.ReadinessProbe.InitialDelaySeconds
 	if readyDelayFromYaml != 0{
 		readyDelay = int64(readyDelayFromYaml)
 	}
 
 	readyPeriod,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-periodSeconds"], 10, 32)
-	readyPeriodFromYaml := apimanager.Spec.Profiles[0].Deployment.ReadinessProbe.PeriodSeconds
+	readyPeriodFromYaml := apimanager.Spec.Profiles[2].Deployment.ReadinessProbe.PeriodSeconds
 	if readyPeriodFromYaml != 0{
 		readyPeriod = int64(readyPeriodFromYaml)
 	}
 
 	readyThres,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-failureThreshold"], 10, 32)
-	readyThresFromYaml := apimanager.Spec.Profiles[0].Deployment.ReadinessProbe.FailureThreshold
+	readyThresFromYaml := apimanager.Spec.Profiles[2].Deployment.ReadinessProbe.FailureThreshold
 	if readyThresFromYaml != 0{
 		readyThres = int64(readyThresFromYaml)
 	}
