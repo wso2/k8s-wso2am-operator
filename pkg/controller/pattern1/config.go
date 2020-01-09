@@ -149,7 +149,7 @@ func AssignApimAnalyticsConfigMapValues(apimanager *apimv1alpha1.APIManager,conf
 	if replicasFromYaml != 0{
 		replicas = int64(replicasFromYaml)
 	}
-	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySecondss"], 10, 32)
+	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	minReadySecFromYaml := apimanager.Spec.Profiles[0].Deployment.MinReadySeconds
 	if minReadySecFromYaml != 0{
 		minReadySec = int64(minReadySecFromYaml)

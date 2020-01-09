@@ -385,15 +385,15 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		//pvcConfName := "pvc-config"
-		//pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
-		//pvcConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pvcConfName)
-		//if errors.IsNotFound(err){
-		//	pvcConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,pvcConfWso2))
-		//	if err!= nil{
-		//		fmt.Println("Creating default pvc configmap in user specified ns",pvcConfUser)
-		//	}
-		//}
+		pvcConfName := "pvc-config"
+		pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
+		pvcConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pvcConfName)
+		if errors.IsNotFound(err){
+			pvcConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,pvcConfWso2))
+			if err!= nil{
+				fmt.Println("Creating default pvc configmap in user specified ns",pvcConfUser)
+			}
+		}
 
 
 		//newconfmap := &corev1.ConfigMap{}
@@ -438,8 +438,8 @@ func (c *Controller) syncHandler(key string) error {
 		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			x := pattern1.AssignApimConfigMapValues(apimanager,configmap)
-			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, x))
+			z := pattern1.AssignApimConfigMapValues(apimanager,configmap)
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z))
 			if err != nil {
 				return err
 			}
@@ -611,9 +611,9 @@ func (c *Controller) syncHandler(key string) error {
 
 		//for apim instance 2 also
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
-			x := pattern1.AssignApimConfigMapValues(apimanager,configmap)
+			z := pattern1.AssignApimConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
-			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, x))
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, z))
 		}
 
 		//for analytics dashboard deployment
