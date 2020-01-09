@@ -54,12 +54,14 @@ customresourcedefinition.apiextensions.k8s.io/apimanagers.apim.wso2.com created
 apimanager.apim.wso2.com/cluster-1 created
 deployment.apps/wso2am-controller created
 ```
-5. Now you can view the running pod by executing the command, and Make sure to replace <USER-NAMESPACE> with the name changed in step 3
+5. Now view the running pods by executing the command. Make sure to replace <USER-NAMESPACE> to the name changed in step 3
+   By default pattern-1 is executing, you will see 5 pods. Each pod represents the components based on relavant patterns.
     
 ```
 kubectl get pods -n <USER-NAMESPACE>
 
 Output:
+
 NAME                                                       READY   STATUS    RESTARTS   AGE
 analytics-dash-deploy-54bd8d9b55-rmwnn                     1/1     Running   0          3m35s
 analytics-worker-deploy-79dc97599d-m445h                   1/1     Running   0          3m35s
@@ -69,6 +71,14 @@ wso2apim-with-analytics-mysql-deployment-5fccb54d6-p29z5   1/1     Running   0  
 
 
 ```
+
+6. Once the status becomes running, view the logs of each pod using following command.
+
+```
+kubectl logs apim-1-deploy-7fcd974f8-m7ghq -n test
+```
+
+
 
 
 
