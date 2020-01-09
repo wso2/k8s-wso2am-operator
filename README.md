@@ -77,17 +77,29 @@ wso2apim-with-analytics-mysql-deployment-5fccb54d6-p29z5   1/1     Running   0  
 6. Once the status becomes running, view the logs of each pod using following command.
 
 ```
-kubectl logs apim-1-deploy-7fcd974f8-m7ghq -n <USER-NAMESPACE>
+kubectl logs <POD-NAME> -n <USER-NAMESPACE>
 ```
-*Note*: To access the API portal, add host mapping entries to the /etc/hosts file. As we have exposed the API portal service in Node Port type, you can use the IP address of any Kubernetes node.
 
+**Note:** To access the API portals, Add host mapping entries to the /etc/hosts file. As we have exposed the API portal service in Node Port type, you can use the IP address of any Kubernetes node.
+
+```
 <Any K8s Node IP>  wso2apim
 <Any K8s Node IP>  wso2apim-analytics
-For Docker for Mac use "localhost" for the K8s node IP
+```
 
-For Minikube, use minikube ip command to get the K8s node IP
+- For Docker for Mac use "localhost" for the K8s node IP
+- For Minikube, use minikube ip command to get the K8s node IP
+- For GKE
+    ```$xslt
+    (kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="ExternalIP")].address }')
+    ```
+    - This will give the external IPs of the nodes available in the cluster. Pick any IP to include in /etc/hosts file.
+  
+   **APIM Publisher** - https://wso2apim:9443/publisher
+   **APIM Devportal** - https://wso2apim:9443/devportal
+   **APIM Carbon**    - https://wso2apim:9443/carbon/
 
-For GKE, it will assign the external ip.
+<br />
 
 
 
