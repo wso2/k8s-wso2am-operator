@@ -8,27 +8,27 @@ spec:
   service:
     type: NodePort
   profiles:
-    #configuratiosn for apim instance 1
+    #configurations for apim instance 1
     - name: api-manager-1
-      deployment:
-        replicas: 1
-        minReadySeconds: 240
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 2000m
-          limits:
-            memory: 3Gi
-            cpu: 3000m
-        livenessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
+#      deployment:
+#        replicas: 1
+#        minReadySeconds: 240
+#        imagePullPolicy: Always
+#        resources:
+#          requests:
+#            memory: 2Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 3Gi
+#            cpu: 3000m
+#        livenessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
 #        configMaps:
 #          deploymentConfigMap: wso2am-pattern-1-am-1-conf
 #          newConfigMap:
@@ -44,8 +44,7 @@ spec:
 #              mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/vol1
 #            - name: new-pvc-claim-2
 #              mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/vol2
-
-      #configuratiosn for apim instance 2
+    #configurations for apim instance 2
     - name: api-manager-2
       service:
         type: NodePort
@@ -69,7 +68,9 @@ spec:
           failureThreshold: 3
           periodSeconds: 10
 
-      #configurations for analytics dashboard
+
+
+    #configurations for analytics dashboard
     - name: analytics-dashboard
       service:
         type: NodePort
@@ -92,7 +93,6 @@ spec:
           initialDelaySeconds: 20
           failureThreshold: 3
           periodSeconds: 10
-
     #configurations for analytics worker
     - name: analytics-worker
       service:
