@@ -20,3 +20,9 @@ In this document, we will walk through the following.
 * [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
 * [Docker](https://docs.docker.com/install/) & [DockerHub](https://hub.docker.com/) / private docker registry account
 * [GCP](https://cloud.google.com/) / [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
+
+## Steps:
+1. Clone the wso2am-k8s-operator repository
+
+``` git clone https://github.com/wso2-incubator/wso2am-k8s-operator.git ```
+2. 
