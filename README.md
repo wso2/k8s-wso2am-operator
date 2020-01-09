@@ -24,7 +24,9 @@ In this document, we will walk through the following.
 ## Steps:
 1. Clone the wso2am-k8s-operator repository
 
-``` git clone https://github.com/wso2-incubator/wso2am-k8s-operator.git ```
+``` 
+git clone https://github.com/wso2-incubator/wso2am-k8s-operator.git 
+```
 
 2. Setup the required Storage
 
