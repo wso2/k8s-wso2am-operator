@@ -96,10 +96,11 @@ kubectl logs <POD-NAME> -n <USER-NAMESPACE>
     - This will give the external IPs of the nodes available in the cluster. Pick any IP to include in /etc/hosts file.
   
    **APIM Publisher** - https://wso2apim:9443/publisher
+   
    **APIM Devportal** - https://wso2apim:9443/devportal
+   
    **APIM Carbon**    - https://wso2apim:9443/carbon/
 
-<br />
 
 
 
