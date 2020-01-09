@@ -25,4 +25,28 @@ In this document, we will walk through the following.
 1. Clone the wso2am-k8s-operator repository
 
 ``` git clone https://github.com/wso2-incubator/wso2am-k8s-operator.git ```
-2. 
+
+2. Setup the required Storage
+
+    [setting up nfs](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
+   
+3. Go inside wso2am-k8s-operator/ folder
+4. Execute the below command
+
+``` kubectl apply -f artifacts/install/controller-artifacts/ ```
+
+and you will get the following output
+```
+namespace/test created
+serviceaccount/wso2am-pattern-1-svc-account created
+clusterrole.rbac.authorization.k8s.io/wso2am-controller-role created
+clusterrolebinding.rbac.authorization.k8s.io/wso2am-controller-role-binding created
+customresourcedefinition.apiextensions.k8s.io/apimanagers.apim.wso2.com created
+apimanager.apim.wso2.com/cluster-1 created
+deployment.apps/wso2am-controller created
+```
+
+
+
+
+
