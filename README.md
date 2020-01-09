@@ -2,6 +2,21 @@
 
 Deploying WSO2 APIM Patterns in kubernetes through a simple command. Introducing a new Custom Resource Definition called APIManager to efficiently and easily deploy all 4 patterns, and the custom pattern in Kubernetes.
 
-Inline-style: 
-![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+![alt text](https://lh3.googleusercontent.com/-SDgiNAZzsD4/XhbH_LXDBRI/AAAAAAAADOI/Ani2mUSrfMI6yqJcIlYoXoQxmtKMdyxtwCLcBGAsYHQ/s0/pic1.png "K8S CRD workflow")
 
+### Quick Start Guide
+
+In this document, we will walk through the following.
+* Deploy a default pattern in Kubernetes
+* Deploy other patterns
+* Deploy Custom pattern
+* Expose Service via NodePort (default-LoadBalancer)
+* Override Configurations (configmap, pvc, deploy-config)
+* Add new Configurations (configmap, pvc)
+* Invoke the API
+
+### Installation Prerequisites
+* Golang v1.12+
+* Kubernetes cluster and client v1.12 or above
+* Docker & DockerHub / private docker registry account
+* GCP / Minikube
