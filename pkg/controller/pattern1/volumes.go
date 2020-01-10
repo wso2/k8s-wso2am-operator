@@ -99,7 +99,7 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		Name: synapseConf,
 		VolumeSource: corev1.VolumeSource{
 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName:"pvc-synapse-configs",
+				ClaimName:"wso2am-p1-am-synapse-configs",
 			},
 		},
 	})
@@ -107,7 +107,7 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		Name: execPlan,
 		VolumeSource: corev1.VolumeSource{
 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: "pvc-execution-plans",
+				ClaimName: "wso2am-p1-am-execution-plans",
 			},
 		},
 	})
@@ -208,7 +208,7 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		Name: synapseConf,
 		VolumeSource: corev1.VolumeSource{
 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName:"pvc-synapse-configs",
+				ClaimName:"wso2am-p1-am-synapse-configs",
 			},
 		},
 	})
@@ -216,7 +216,7 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		Name: execPlan,
 		VolumeSource: corev1.VolumeSource{
 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: "pvc-execution-plans",
+				ClaimName: "wso2am-p1-am-execution-plans",
 			},
 		},
 	})
@@ -434,7 +434,7 @@ func getMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		Name: "apim-rdbms-persistent-storage",
 		VolumeSource: corev1.VolumeSource{
 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName:"pvc-mysql",
+				ClaimName:"wso2am-p1-mysql",
 			},
 		},
 	})

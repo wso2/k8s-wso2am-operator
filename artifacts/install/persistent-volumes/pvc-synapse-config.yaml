@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-synapse-configs
+  name: wso2am-p1-am-synapse-configs
   namespace: test
 spec:
-  storageClassName: manual
+  storageClassName: nfs
   accessModes:
     - ReadWriteMany
   resources:

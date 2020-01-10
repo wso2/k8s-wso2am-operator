@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-mysql
+  name: wso2am-p1-mysql
   namespace: test
 spec:
-  storageClassName: slow
+  storageClassName: nfs
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 20Gi
-  selector:
-    matchLabels:
-      name: apim-mysql
+#   selector:
+#     matchLabels:
+#       name: apim-mysql
