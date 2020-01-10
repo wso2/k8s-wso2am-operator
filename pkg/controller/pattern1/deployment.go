@@ -53,7 +53,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Profiles[0].Deployment.Replicas,
+			Replicas: apimanager.Spec.Profiles.Apimanager1.Deployment.Replicas,
 			MinReadySeconds:x.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
@@ -783,12 +783,15 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *apps
 }
 
 //  for handling mysql deployment
-func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
+func MysqlDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues) *appsv1.Deployment {
+
+	mysqlvolumemount, mysqlvolume := getMysqlVolumes(apimanager)
+
+
 	labels := map[string]string{
 		"deployment": "wso2apim-with-analytics-mysql",
 	}
 	runasuser := int64(999)
-	mysqlreplics := int32(1)
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -799,7 +802,7 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: &mysqlreplics,
+			Replicas: apimanager.Spec.Replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
@@ -811,8 +814,8 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2apim-with-analytics-mysql",
-							Image: "mysql:5.7",
-							ImagePullPolicy: "IfNotPresent",
+							Image: y.Image,
+							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser: &runasuser,
 							},
@@ -837,16 +840,8 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 									Protocol:      "TCP",
 								},
 							},
-							VolumeMounts: []corev1.VolumeMount{
-								{
-									Name: "mysql-dbscripts",
-									MountPath: "/docker-entrypoint-initdb.d",
-								},
-								{
-									Name: "apim-rdbms-persistent-storage",
-									MountPath: "/var/lib/mysql",
-								},
-							},
+							VolumeMounts: mysqlvolumemount,
+							
 							Args: []string{
 								"--max-connections",
 								"10000",
@@ -855,26 +850,8 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 						},
 					},
 
-					Volumes: []corev1.Volume{
-						{
-							Name: "mysql-dbscripts",
-							VolumeSource: corev1.VolumeSource{
-								ConfigMap: &corev1.ConfigMapVolumeSource{
-									LocalObjectReference: corev1.LocalObjectReference{
-										Name: "mysql-dbscripts",
-									},
-								},
-							},
-						},
-						{
-							Name: "apim-rdbms-persistent-storage",
-							VolumeSource: corev1.VolumeSource{
-								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName:"pvc-mysql",
-								},
-							},
-						},
-					},
+					Volumes:mysqlvolume,
+					
 					ServiceAccountName: "wso2am-pattern-1-svc-account",
 				},
 			},

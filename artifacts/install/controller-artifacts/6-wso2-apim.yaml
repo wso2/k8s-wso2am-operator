@@ -8,8 +8,7 @@ spec:
   service:
     type: NodePort
   profiles:
-    #configurations for apim instance 1
-    - name: api-manager-1
+    api-manager-1:
       deployment:
         replicas: 1
         minReadySeconds: 240
@@ -44,75 +43,68 @@ spec:
 #              mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/vol1
 #            - name: new-pvc-claim-2
 #              mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/vol2
-    #configurations for apim instance 2
-    - name: api-manager-2
-      service:
-        type: NodePort
-      deployment:
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 2000m
-          limits:
-            memory: 3Gi
-            cpu: 3000m
-        replicas: 1
-        minReadySeconds: 240
-        imagePullPolicy: Always
-        livenessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
 
-
-
-    #configurations for analytics dashboard
-    - name: analytics-dashboard
-      service:
-        type: NodePort
-      deployment:
-        resources:
-          requests:
-            memory: 4Gi
-            cpu: 2000m
-          limits:
-            memory: 4Gi
-            cpu: 2000m
-        replicas: 1
-        minReadySeconds: 30
-        imagePullPolicy: Always
-        livenessProbe:
-          initialDelaySeconds: 20
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 20
-          failureThreshold: 3
-          periodSeconds: 10
-    #configurations for analytics worker
-    - name: analytics-worker
-      service:
-        type: NodePort
-      deployment:
-        resources:
-          requests:
-            memory: 4Gi
-            cpu: 2000m
-          limits:
-            memory: 4Gi
-            cpu: 2000m
-        replicas: 1
-        minReadySeconds: 30
-        imagePullPolicy: Always
-        livenessProbe:
-          initialDelaySeconds: 20
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 20
-          failureThreshold: 3
-          periodSeconds: 10
+#
+#    api-manager-2:
+#      deployment:
+#        resources:
+#          requests:
+#            memory: 2Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 3Gi
+#            cpu: 3000m
+#        replicas: 1
+#        minReadySeconds: 240
+#        imagePullPolicy: Always
+#        livenessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
+#
+#
+#    analytics-dashboard:
+#      deployment:
+#        resources:
+#          requests:
+#            memory: 4Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 4Gi
+#            cpu: 2000m
+#        replicas: 1
+#        minReadySeconds: 30
+#        imagePullPolicy: Always
+#        livenessProbe:
+#          initialDelaySeconds: 20
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 20
+#          failureThreshold: 3
+#          periodSeconds: 10
+#
+#    analytics-worker:
+#      deployment:
+#        resources:
+#          requests:
+#            memory: 4Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 4Gi
+#            cpu: 2000m
+#        replicas: 1
+#        minReadySeconds: 30
+#        imagePullPolicy: Always
+#        livenessProbe:
+#          initialDelaySeconds: 20
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 20
+#          failureThreshold: 3
+#          periodSeconds: 10

@@ -61,28 +61,6 @@ data:
   p1-apim-analytics-deployment-resources-limits-cpu: "2000m"
   p1-apim-analytics-deployment-resources-limits-memory: "4Gi"
 
-  maxSurge: "1"
-  maxUnavailable: "0"
-  periodSeconds: "10"
-  imagePullPolicy: "Always"
-  failureThreshold: "3"
-
-  amImage: "wso2/wso2am:3.0.0"
-  amMinReadySeconds: "240"
-  amProbeInitialDelaySeconds: "240"
-  amRequestsCPU: "2000m"
-  amRequestsMemory: "2Gi"
-  amLimitsCPU: "3000m"
-  amLimitsMemory: "3Gi"
-
-  analyticsMinReadySeconds: "30"
-  analyticsProbeInitialDelaySeconds: "20"
-  analyticsCPU: "2000m"
-  analyticsMemory: "4Gi"
-
-
-
-
-
-
-
+  p1-mysql-replicas: "1"
+  p1-mysql-image: "mysql:5.7"
+  p1-mysql-imagePullPolicy: "Always"

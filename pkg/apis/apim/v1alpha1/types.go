@@ -110,18 +110,29 @@ type Service struct {
 	Type string `json:"type"`
 }
 
-type Profile struct {
+type Custom struct {
 	Name  string `json:"name"`
 	Deployment Deployment `json:"deployment"`
 
+}
 
+type Artifacts struct {
+	Deployment Deployment `json:"deployment"`
+}
+
+type Profile struct {
+	Apimanager1 Artifacts `json:"api-manager-1"`
+	Apimanager2 Artifacts `json:"api-manager-2"`
+	AnalyticsDashboard Artifacts `json:"analytics-dashboard"`
+	AnalyticsWorker Artifacts `json:"analytics-worker"`
+	Custom []Custom `json:"custom"`
 }
 
 // APIManagerSpec is the spec for a APIManager resource
 type APIManagerSpec struct {
 	Pattern        string             `json:"pattern"`
 	Replicas       *int32             `json:"replicas"`
-	Profiles 	[]Profile  				`json:"profiles"`
+	Profiles 	Profile  				`json:"profiles"`
 	Service Service `json:"service"`
 
 }

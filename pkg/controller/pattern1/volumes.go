@@ -11,30 +11,30 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 
 	defaultdeployConf :=  "wso2am-pattern-1-am-1-conf"
 	deployconfigmap := "wso2am-pattern-1-am-1-conf"
-	deployConfFromYaml := apimanager.Spec.Profiles[0].Deployment.Configmaps.DeploymentConfigmap
+	deployConfFromYaml := apimanager.Spec.Profiles.Apimanager1.Deployment.Configmaps.DeploymentConfigmap
 	if deployConfFromYaml != ""{
 		deployconfigmap = deployConfFromYaml
 	}
 	synapseConf := "wso2am-pattern-1-am-volume-claim-synapse-configs"
-	synapseConfFromYaml := apimanager.Spec.Profiles[0].Deployment.PersistentVolumeClaim.SynapseConfigs
+	synapseConfFromYaml := apimanager.Spec.Profiles.Apimanager1.Deployment.PersistentVolumeClaim.SynapseConfigs
 	if synapseConfFromYaml != "" {
 		synapseConf = synapseConfFromYaml
 	}
 	execPlan := "wso2am-pattern-1-am-volume-claim-executionplans"
-	execPlanFromYaml := apimanager.Spec.Profiles[0].Deployment.PersistentVolumeClaim.ExecutionPlans
+	execPlanFromYaml := apimanager.Spec.Profiles.Apimanager1.Deployment.PersistentVolumeClaim.ExecutionPlans
 	if execPlanFromYaml != "" {
 		execPlan = execPlanFromYaml
 	}
 	//for newly created set of configmaps by user
 	var am1volumemounts []corev1.VolumeMount
-	for _,c:= range apimanager.Spec.Profiles[0].Deployment.Configmaps.NewConfigmap{
+	for _,c:= range apimanager.Spec.Profiles.Apimanager1.Deployment.Configmaps.NewConfigmap{
 		am1volumemounts =append(am1volumemounts, corev1.VolumeMount{
 			Name:             c.Name,
 			MountPath: 		  c.MountPath,
 		})
 	}
 	//for newly created set of PVCs by user
-	for _,c:= range apimanager.Spec.Profiles[0].Deployment.PersistentVolumeClaim.NewClaim{
+	for _,c:= range apimanager.Spec.Profiles.Apimanager1.Deployment.PersistentVolumeClaim.NewClaim{
 		am1volumemounts =append(am1volumemounts, corev1.VolumeMount{
 			Name:             c.Name,
 			MountPath: 		  c.MountPath,
@@ -61,7 +61,7 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 
 
 	var am1volume []corev1.Volume
-	for _,c:= range apimanager.Spec.Profiles[0].Deployment.Configmaps.NewConfigmap{
+	for _,c:= range apimanager.Spec.Profiles.Apimanager1.Deployment.Configmaps.NewConfigmap{
 		am1volume =append(am1volume, corev1.Volume{
 			Name:         c.Name,
 			VolumeSource: corev1.VolumeSource{
@@ -73,7 +73,7 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 			},
 		})
 	}
-	for _,c:= range apimanager.Spec.Profiles[0].Deployment.PersistentVolumeClaim.NewClaim{
+	for _,c:= range apimanager.Spec.Profiles.Apimanager1.Deployment.PersistentVolumeClaim.NewClaim{
 		am1volume =append(am1volume, corev1.Volume{
 			Name:         c.Name,
 			VolumeSource: corev1.VolumeSource{
@@ -120,30 +120,30 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 
 	defaultdeployConf :=  "wso2am-pattern-1-am-2-conf"
 	deployconfigmap := "wso2am-pattern-1-am-2-conf"
-	deployConfFromYaml := apimanager.Spec.Profiles[1].Deployment.Configmaps.DeploymentConfigmap
+	deployConfFromYaml := apimanager.Spec.Profiles.Apimanager2.Deployment.Configmaps.DeploymentConfigmap
 	if deployConfFromYaml != ""{
 		deployconfigmap = deployConfFromYaml
 	}
 	synapseConf := "wso2am-pattern-1-am-volume-claim-synapse-configs"
-	synapseConfFromYaml := apimanager.Spec.Profiles[1].Deployment.PersistentVolumeClaim.SynapseConfigs
+	synapseConfFromYaml := apimanager.Spec.Profiles.Apimanager2.Deployment.PersistentVolumeClaim.SynapseConfigs
 	if synapseConfFromYaml != "" {
 		synapseConf = synapseConfFromYaml
 	}
 	execPlan := "wso2am-pattern-1-am-volume-claim-executionplans"
-	execPlanFromYaml := apimanager.Spec.Profiles[1].Deployment.PersistentVolumeClaim.ExecutionPlans
+	execPlanFromYaml := apimanager.Spec.Profiles.Apimanager2.Deployment.PersistentVolumeClaim.ExecutionPlans
 	if execPlanFromYaml != "" {
 		execPlan = execPlanFromYaml
 	}
 	//for newly created set of configmaps by user
 	var am2volumemounts []corev1.VolumeMount
-	for _,c:= range apimanager.Spec.Profiles[1].Deployment.Configmaps.NewConfigmap{
+	for _,c:= range apimanager.Spec.Profiles.Apimanager2.Deployment.Configmaps.NewConfigmap{
 		am2volumemounts =append(am2volumemounts, corev1.VolumeMount{
 			Name:             c.Name,
 			MountPath: 		  c.MountPath,
 		})
 	}
 	//for newly created set of PVCs by user
-	for _,c:= range apimanager.Spec.Profiles[1].Deployment.PersistentVolumeClaim.NewClaim{
+	for _,c:= range apimanager.Spec.Profiles.Apimanager2.Deployment.PersistentVolumeClaim.NewClaim{
 		am2volumemounts =append(am2volumemounts, corev1.VolumeMount{
 			Name:             c.Name,
 			MountPath: 		  c.MountPath,
@@ -170,7 +170,7 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 
 
 	var am2volume []corev1.Volume
-	for _,c:= range apimanager.Spec.Profiles[1].Deployment.Configmaps.NewConfigmap{
+	for _,c:= range apimanager.Spec.Profiles.Apimanager2.Deployment.Configmaps.NewConfigmap{
 		am2volume =append(am2volume, corev1.Volume{
 			Name:         c.Name,
 			VolumeSource: corev1.VolumeSource{
@@ -182,7 +182,7 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 			},
 		})
 	}
-	for _,c:= range apimanager.Spec.Profiles[1].Deployment.PersistentVolumeClaim.NewClaim{
+	for _,c:= range apimanager.Spec.Profiles.Apimanager2.Deployment.PersistentVolumeClaim.NewClaim{
 		am2volume =append(am2volume, corev1.Volume{
 			Name:         c.Name,
 			VolumeSource: corev1.VolumeSource{
@@ -229,21 +229,21 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Volu
 
 	defaultdashconf :=  "wso2am-pattern-1-am-analytics-dashboard-conf"
 	dashconfigmap := "dash-conf"
-	dashconfFromYaml := apimanager.Spec.Profiles[2].Deployment.Configmaps.DeploymentConfigmap
+	dashconfFromYaml := apimanager.Spec.Profiles.AnalyticsDashboard.Deployment.Configmaps.DeploymentConfigmap
 	if dashconfFromYaml != ""{
 		dashconfigmap = dashconfFromYaml
 	}
 
 	//for newly created set of configmaps by user
 	var dashvolumemounts []corev1.VolumeMount
-	for _,c:= range apimanager.Spec.Profiles[2].Deployment.Configmaps.NewConfigmap{
+	for _,c:= range apimanager.Spec.Profiles.AnalyticsDashboard.Deployment.Configmaps.NewConfigmap{
 		dashvolumemounts =append(dashvolumemounts, corev1.VolumeMount{
 			Name:             c.Name,
 			MountPath: 		  c.MountPath,
 		})
 	}
 	//for newly created set of PVCs by user
-	for _,c:= range apimanager.Spec.Profiles[2].Deployment.PersistentVolumeClaim.NewClaim{
+	for _,c:= range apimanager.Spec.Profiles.AnalyticsDashboard.Deployment.PersistentVolumeClaim.NewClaim{
 		dashvolumemounts =append(dashvolumemounts, corev1.VolumeMount{
 			Name:             c.Name,
 			MountPath: 		  c.MountPath,
@@ -266,7 +266,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Volu
 	//})
 
 	var dashvolume []corev1.Volume
-	for _,c:= range apimanager.Spec.Profiles[2].Deployment.Configmaps.NewConfigmap{
+	for _,c:= range apimanager.Spec.Profiles.AnalyticsDashboard.Deployment.Configmaps.NewConfigmap{
 		dashvolume =append(dashvolume, corev1.Volume{
 			Name:         c.Name,
 			VolumeSource: corev1.VolumeSource{
@@ -278,7 +278,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Volu
 			},
 		})
 	}
-	for _,c:= range apimanager.Spec.Profiles[2].Deployment.PersistentVolumeClaim.NewClaim{
+	for _,c:= range apimanager.Spec.Profiles.AnalyticsDashboard.Deployment.PersistentVolumeClaim.NewClaim{
 		dashvolume =append(dashvolume, corev1.Volume{
 			Name:         c.Name,
 			VolumeSource: corev1.VolumeSource{
@@ -323,21 +323,21 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Vo
 
 	defaultdeployConf :=  "worker-conf"
 	deployconfigmap := "worker-conf"
-	workerconfFromYaml := apimanager.Spec.Profiles[3].Deployment.Configmaps.DeploymentConfigmap
+	workerconfFromYaml := apimanager.Spec.Profiles.AnalyticsWorker.Deployment.Configmaps.DeploymentConfigmap
 	if workerconfFromYaml != ""{
 		deployconfigmap = workerconfFromYaml
 	}
 
 	//for newly created set of configmaps by user
 	var workervolumemounts []corev1.VolumeMount
-	for _,c:= range apimanager.Spec.Profiles[3].Deployment.Configmaps.NewConfigmap{
+	for _,c:= range apimanager.Spec.Profiles.AnalyticsWorker.Deployment.Configmaps.NewConfigmap{
 		workervolumemounts =append(workervolumemounts, corev1.VolumeMount{
 			Name:             c.Name,
 			MountPath: 		  c.MountPath,
 		})
 	}
 	//for newly created set of PVCs by user
-	for _,c:= range apimanager.Spec.Profiles[3].Deployment.PersistentVolumeClaim.NewClaim{
+	for _,c:= range apimanager.Spec.Profiles.AnalyticsWorker.Deployment.PersistentVolumeClaim.NewClaim{
 		workervolumemounts =append(workervolumemounts, corev1.VolumeMount{
 			Name:             c.Name,
 			MountPath: 		  c.MountPath,
@@ -359,7 +359,7 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Vo
 	//})
 
 	var workervolume []corev1.Volume
-	for _,c:= range apimanager.Spec.Profiles[3].Deployment.Configmaps.NewConfigmap{
+	for _,c:= range apimanager.Spec.Profiles.AnalyticsWorker.Deployment.Configmaps.NewConfigmap{
 		workervolume =append(workervolume, corev1.Volume{
 			Name:         c.Name,
 			VolumeSource: corev1.VolumeSource{
@@ -371,7 +371,7 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Vo
 			},
 		})
 	}
-	for _,c:= range apimanager.Spec.Profiles[3].Deployment.PersistentVolumeClaim.NewClaim{
+	for _,c:= range apimanager.Spec.Profiles.AnalyticsWorker.Deployment.PersistentVolumeClaim.NewClaim{
 		workervolume =append(workervolume, corev1.Volume{
 			Name:         c.Name,
 			VolumeSource: corev1.VolumeSource{
@@ -397,6 +397,49 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Vo
 
 
 	return workervolumemounts, workervolume
+
+}
+
+func getMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount, []corev1.Volume) {
+
+	//for newly created set of configmaps by user
+	var mysqlvolumemounts []corev1.VolumeMount
+
+	//adding default deploymentConfigmap
+	mysqlvolumemounts=append(mysqlvolumemounts,corev1.VolumeMount{
+		Name: "mysql-dbscripts",
+		MountPath: "/docker-entrypoint-initdb.d",
+
+	})
+	mysqlvolumemounts=append(mysqlvolumemounts,corev1.VolumeMount{
+		Name: "apim-rdbms-persistent-storage",
+		MountPath: "/var/lib/mysql",
+
+	})
+
+	var mysqlvolume []corev1.Volume
+
+	mysqlvolume =append(mysqlvolume,corev1.Volume{
+		Name: "mysql-dbscripts",
+		VolumeSource: corev1.VolumeSource{
+			ConfigMap: &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: "mysql-dbscripts",
+				},
+			},
+		},
+	})
+
+	mysqlvolume =append(mysqlvolume,corev1.Volume{
+		Name: "apim-rdbms-persistent-storage",
+		VolumeSource: corev1.VolumeSource{
+			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+				ClaimName:"pvc-mysql",
+			},
+		},
+	})
+
+	return mysqlvolumemounts, mysqlvolume
 
 }
 
