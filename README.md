@@ -102,14 +102,8 @@ In this document, we will walk through the following.
    
 
 After successfully accessing the portals, Follow the below documentation and try out the complete workflow. 
+
 [API Manager Documentation 3.0.0](https://apim.docs.wso2.com/en/latest/)
    
    
-
-
-
-
-
-
-
 
