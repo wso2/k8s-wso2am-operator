@@ -35,10 +35,15 @@ git clone https://github.com/wso2-incubator/wso2am-k8s-operator.git
     [Minikube users](https://docs.google.com/document/d/1ILIQKGqZ53y2cMhS731RRZMKsdbY3C-OSi4M10g7i8Q/edit?usp=sharing)
    
 3. Go inside wso2am-k8s-operator/artifacts/install/controller-artifacts/ folder. Open the below set of files and replace <USER-NAMESPACE> with any name you like.
+    
     1-namespace.yaml 
+    
     2-service-account.yaml
+    
     4-cluster-role-binding.yaml
+    
     6-wso2-apim.yaml
+    
     7-controller.yaml
     
 4. After replacing the namespace, execute the following command
@@ -99,7 +104,6 @@ kubectl logs <POD-NAME> -n <USER-NAMESPACE>
    
    **APIM Devportal** - https://wso2apim:9443/devportal
    
-   **APIM Carbon**    - https://wso2apim:9443/carbon/
 
 
 
