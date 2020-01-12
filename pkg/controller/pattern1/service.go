@@ -48,15 +48,15 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     "NodePort",
-			ExternalIPs: []string{"192.168.99.101"},
+			Type:     "LoadBalancer",
+			// ExternalIPs: []string{"192.168.99.101"},
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "pass-through-http",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       8280,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
-					NodePort:   32004,
+					// NodePort:   32004,
 					//NodePort:9611,
 				},
 				{
@@ -64,7 +64,7 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       8243,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
-					NodePort:   32003,
+					// NodePort:   32003,
 					//NodePort:   9711,
 
 				},
@@ -73,7 +73,7 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9763,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
-					NodePort:   32002,
+					// NodePort:   32002,
 					//NodePort:   5672,
 
 				},
@@ -82,7 +82,7 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9443,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-					NodePort:   32001,
+					// NodePort:   32001,
 					//NodePort:   9443,
 
 				},
@@ -91,7 +91,7 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       5672,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
-					NodePort:   32005,
+					// NodePort:   32005,
 					//NodePort:   5672,
 
 				},
@@ -145,36 +145,36 @@ func Apim2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     "NodePort",
-			ExternalIPs: []string{"192.168.99.101"},
+			Type:     "LoadBalancer",
+			// ExternalIPs: []string{"192.168.99.101"},
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "pass-through-http",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9611,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
-					NodePort:   32009,
+					// NodePort:   32009,
 				},
 				{
 					Name:       "pass-through-https",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9711,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
-					NodePort:   32008,
+					// NodePort:   32008,
 				},
 				{
 					Name:       "servlet-http",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       5672,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
-					NodePort:   32007,
+					// NodePort:   32007,
 				},
 				{
 					Name:       "servlet-https",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9443,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-					NodePort:   32006,
+					// NodePort:   32006,
 				},
 				//{
 				//	Name:       "jms-provider",
@@ -232,10 +232,10 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     "NodePort",
+			Type:     "LoadBalancer",
 			// values are fetched from 6-wso2-apim.yaml file
 			// Type: apimanager.Spec.ServType,
-			ExternalIPs: []string{"192.168.99.101"},
+			// ExternalIPs: []string{"192.168.99.101"},
 			// ExternalIPs: apimanager.Spec.ExternalIps,
 			Ports: []corev1.ServicePort{
 				//{
@@ -250,7 +250,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       32201,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
-					NodePort:   32201,
+					// NodePort:   32201,
 				},
 			},
 		},
@@ -273,10 +273,10 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     "NodePort",
+			Type:     "LoadBalancer",
 			// values are fetched from 6-wso2-apim.yaml file
 			// Type: apimanager.Spec.ServType,
-			ExternalIPs: []string{"192.168.99.101"},
+			// ExternalIPs: []string{"192.168.99.101"},
 			// ExternalIPs: apimanager.Spec.ExternalIps,
 			Ports: []corev1.ServicePort{
 				{
@@ -284,42 +284,42 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7612,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7612},
-					NodePort:   32020,
+					// NodePort:   32020,
 				},
 				{
 					Name:       "thrift-ssl",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7712,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7712},
-					NodePort:   32011,
+					// NodePort:   32011,
 				},
 				{
 					Name:       "rest-api-port-1",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9444,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9444},
-					NodePort:   32012,
+					// NodePort:   32012,
 				},
 				{
 					Name:       "rest-api-port-2",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9091,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9091},
-					NodePort:   32013,
+					// NodePort:   32013,
 				},
 				{
 					Name:       "rest-api-port-3",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7071,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7071},
-					NodePort:   32014,
+					// NodePort:   32014,
 				},
 				{
 					Name:       "rest-api-port-4",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7444,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7444},
-					NodePort:   32015,
+					// NodePort:   32015,
 				},
 			},
 		},
