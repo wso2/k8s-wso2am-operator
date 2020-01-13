@@ -2,6 +2,8 @@
 
 ##### Deploying WSO2 API Manager with a simple Custom Resource Definition.
 ```
+wso2-apim.yaml
+--------------
 apiVersion: apim.wso2.com/v1alpha1
 kind: APIManager
 metadata:
