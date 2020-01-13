@@ -257,7 +257,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2-pattern-1-am",
-							Image: "wso2/wso2am:3.0.0",
+							Image: z.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -269,7 +269,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 									},
 								},
 								InitialDelaySeconds: z.Livedelay,
-								PeriodSeconds:       z.Liveperiod,
+                                PeriodSeconds:       z.Liveperiod,
+                                FailureThreshold:    z.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -283,7 +284,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 								},
 
 								InitialDelaySeconds: z.Readydelay,
-								PeriodSeconds:       z.Readyperiod,
+                                PeriodSeconds:       z.Readyperiod,
+                                FailureThreshold:    z.Readythres,
 							},
 
 							Lifecycle: &corev1.Lifecycle{

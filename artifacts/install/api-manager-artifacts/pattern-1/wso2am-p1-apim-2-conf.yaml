@@ -23,14 +23,14 @@ data:
         [database.apim_db]
         type = "mysql"
         url = "jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_APIMGT_DB?useSSL=false"
-        username = "root"
-        password = "root"
+        username = "wso2carbon"
+        password = "wso2carbon"
         driver = "com.mysql.jdbc.Driver"
         [database.shared_db]
         type = "mysql"
         url = "jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_SHARED_DB?autoReconnect=true&amp;useSSL=false"
-        username = "root"
-        password = "root"
+        username = "wso2carbon"
+        password = "wso2carbon"
         driver = "com.mysql.jdbc.Driver"
         [keystore.tls]
         file_name =  "wso2carbon.jks"
@@ -49,8 +49,8 @@ data:
         password= "${admin.password}"
         ws_endpoint = "ws://wso2apim:9099"
         wss_endpoint = "wss://wso2apim:8099"
-        http_endpoint = "http://wso2apim:32009"
-        https_endpoint = "https://wso2apim:32008"
+        http_endpoint = "http://wso2apim:8280"
+        https_endpoint = "https://wso2apim:8243"
         #[apim.cache.gateway_token]
         #enable = true
         #expiry_time = "900s"

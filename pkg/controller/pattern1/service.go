@@ -86,15 +86,15 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					//NodePort:   9443,
 
 				},
-				{
-					Name:       "jms-provider",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       5672,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
-					// NodePort:   32005,
-					//NodePort:   5672,
+				// {
+				// 	Name:       "jms-provider",
+				// 	Protocol:   corev1.ProtocolTCP,
+				// 	Port:       5672,
+				// 	TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
+				// 	// NodePort:   32005,
+				// 	//NodePort:   5672,
 
-				},
+				// },
 				//{
 				//	Name:       "binary",
 				//	Protocol:   corev1.ProtocolTCP,
@@ -151,22 +151,22 @@ func Apim2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 				{
 					Name:       "pass-through-http",
 					Protocol:   corev1.ProtocolTCP,
-					Port:       9611,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
+					Port:       8280, 
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
 					// NodePort:   32009,
 				},
 				{
 					Name:       "pass-through-https",
 					Protocol:   corev1.ProtocolTCP,
-					Port:       9711,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
+					Port:       8243,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
 					// NodePort:   32008,
 				},
 				{
 					Name:       "servlet-http",
 					Protocol:   corev1.ProtocolTCP,
-					Port:       5672,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
+					Port:       9763,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
 					// NodePort:   32007,
 				},
 				{

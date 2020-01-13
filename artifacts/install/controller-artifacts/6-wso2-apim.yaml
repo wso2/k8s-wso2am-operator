@@ -7,27 +7,27 @@ spec:
   pattern: Pattern-1
   service:
     type: NodePort
-  profiles:
-    api-manager-1:
-      deployment:
-        replicas: 1
-        minReadySeconds: 240
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 2000m
-          limits:
-            memory: 3Gi
-            cpu: 3000m
-        livenessProbe:
-          initialDelaySeconds: 180
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 180
-          failureThreshold: 3
-          periodSeconds: 10
+#   profiles:
+#     api-manager-1:
+#       deployment:
+#         replicas: 1
+#         minReadySeconds: 240
+#         imagePullPolicy: Always
+#         resources:
+#           requests:
+#             memory: 2Gi
+#             cpu: 2000m
+#           limits:
+#             memory: 3Gi
+#             cpu: 3000m
+#         livenessProbe:
+#           initialDelaySeconds: 180
+#           failureThreshold: 3
+#           periodSeconds: 10
+#         readinessProbe:
+#           initialDelaySeconds: 180
+#           failureThreshold: 3
+#           periodSeconds: 10
 #        configMaps:
 #          deploymentConfigMap: wso2am-pattern-1-am-1-conf
 #          newConfigMap:
