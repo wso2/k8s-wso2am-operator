@@ -86,3 +86,58 @@ In this document, we will walk through the following.
 **Sample Scenarios**
 
 [Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md) 
+
+6. After successfully applied the custom resource file, 
+   You can view the logs of the controller.
+   
+```
+kubectl get pods -n wso2-system
+
+Output:
+NAME                               READY   STATUS    RESTARTS   AGE
+wso2am-controller-75c5b84c-vsp4x   1/1     Running   0          76m
+
+kubectl logs wso2am-controller-75c5b84c-vsp4x -n wso2-system
+
+Output:
+W0113 09:00:45.694404       1 client_config.go:543] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.
+I0113 09:00:45.698364       1 controller.go:128] Setting up event handlers
+I0113 09:00:45.698636       1 controller.go:194] Starting Apimanager controller
+I0113 09:00:45.698834       1 controller.go:198] Waiting for informer caches to sync
+I0113 09:00:45.799345       1 controller.go:203] Starting workers
+I0113 09:00:45.799736       1 controller.go:209] Started workers
+I0113 09:02:23.393306       1 controller.go:265] Successfully synced 'default/cluster-1'
+I0113 09:02:23.393748       1 event.go:281] Event(v1.ObjectReference{Kind:"APIManager", Namespace:"default", Name:"cluster-1", UID:"4a2ea188-374e-481e-99e4-497db9472916", APIVersion:"apim
+.wso2.com/v1alpha1", ResourceVersion:"961222", FieldPath:""}): type: 'Normal' reason: 'synced' Apimanager synced successfully
+I0113 09:02:23.739969       1 controller.go:265] Successfully synced 'default/cluster-1'
+
+```
+7. Relavant artifact's pods based on specified pattern will be up and running. Check them through below command.
+```
+    kubectl get pods
+    
+    Output:
+    NAME                                                       READY   STATUS    RESTARTS   AGE
+    analytics-dash-deploy-54bd8d9b55-rmwnn                     1/1     Running   0          3m35s
+    analytics-worker-deploy-79dc97599d-m445h                   1/1     Running   0          3m35s
+    apim-1-deploy-7fcd974f8-m7ghq                              1/1     Running   0          3m35s
+    apim-2-deploy-6bb4bff84-6cmz2                              1/1     Running   0          3m35s
+    wso2apim-with-analytics-mysql-deployment-5fccb54d6-p29z5   1/1     Running   0          3m35s
+
+```
+8. Also you can view the running services through this command.
+```
+kubectl get svc
+
+NAME                                    TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                                                                     AGE
+analytics-dash-svc                      LoadBalancer   10.43.246.200   34.93.74.215     32201:31562/TCP                                                                             118m
+apim-1-svc                              LoadBalancer   10.43.245.163   35.244.26.60     8280:32339/TCP,8243:32247/TCP,9763:30327/TCP,9443:31757/TCP                                 118m
+apim-2-svc                              LoadBalancer   10.43.244.31    34.93.171.163    8280:32289/TCP,8243:31366/TCP,9763:30954/TCP,9443:31909/TCP                                 118m
+kubernetes                              ClusterIP      10.43.240.1     <none>           443/TCP                                                                                     2d21h
+wso2apim-analytics-service              LoadBalancer   10.43.252.140   35.200.217.231   7612:30414/TCP,7712:32469/TCP,9444:32169/TCP,9091:30755/TCP,7071:30125/TCP,7444:31236/TCP   118m
+wso2apim-with-analytics-rdbms-service   ClusterIP      10.43.242.130   <none>           3306/TCP                                                                                    118m
+
+```
+
+
+  
