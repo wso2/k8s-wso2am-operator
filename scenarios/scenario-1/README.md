@@ -15,7 +15,6 @@ Apply the above yaml file using the command
 kubectl apply -f wso2-apim.yaml
 
 Output:
-
 apimanager.apim.wso2.com/cluster-1 created
 
 ```
