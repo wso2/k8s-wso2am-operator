@@ -81,7 +81,8 @@ type Controller struct {
 	servicesSynced    cache.InformerSynced
 	apimanagerslister listers.APIManagerLister
 	apimanagersSynced cache.InformerSynced
-	configMapLister   corev1listers.ConfigMapLister
+    configMapLister   corev1listers.ConfigMapLister
+    persistentVolumeClaimsLister corelisters.PersistentVolumeClaimLister
 	recorder record.EventRecorder          			// recorder is an event recorder for recording Event resources to the Kubernetes API.
 	workqueue workqueue.RateLimitingInterface
 	// workqueue is a rate limited work queue. This is used to queue work to be processed instead of performing it as
@@ -99,7 +100,8 @@ func NewController(
 	sampleclientset clientset.Interface,
 	deploymentInformer appsinformers.DeploymentInformer,
 	serviceInformer coreinformers.ServiceInformer,
-	configmapInformer coreinformers.ConfigMapInformer,
+    configmapInformer coreinformers.ConfigMapInformer,
+    persistentVolumeClaimInformer coreinformers.PersistentVolumeClaimInformer,
 	apimanagerInformer informers.APIManagerInformer) *Controller {
 
 	// Create event broadcaster.
@@ -118,7 +120,8 @@ func NewController(
 		deploymentsSynced: deploymentInformer.Informer().HasSynced,
 		servicesLister:    serviceInformer.Lister(),
 		servicesSynced:    serviceInformer.Informer().HasSynced,
-		configMapLister:   configmapInformer.Lister(),
+        configMapLister:   configmapInformer.Lister(),
+        persistentVolumeClaimsLister: persistentVolumeClaimInformer.Lister(),
 		apimanagerslister: apimanagerInformer.Lister(),
 		apimanagersSynced: apimanagerInformer.Informer().HasSynced,
 		workqueue:         workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Apimanagers"),
@@ -163,6 +166,11 @@ func NewController(
 			}
 			controller.handleObject(new)
 		},
+		DeleteFunc: controller.handleObject,
+	})
+
+    persistentVolumeClaimInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    controller.handleObject,
 		DeleteFunc: controller.handleObject,
 	})
 
@@ -311,7 +319,12 @@ func (c *Controller) syncHandler(key string) error {
 		dashboardDeploymentName := "analytics-dash-deploy"
 		dashboardServiceName := "analytics-dash-svc"
 		workerDeploymentName := "analytics-worker-deploy"
-		workerServiceName := "wso2apim-analytics-service"
+        workerServiceName := "wso2apim-analytics-service"
+        
+        synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
+		executionPlanPVCName := "wso2am-p1-am-execution-plans"
+		mysqlPVCName := "wso2am-p1-mysql"
+
 
 		/////////checking whether resourecs already exits, else create one
 		configMapName := "controller-config"
@@ -387,13 +400,6 @@ func (c *Controller) syncHandler(key string) error {
 
 		pvcConfName := "pvc-config"
 		pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
-		pvcConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pvcConfName)
-		if errors.IsNotFound(err){
-			pvcConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,pvcConfWso2))
-			if err!= nil{
-				fmt.Println("Creating default pvc configmap in user specified ns",pvcConfUser)
-			}
-		}
 
 
 		//newconfmap := &corev1.ConfigMap{}
@@ -511,6 +517,29 @@ func (c *Controller) syncHandler(key string) error {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.MysqlService(apimanager))
+        }
+        
+        	
+		// Get synapse-configs-pvc name using hardcoded value
+		pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			sconf := pattern1.AssignConfigMapValuesForSynapseConfigsPvc(apimanager, pvcConfWso2)
+			pvc1, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeSynapseConfigsPvc(apimanager, sconf))
+		}
+		// Get execution-plans-pvc name using hardcoded value
+		pvc2, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(executionPlanPVCName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
+			pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
+		}
+		// Get mysql-pvc name using hardcoded value
+		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			sqlconf := pattern1.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
+			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeMysqlPvc(apimanager, sqlconf))
 		}
 
 		// If an error occurs during Get/Create, we'll requeue the item so we can
@@ -590,7 +619,28 @@ func (c *Controller) syncHandler(key string) error {
 			msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
+        }
+        
+
+		// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(pvc1, apimanager) {
+			msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by Apimanager", pvc1.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
 		}
+		// If the execution-plan pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(pvc2, apimanager) {
+			msg := fmt.Sprintf("execution-plans pvc %q already exists and is not managed by Apimanager", pvc2.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+		// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(pvc3, apimanager) {
+			msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by Apimanager", pvc3.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
 
 		//If the apim instance 2 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		//if !metav1.IsControlledBy(rcm, apimanager) {
