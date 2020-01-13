@@ -37,15 +37,11 @@ In this document, we will walk through the following.
 <summary>Advanced</summary>
 <br>
 <p>
-GCP Users:
-    
-- External NFS setup.
-  [doc](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
-    
-    
-Minikube Users:
-
-- HostPath setup.
+- GCP Users:
+    External NFS setup.
+    [doc](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
+- Minikube Users:
+    HostPath setup.
 </p>
 </details>
 
