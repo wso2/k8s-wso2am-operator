@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: wso2am-controller
-          image: thamiliniramakrishna/wso2-apim-controller:latest
+          image: keshi96/wso2am-controller:final2
           imagePullPolicy: Always
       serviceAccountName: wso2am-pattern-1-svc-account
