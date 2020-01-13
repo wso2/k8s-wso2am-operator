@@ -86,7 +86,9 @@ In this document, we will walk through the following.
 **Sample Scenarios**
 
 [Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
+
 [Scenario-2](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
+
 [Scenario-3](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
 
 ---
