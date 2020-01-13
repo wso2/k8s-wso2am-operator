@@ -89,57 +89,5 @@ Minikube Users:
     configmap/mysql-dbscripts created
 ```
 
-6. Now apply the basic yaml file to get the artifacts up and running
-```
-   kubectl apply -f artifacts/install/wso2-apim.yaml 
-```
-
-
-7. Now view the running pods by executing the command. Make sure to replace <USER-NAMESPACE> to the name changed in step 3
-   By default pattern-1 is executing, you will see 5 pods. Each pod represents the components based on relavant patterns.
-    
-```
-    kubectl get pods -n <USER-NAMESPACE>
-
-    Output:
-
-    NAME                                                       READY   STATUS    RESTARTS   AGE
-    analytics-dash-deploy-54bd8d9b55-rmwnn                     1/1     Running   0          3m35s
-    analytics-worker-deploy-79dc97599d-m445h                   1/1     Running   0          3m35s
-    apim-1-deploy-7fcd974f8-m7ghq                              1/1     Running   0          3m35s
-    apim-2-deploy-6bb4bff84-6cmz2                              1/1     Running   0          3m35s
-    wso2apim-with-analytics-mysql-deployment-5fccb54d6-p29z5   1/1     Running   0          3m35s
-
-
-```
-
-8. Once the status becomes running, view the logs of each pod using following command.
-
-```
-    kubectl logs <POD-NAME> -n <USER-NAMESPACE>
-```
-
-**Note:** 
-- GCP : To access the API portals, Add host mapping entries to the /etc/hosts file. As we have exposed the API portal service in Node Port type, you can use the IP address of any Kubernetes node.
-```$xslt
-    (kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="ExternalIP")].address }')
-```
-- Minikube: Add minikube ip to the /etc/hosts file
-
-```
-    <Any K8s Node IP / Minikube IP>  wso2apim
-    <Any K8s Node IP / Minikube IP>  wso2apim-analytics
-```
-
-
-   _APIM Publisher_ - https://wso2apim:9443/publisher
-   
-   _APIM Devportal_ - https://wso2apim:9443/devportal
-   
-
-After successfully accessing the portals, Follow the below documentation and try out the complete workflow. 
-
-[API Manager Documentation 3.0.0](https://apim.docs.wso2.com/en/latest/)
-   
-   
-
+**Sample Scenarios**
+[Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/edit/master/README.md) 
