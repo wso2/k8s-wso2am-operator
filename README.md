@@ -33,44 +33,17 @@ In this document, we will walk through the following.
    helm install stable/nfs-server-provisioner
    
    
-   
-   
-   <details><summary>If you are using Minikube click here</summary>
-<p>
-
-**_Note:_**  By default API operator requires the LoadBalancer service type which is not supported in Minikube by default. Here is how you can enable it on Minikube.
-
-- On Minikube, the LoadBalancer type makes the Service accessible through the minikube service command.
-
-    ```
-    >> minikube service <SERVICE_NAME> --url
-    >> minikube service products --url
-    ```
-    
-    The IP you receive from above output can be used as the "external-IP" in the following command.
-
-</p>
-</details>
-
-
-
-
+<details>
+<summary>Advanced</summary>
+<br>
+GCP Users:
+    External NFS setup can be done
+Minikube Users:
+    HostPath setup can be done</details>
 
    
    <details><summary>For Advanced settings click here</summary>
 <p>
-
-GCP Users:
-    External NFS setup can be done
-Minikube Users:
-    HostPath setup can be done
-
-</p>
-</details>
-
-
-
-
 
 
    
