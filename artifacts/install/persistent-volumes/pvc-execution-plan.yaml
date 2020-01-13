@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: wso2am-p1-am-execution-plans
-  namespace: test
+  namespace: test2
 spec:
   storageClassName: nfs
   accessModes:
