@@ -39,19 +39,19 @@ In this document, we will walk through the following.
 <p>
 GCP Users:
     
-- External NFS setup can be done
+- External NFS setup.
   [doc](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
     
     
 Minikube Users:
 
-- HostPath setup can be done
+- HostPath setup.
 </p>
 </details>
 
   
     
-3. Apply the command to get the controller-artifacts (in wso2-system namespace)
+3. Apply the command to create the controller-artifacts (in wso2-system namespace)
 
 ``` 
     kubectl apply -f artifacts/install/controller-artifacts/ 
@@ -63,10 +63,39 @@ Minikube Users:
     clusterrole.rbac.authorization.k8s.io/wso2am-controller-role created
     clusterrolebinding.rbac.authorization.k8s.io/wso2am-controller-role-binding created
     customresourcedefinition.apiextensions.k8s.io/apimanagers.apim.wso2.com created
-    apimanager.apim.wso2.com/cluster-1 created
     deployment.apps/wso2am-controller created
 ```
-5. Now view the running pods by executing the command. Make sure to replace <USER-NAMESPACE> to the name changed in step 3
+4. Apply the command below to create controller-configs (in wso2-system namespace)
+```
+    kubectl apply -f artifacts/install/controller-configs/
+    
+    Output:
+    
+    configmap/controller-config created
+    configmap/pvc-config created
+```
+
+5. Apply the command below to create pattern-spceific api manager artifacts
+```
+    kubectl apply -f artifacts/install/api-manager-artifacts/pattern-1/
+    
+    Output:
+    
+    configmap/wso2am-pattern-1-am-analytics-dashboard-bin created
+    configmap/dash-conf created
+    configmap/worker-conf created
+    configmap/wso2am-pattern-1-am-1-conf created
+    configmap/wso2am-pattern-1-am-2-conf created
+    configmap/mysql-dbscripts created
+```
+
+6. Now apply the basic yaml file to get the artifacts up and running
+```
+   kubectl apply -f artifacts/install/wso2-apim.yaml 
+```
+
+
+7. Now view the running pods by executing the command. Make sure to replace <USER-NAMESPACE> to the name changed in step 3
    By default pattern-1 is executing, you will see 5 pods. Each pod represents the components based on relavant patterns.
     
 ```
@@ -84,7 +113,7 @@ Minikube Users:
 
 ```
 
-6. Once the status becomes running, view the logs of each pod using following command.
+8. Once the status becomes running, view the logs of each pod using following command.
 
 ```
     kubectl logs <POD-NAME> -n <USER-NAMESPACE>
