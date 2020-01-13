@@ -90,4 +90,4 @@ Minikube Users:
 ```
 
 **Sample Scenarios**
-[Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/edit/master/README.md) 
+[Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md) 
