@@ -1,6 +1,6 @@
 ## Scenario 1
 
-Deploying WSO2 API Manager with a simple Custom Resource Definition.
+##### Deploying WSO2 API Manager with a simple Custom Resource Definition.
 ```
 apiVersion: apim.wso2.com/v1alpha1
 kind: APIManager
