@@ -36,9 +36,9 @@ In this document, we will walk through the following.
 <details>
 <summary>Advanced</summary>
 <br>
-<ul><li><h6>GCP Users:</h6></li>
+<ul><li>GCP Users:</li>
     External NFS setup. 
-<li><h6>Minikube Users:</h6></li>
+<li>Minikube Users:</li>
     HostPath setup.
  </ul>
 </details>
