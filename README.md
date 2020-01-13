@@ -36,15 +36,11 @@ In this document, we will walk through the following.
 <details>
 <summary>Advanced</summary>
 <br>
-<p>
-* GCP Users:
-    
-- External NFS setup.
-  [doc](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
-* Minikube Users:
-
-- HostPath setup.
-</p>
+<ul><li><h6>GCP Users:</h6></li>
+    External NFS setup. 
+<li><h6>Minikube Users:</h6></li>
+    HostPath setup.
+ </ul>
 </details>
 
   
@@ -88,4 +84,5 @@ In this document, we will walk through the following.
 ```
 
 **Sample Scenarios**
+
 [Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md) 
