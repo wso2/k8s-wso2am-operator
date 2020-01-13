@@ -85,7 +85,11 @@ In this document, we will walk through the following.
 
 **Sample Scenarios**
 
-[Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md) 
+[Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
+[Scenario-2]
+[Scenario-3]
+
+<br>
 
 6. After successfully applied the custom resource file, 
    You can view the logs of the controller.
