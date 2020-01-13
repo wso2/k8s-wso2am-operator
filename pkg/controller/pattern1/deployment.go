@@ -184,7 +184,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 						},
 					},
 
-					ServiceAccountName: "wso2am-pattern-1-svc-account",
+					// ServiceAccountName: "wso2am-pattern-1-svc-account",
 					ImagePullSecrets:[]corev1.LocalObjectReference{
 						{
 							Name:"wso2am-pattern-1-creds",
@@ -350,7 +350,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 						},
 					},
 
-					ServiceAccountName: "wso2am-pattern-1-svc-account",
+					// ServiceAccountName: "wso2am-pattern-1-svc-account",
 					ImagePullSecrets:[]corev1.LocalObjectReference{
 						{
 							Name:"wso2am-pattern-1-creds",
@@ -567,7 +567,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *a
 						},
 					},
 
-					ServiceAccountName: "wso2am-pattern-1-svc-account",
+					// ServiceAccountName: "wso2am-pattern-1-svc-account",
 					ImagePullSecrets:[]corev1.LocalObjectReference{
 						{
 							Name:"wso2am-pattern-1-creds",
@@ -770,7 +770,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *apps
 							VolumeMounts: workervolumemounts,
 						},
 					},
-					ServiceAccountName: "wso2am-pattern-1-svc-account",
+					// ServiceAccountName: "wso2am-pattern-1-svc-account",
 					ImagePullSecrets:[]corev1.LocalObjectReference{
 						{
 							Name:"wso2am-pattern-1-creds",
@@ -854,7 +854,7 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues) *apps
 
 					Volumes:mysqlvolume,
 					
-					ServiceAccountName: "wso2am-pattern-1-svc-account",
+					// ServiceAccountName: "wso2am-pattern-1-svc-account",
 				},
 			},
 		},
