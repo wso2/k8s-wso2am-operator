@@ -86,10 +86,10 @@ In this document, we will walk through the following.
 **Sample Scenarios**
 
 [Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
-[Scenario-2]
-[Scenario-3]
+[Scenario-2](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
+[Scenario-3](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
 
-<br>
+---
 
 6. After successfully applied the custom resource file, 
    You can view the logs of the controller.
@@ -100,6 +100,8 @@ kubectl get pods -n wso2-system
 Output:
 NAME                               READY   STATUS    RESTARTS   AGE
 wso2am-controller-75c5b84c-vsp4x   1/1     Running   0          76m
+
+---
 
 kubectl logs wso2am-controller-75c5b84c-vsp4x -n wso2-system
 
