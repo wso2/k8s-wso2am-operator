@@ -19,7 +19,7 @@ In this document, we will walk through the following.
 * [Golang](https://golang.org/doc/install) v1.12+ 
 * [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
 * [Docker](https://docs.docker.com/install/) & [DockerHub](https://hub.docker.com/) / private docker registry account
-* [GCP](https://cloud.google.com/) / [Minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
+* [Helm](http://docs.shippable.com/deploy/tutorial/deploy-to-gcp-gke-helm/)
 
 ## Steps:
 1. Clone the wso2am-k8s-operator repository
@@ -30,28 +30,40 @@ In this document, we will walk through the following.
 
 2. Setup the required Storage
 
-    [GKE users](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
+   helm install stable/nfs-server-provisioner
+   
+   
+   
+   <details><summary>For Advanced settings click here</summary>
+<p>
+
+GCP Users:
+    External NFS setup can be done
+Minikube Users:
+    HostPath setup can be done
+
+</p>
+</details>
+
+
+
+
+
+
+   
+   [GKE users](https://docs.google.com/document/d/1oLLbz5q53_vN9fXN-byXuCifdobT-_jXAno7zc87Gnk/edit?ts=5e16c0ca)
     
     [Minikube users](https://docs.google.com/document/d/1ILIQKGqZ53y2cMhS731RRZMKsdbY3C-OSi4M10g7i8Q/edit?usp=sharing)
    
-3. Go inside wso2am-k8s-operator/artifacts/install/controller-artifacts/ folder. Open the below set of files and replace <USER-NAMESPACE> with any name you like.
     
-```
-    1-namespace.yaml
-    2-service-account.yaml
-    4-cluster-role-binding.yaml
-    6-wso2-apim.yaml
-    7-controller.yaml
-```
-    
-4. After replacing the namespace, execute the following command
+3. Apply the command to get the controller-artifacts (in wso2-system namespace)
 
 ``` 
     kubectl apply -f artifacts/install/controller-artifacts/ 
 
     Output: 
 
-    namespace/<USER-NAMESPACE> created
+    namespace/wso2-system created
     serviceaccount/wso2am-pattern-1-svc-account created
     clusterrole.rbac.authorization.k8s.io/wso2am-controller-role created
     clusterrolebinding.rbac.authorization.k8s.io/wso2am-controller-role-binding created
