@@ -176,17 +176,17 @@ data:
     configmap/mysql-dbscripts created
 ```
 
-**Sample Scenarios**
+6. Now Let's deploy WSO2 API Manager based on Scenarios. The default and the simplest one is Scenario-1.
+
+```
+kubectl apply -f scenarios/scenario-1/wso2-apim.yaml
+```
 
 [Scenario-1](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
 
-[Scenario-2](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
-
-[Scenario-3](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/scenarios/scenario-1/README.md)
-
 ---
 
-6. After successfully applied the custom resource file, 
+7. After successfully applied the custom resource file, 
    You can view the logs of the controller.
    
 ```
