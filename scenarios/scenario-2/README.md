@@ -1,6 +1,6 @@
 ### Scenario 2
 
-1. Go inside root folder wso2am-k8s-operator
+1. Go inside root folder _wso2am-k8s-operator_
 
 2. Create a new configmap with the name of **wso2am-pattern-1-am-1-conf** using given deployment.toml file using the command,
 
@@ -13,7 +13,7 @@ kubectl create configmap wso2am-pattern-1-am-1-conf --from-file=wso2am-k8s-opera
 3. Then apply the given yaml using the command
 
 ```
-kubectl apply -f kubectl apply -f scenarios/scenario-2/wso2-apim.yaml
+kubectl apply -f scenarios/scenario-2/wso2-apim.yaml
 ```
 
 Now WSO2 API Manager will be exposed via NodePort Service Type successfully.
