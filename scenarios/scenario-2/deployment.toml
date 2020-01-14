@@ -46,8 +46,8 @@ username= "${admin.username}"
 password= "${admin.password}"
 ws_endpoint = "ws://wso2apim:9099"
 wss_endpoint = "wss://wso2apim:8099"
-http_endpoint = "http://wso2apim:8280"
-https_endpoint = "https://wso2apim:8243"
+http_endpoint = "http://wso2apim:32004"
+https_endpoint = "https://wso2apim:32003"
 #[apim.cache.gateway_token]
 #enable = true
 #expiry_time = "900s"
