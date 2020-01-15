@@ -44,6 +44,30 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 
 	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager)
 
+
+	apim1deployports := []corev1.ContainerPort{}
+	if apimanager.Spec.Service.Type =="LoadBalancer"{
+		apim1deployports = getApim1DeployLBPorts()
+	}
+	if apimanager.Spec.Service.Type =="NodePort"{
+		apim1deployports = getApim1DeployNPPorts()
+	}
+
+	cmdstring := []string{}
+	if apimanager.Spec.Service.Type=="NodePort"{
+		cmdstring = []string{
+			"/bin/sh",
+			"-c",
+			"nc -z localhost 32001",
+		}
+	} else {
+		cmdstring = []string{
+			"/bin/sh",
+			"-c",
+			"nc -z localhost 9443",
+		}
+	}
+
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "apim-1-deploy",
@@ -94,11 +118,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
-										Command:[]string{
-											"/bin/sh",
-											"-c",
-											"nc -z localhost 9443",
-										},
+										Command:cmdstring,
 									},
 								},
 								InitialDelaySeconds: x.Livedelay,
@@ -108,11 +128,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
-										Command:[]string{
-											"/bin/sh",
-											"-c",
-											"nc -z localhost 9443",
-										},
+										Command:cmdstring,
 									},
 								},
 
@@ -133,7 +149,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 									},
 								},
 							},
-								//Resources:corev1.ResourceRequirements{
+							//Resources:corev1.ResourceRequirements{
 							//	Requests:corev1.ResourceList{
 							//		corev1.ResourceCPU:x.Reqcpu,
 							//		corev1.ResourceMemory:x.Reqmem,
@@ -146,24 +162,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 
 							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
 
-							Ports: []corev1.ContainerPort{
-								{
-									ContainerPort: 8280,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 8243,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9763,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9443,
-									Protocol:      "TCP",
-								},
-							},
+							Ports: apim1deployports,
 							Env: []corev1.EnvVar{
 								// {
 								// 	Name:  "HOST_NAME",
@@ -201,8 +200,14 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 
 func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv1.Deployment {
 
-
 	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager)
+	apim2deployports := []corev1.ContainerPort{}
+	if apimanager.Spec.Service.Type =="LoadBalancer"{
+		apim2deployports = getApim2DeployLBPorts()
+	}
+	if apimanager.Spec.Service.Type =="NodePort"{
+		apim2deployports = getApim2DeployNPPorts()
+	}
 
 
 	labels := map[string]string{
@@ -210,6 +215,20 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 		"node": "wso2am-pattern-1-am-2",
 	}
 
+	cmdstring := []string{}
+	if apimanager.Spec.Service.Type=="NodePort"{
+		cmdstring = []string{
+			"/bin/sh",
+			"-c",
+			"nc -z localhost 32006",
+		}
+	} else {
+		cmdstring = []string{
+			"/bin/sh",
+			"-c",
+			"nc -z localhost 9443",
+		}
+	}
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "apim-2-deploy",
@@ -261,11 +280,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
-										Command:[]string{
-											"/bin/sh",
-											"-c",
-											"nc -z localhost 9443",
-										},
+										Command:cmdstring,
 									},
 								},
 								InitialDelaySeconds: z.Livedelay,
@@ -275,11 +290,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
-										Command:[]string{
-											"/bin/sh",
-											"-c",
-											"nc -z localhost 9443",
-										},
+										Command:cmdstring,
 									},
 								},
 
@@ -313,24 +324,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 
-							Ports: []corev1.ContainerPort{
-								{
-									ContainerPort: 8280,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 8243,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9763,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9443,
-									Protocol:      "TCP",
-								},
-							},
+							Ports:apim2deployports,
+
 							Env: []corev1.EnvVar{
 								// {
 								// 	Name:  "HOST_NAME",
