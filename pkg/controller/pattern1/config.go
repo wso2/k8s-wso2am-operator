@@ -499,7 +499,7 @@ func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.Config
 	}
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      configMap.Name,
+			Name:      configMap.Name+"-"+apimanager.Name,
 			Namespace: apimanager.Namespace,
 			Labels:   labels,
 			OwnerReferences: []metav1.OwnerReference{

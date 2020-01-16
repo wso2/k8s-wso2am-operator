@@ -340,7 +340,8 @@ func (c *Controller) syncHandler(key string) error {
 
 		dashConfName := "wso2am-p1-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
-		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfName)
+		dashConfUserName:= "wso2am-p1-analytics-dash-conf-"+apimanager.Name
+		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
 		if errors.IsNotFound(err){
 			dashConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,dashConfWso2))
 			if err!= nil{
@@ -350,7 +351,8 @@ func (c *Controller) syncHandler(key string) error {
 
 		mysqlDbConfName := "wso2am-p1-mysql-dbscripts"
 		mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
-		mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfName)
+		mysqlDbConfUserName:= "wso2am-p1-mysql-dbscripts-"+apimanager.Name
+		mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfUserName)
 		if errors.IsNotFound(err){
 			mysqlDbConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,mysqlDbConfWso2))
 			if err!= nil{
@@ -360,7 +362,8 @@ func (c *Controller) syncHandler(key string) error {
 
 		workerConfName := "wso2am-p1-analytics-worker-conf"
 		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
-		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfName)
+		workerConfUserName:= "wso2am-p1-analytics-worker-conf-"+apimanager.Name
+		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
 		if errors.IsNotFound(err){
 			workerConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,workerConfWso2))
 			if err!= nil{
@@ -370,7 +373,8 @@ func (c *Controller) syncHandler(key string) error {
 
 		am1ConfName := "wso2am-p1-apim-1-conf"
 		am1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am1ConfName)
-		am1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am1ConfName)
+		am1ConfUserName:= "wso2am-p1-apim-1-conf-"+apimanager.Name
+		am1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am1ConfUserName)
 		if errors.IsNotFound(err){
 			am1ConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,am1ConfWso2))
 			if err!= nil{
@@ -381,7 +385,8 @@ func (c *Controller) syncHandler(key string) error {
 
 		am2ConfName := "wso2am-p1-apim-2-conf"
 		am2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am2ConfName)
-		am2ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am2ConfName)
+		am2ConfUserName:= "wso2am-p1-apim-2-conf-"+apimanager.Name
+		am2ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am2ConfUserName)
 		if errors.IsNotFound(err){
 			am2ConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,am2ConfWso2))
 			if err!= nil{
@@ -391,7 +396,8 @@ func (c *Controller) syncHandler(key string) error {
 
 		dashBinConfName := "wso2am-p1-analytics-dash-bin"
 		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
-		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfName)
+		dashBinConfUserName:= "wso2am-p1-analytics-dash-bin-"+apimanager.Name
+		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
 		if errors.IsNotFound(err){
 			dashBinConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,dashBinConfWso2))
 			if err!= nil{
