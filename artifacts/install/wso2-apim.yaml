@@ -3,10 +3,39 @@ kind: APIManager
 metadata:
   name: cluster-1
 spec:
-  pattern: Pattern-1
-#  service:
-#    type: NodePort
-#   profiles:
+  pattern: Pattern-x
+  profiles:
+    custom:
+      - name: new-api-manager
+        deployment:
+          replicas: 1
+          minReadySeconds: 240
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: 2000m
+            limits:
+              memory: 3Gi
+              cpu: 3000m
+          livenessProbe:
+            initialDelaySeconds: 180
+            failureThreshold: 3
+            periodSeconds: 10
+          readinessProbe:
+            initialDelaySeconds: 180
+            failureThreshold: 3
+            periodSeconds: 10
+          configMaps:
+            newConfigMap:
+              - name: custom-sequence-new
+                mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/new
+          persistentVolumeClaim:
+            newClaim:
+              - name: new-pvc-claim-1
+                mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/new
+
+
 #     api-manager-1:
 #       deployment:
 #         replicas: 1
