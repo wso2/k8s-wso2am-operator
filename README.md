@@ -151,6 +151,7 @@ data:
     clusterrolebinding.rbac.authorization.k8s.io/wso2am-controller-role-binding created
     customresourcedefinition.apiextensions.k8s.io/apimanagers.apim.wso2.com created
     deployment.apps/wso2am-controller created
+
 ```
 4. Apply the command below to create controller-configs (in wso2-system namespace)
 ```
@@ -168,18 +169,24 @@ data:
     
     Output:
     
-    configmap/wso2am-pattern-1-am-analytics-dashboard-bin created
-    configmap/dash-conf created
-    configmap/worker-conf created
-    configmap/wso2am-pattern-1-am-1-conf created
-    configmap/wso2am-pattern-1-am-2-conf created
-    configmap/mysql-dbscripts created
+    configmap/wso2am-p1-analytics-dash-bin created
+    configmap/wso2am-p1-analytics-dash-conf created
+    configmap/wso2am-p1-analytics-worker-conf created
+    configmap/wso2am-p1-apim-1-conf created
+    configmap/wso2am-p1-apim-2-conf created
+    configmap/wso2am-p1-mysql-dbscripts created
+
 ```
 
 6. Now Let's deploy WSO2 API Manager based on Scenarios. The default and the simplest one is Scenario-1.
 
 ```
-kubectl apply -f scenarios/scenario-1/wso2-apim.yaml
+    kubectl apply -f scenarios/scenario-1/wso2-apim.yaml 
+
+    Output:
+
+    apimanager.apim.wso2.com/cluster-1 created
+
 ```
 
 7. Relavant artifact's pods based on specified pattern will be up and running. Check them through below command.
@@ -188,12 +195,11 @@ kubectl apply -f scenarios/scenario-1/wso2-apim.yaml
     
     Output:
     NAME                                                       READY   STATUS    RESTARTS   AGE
-    analytics-dash-deploy-54bd8d9b55-rmwnn                     1/1     Running   0          3m35s
-    analytics-worker-deploy-79dc97599d-m445h                   1/1     Running   0          3m35s
-    apim-1-deploy-7fcd974f8-m7ghq                              1/1     Running   0          3m35s
-    apim-2-deploy-6bb4bff84-6cmz2                              1/1     Running   0          3m35s
-    wso2apim-with-analytics-mysql-deployment-5fccb54d6-p29z5   1/1     Running   0          3m35s
-
+    mysql-cluster-1-787bbf7d7f-dd97x                           1/1     Running   0          3m35s
+    wso2-am-1-cluster-1-7c965f55db-r98zh                       1/1     Running   0          3m35s
+    wso2-am-2-cluster-1-7dd4669dd-tzl6q                        1/1     Running   0          3m35s
+    wso2-am-analytics-dashboard-cluster-1-7654b7b7b7-nnfwc     1/1     Running   0          3m35s
+    wso2-am-analytics-worker-cluster-1-67b995dd64-4d4tz        1/1     Running   0          3m35s
 ```
 8. Also you can view the running services through this command.
 ```
