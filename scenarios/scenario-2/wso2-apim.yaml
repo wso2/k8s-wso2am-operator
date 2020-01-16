@@ -9,4 +9,7 @@ spec:
   profiles:
     api-manager-1:
       configMaps:
-        deploymentConfigMap: wso2am-pattern-1-am-1-conf
+        deploymentConfigMap: wso2am-p1-apim-1-conf
+    api-manager-2:
+      configMaps:
+        deploymentConfigMap: wso2am-p1-apim-2-conf

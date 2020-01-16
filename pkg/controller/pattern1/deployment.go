@@ -70,7 +70,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "apim-1-deploy",
+			Name:      "wso2-am-1-"+apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -231,7 +231,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 	}
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "apim-2-deploy",
+			Name:      "wso2-am-2-"+apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -373,7 +373,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *a
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "analytics-dash-deploy",
+			Name:      "wso2-am-analytics-dashboard-"+apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -542,23 +542,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *a
 							},
 
 							VolumeMounts: dashVolumeMount,
-							//	[]corev1.VolumeMount{
-							//	{
-							//		Name: "wso2am-pattern-1-am-analytics-dashboard-conf",
-							//		MountPath: "/home/wso2carbon/wso2-config-volume/conf/dashboard/deployment.yaml",
-							//		SubPath:"deployment.yaml",
-							//	},
-							//	//{
-							//	//	Name: "wso2am-pattern-1-am-analytics-dashboard-bin",
-							//	//	MountPath: "/home/wso2carbon/wso2-config-volume/wso2/dashboard/bin/carbon.sh",
-							//	//	SubPath:"carbon.sh",
-							//	//},
-							//	//{
-							//	//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
-							//	//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
-							//	//	SubPath:"docker-entrypoint.sh",
-							//	//},
-							//},
+
 						},
 					},
 
@@ -570,41 +554,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *a
 					},
 
 					Volumes: dashVolume,
-						//[]corev1.Volume{
-						//{
-						//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf",
-						//	VolumeSource: corev1.VolumeSource{
-						//		ConfigMap: &corev1.ConfigMapVolumeSource{
-						//			LocalObjectReference: corev1.LocalObjectReference{
-						//				Name: "dash-conf",
-						//			},
-						//			DefaultMode:&defaultMode,
-						//		},
-						//	},
-						//},
-						//{
-						//	Name: "wso2am-pattern-1-am-analytics-dashboard-bin",
-						//	VolumeSource: corev1.VolumeSource{
-						//		ConfigMap: &corev1.ConfigMapVolumeSource{
-						//			LocalObjectReference: corev1.LocalObjectReference{
-						//				Name: "wso2am-pattern-1-am-analytics-dashboard-bin",
-						//			},
-						//			DefaultMode:&defaultMode,
-						//		},
-						//	},
-						//},
-						//{
-						//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
-						//	VolumeSource: corev1.VolumeSource{
-						//		ConfigMap: &corev1.ConfigMapVolumeSource{
-						//			LocalObjectReference: corev1.LocalObjectReference{
-						//				Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
-						//			},
-						//			DefaultMode:&defaultMode,
-						//		},
-						//	},
-						//},
-					//},
+
 				},
 			},
 		},
@@ -624,7 +574,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *apps
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			// Name: apimanager.Spec.DeploymentName,
-			Name:      "analytics-worker-deploy",
+			Name:      "wso2-am-analytics-worker-"+apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -792,7 +742,7 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues) *apps
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2apim-with-analytics-mysql-deployment",
+			Name:      "mysql-"+apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),

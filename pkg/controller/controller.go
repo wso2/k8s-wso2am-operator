@@ -310,15 +310,15 @@ func (c *Controller) syncHandler(key string) error {
 
 	if apimanager.Spec.Pattern == "Pattern-1" {
 
-		apim1deploymentName := "apim-1-deploy"
-		apim2deploymentName := "apim-2-deploy"
+		apim1deploymentName := "wso2-am-1-"+apimanager.Name
+		apim2deploymentName := "wso2-am-2-"+apimanager.Name
 		apim1serviceName := "apim-1-svc"
 		apim2serviceName := "apim-2-svc"
-		mysqldeploymentName := "wso2apim-with-analytics-mysql-deployment"
+		mysqldeploymentName := "mysql-"+apimanager.Name
 		mysqlserviceName := "wso2apim-with-analytics-rdbms-service"
-		dashboardDeploymentName := "analytics-dash-deploy"
+		dashboardDeploymentName := "wso2-am-analytics-dashboard-"+apimanager.Name
 		dashboardServiceName := "analytics-dash-svc"
-		workerDeploymentName := "analytics-worker-deploy"
+		workerDeploymentName := "wso2-am-analytics-worker-"+apimanager.Name
         workerServiceName := "wso2apim-analytics-service"
         
         synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
@@ -338,7 +338,7 @@ func (c *Controller) syncHandler(key string) error {
 		//	}
 		//}
 
-		dashConfName := "dash-conf"
+		dashConfName := "wso2am-p1-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
 		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfName)
 		if errors.IsNotFound(err){
@@ -348,7 +348,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		mysqlDbConfName := "mysql-dbscripts"
+		mysqlDbConfName := "wso2am-p1-mysql-dbscripts"
 		mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
 		mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfName)
 		if errors.IsNotFound(err){
@@ -358,7 +358,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		workerConfName := "worker-conf"
+		workerConfName := "wso2am-p1-analytics-worker-conf"
 		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
 		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfName)
 		if errors.IsNotFound(err){
@@ -368,17 +368,18 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		am1ConfName := "wso2am-pattern-1-am-1-conf"
+		am1ConfName := "wso2am-p1-apim-1-conf"
 		am1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am1ConfName)
 		am1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am1ConfName)
 		if errors.IsNotFound(err){
 			am1ConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,am1ConfWso2))
 			if err!= nil{
 				fmt.Println("Creating am1 configmap in user specified ns",am1ConfUser)
+
 			}
 		}
 
-		am2ConfName := "wso2am-pattern-1-am-2-conf"
+		am2ConfName := "wso2am-p1-apim-2-conf"
 		am2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am2ConfName)
 		am2ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am2ConfName)
 		if errors.IsNotFound(err){
@@ -388,7 +389,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		dashBinConfName := "wso2am-pattern-1-am-analytics-dashboard-bin"
+		dashBinConfName := "wso2am-p1-analytics-dash-bin"
 		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
 		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfName)
 		if errors.IsNotFound(err){
@@ -435,6 +436,7 @@ func (c *Controller) syncHandler(key string) error {
 		if errors.IsNotFound(err) {
 			x := pattern1.AssignApim1ConfigMapValues(apimanager,configmap)
 			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x))
+			//fmt.Println("aaaaaaaaaa metadata name is ", apimanager.Name)
 			if err != nil {
 				return err
 			}

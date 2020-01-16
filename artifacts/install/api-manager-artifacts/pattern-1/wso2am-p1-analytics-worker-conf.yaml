@@ -15,7 +15,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: worker-conf
+  name: wso2am-p1-analytics-worker-conf
   namespace: wso2-system
 data:
   deployment.yaml: "################################################################################\n#

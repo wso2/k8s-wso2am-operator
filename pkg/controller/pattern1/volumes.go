@@ -9,8 +9,8 @@ import (
 
 func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	defaultdeployConf :=  "wso2am-pattern-1-am-1-conf"
-	deployconfigmap := "wso2am-pattern-1-am-1-conf"
+	defaultdeployConf :=  "wso2am-p1-apim-1-conf"
+	deployconfigmap := "wso2am-p1-apim-1-conf"
 	deployConfFromYaml := apimanager.Spec.Profiles.Apimanager1.Deployment.Configmaps.DeploymentConfigmap
 	if deployConfFromYaml != ""{
 		deployconfigmap = deployConfFromYaml
@@ -118,8 +118,8 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 
 func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	defaultdeployConf :=  "wso2am-pattern-1-am-2-conf"
-	deployconfigmap := "wso2am-pattern-1-am-2-conf"
+	defaultdeployConf :=  "wso2am-p1-apim-2-conf"
+	deployconfigmap := "wso2am-p1-apim-2-conf"
 	deployConfFromYaml := apimanager.Spec.Profiles.Apimanager2.Deployment.Configmaps.DeploymentConfigmap
 	if deployConfFromYaml != ""{
 		deployconfigmap = deployConfFromYaml
@@ -227,8 +227,8 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 
 func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	defaultdashconf :=  "wso2am-pattern-1-am-analytics-dashboard-conf"
-	dashconfigmap := "dash-conf"
+	defaultdashconf :=  "wso2am-p1-analytics-dash-conf"
+	dashconfigmap := "wso2am-p1-analytics-dash-conf"
 	dashconfFromYaml := apimanager.Spec.Profiles.AnalyticsDashboard.Deployment.Configmaps.DeploymentConfigmap
 	if dashconfFromYaml != ""{
 		dashconfigmap = dashconfFromYaml
@@ -258,12 +258,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Volu
 
 	})
 
-	////adding docker entrypoint
-	//dashvolumemounts=append(am1volumemounts,corev1.VolumeMount{
-	//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
-	//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
-	//	SubPath:"docker-entrypoint.sh",
-	//})
+
 
 	var dashvolume []corev1.Volume
 	for _,c:= range apimanager.Spec.Profiles.AnalyticsDashboard.Deployment.Configmaps.NewConfigmap{
@@ -301,18 +296,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Volu
 		},
 	})
 
-	//defaultmode := int32(0407)
-	//dashvolume =append(dashvolume,corev1.Volume{
-	//	Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
-	//	VolumeSource: corev1.VolumeSource{
-	//		ConfigMap: &corev1.ConfigMapVolumeSource{
-	//			LocalObjectReference: corev1.LocalObjectReference{
-	//				Name: "wso2am-pattern-1-am-analytics-dashboard-conf-entrypoint",
-	//			},
-	//			DefaultMode:&defaultmode,
-	//		},
-	//	},
-	//})
+
 
 
 	return dashvolumemounts, dashvolume
@@ -321,8 +305,8 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.Volu
 
 func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	defaultdeployConf :=  "worker-conf"
-	deployconfigmap := "worker-conf"
+	defaultdeployConf :=  "wso2am-p1-analytics-worker-conf"
+	deployconfigmap := "wso2am-p1-analytics-worker-conf"
 	workerconfFromYaml := apimanager.Spec.Profiles.AnalyticsWorker.Deployment.Configmaps.DeploymentConfigmap
 	if workerconfFromYaml != ""{
 		deployconfigmap = workerconfFromYaml
@@ -407,7 +391,7 @@ func getMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 
 	//adding default deploymentConfigmap
 	mysqlvolumemounts=append(mysqlvolumemounts,corev1.VolumeMount{
-		Name: "mysql-dbscripts",
+		Name: "wso2am-p1-mysql-dbscripts",
 		MountPath: "/docker-entrypoint-initdb.d",
 
 	})
@@ -420,11 +404,11 @@ func getMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 	var mysqlvolume []corev1.Volume
 
 	mysqlvolume =append(mysqlvolume,corev1.Volume{
-		Name: "mysql-dbscripts",
+		Name: "wso2am-p1-mysql-dbscripts",
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "mysql-dbscripts",
+					Name: "wso2am-p1-mysql-dbscripts",
 				},
 			},
 		},

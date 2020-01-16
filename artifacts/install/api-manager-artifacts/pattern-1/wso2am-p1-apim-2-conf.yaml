@@ -132,6 +132,11 @@ data:
         #enable_policy_deploy = true
         #enable_blacklist_condition = true
         #enable_persistence = true
+        [apim.throttling]
+        enable_data_publishing = false
+        #enable_policy_deploy = true
+        enable_blacklist_condition = false
+        enable_decision_connection = false
         #throttle_decision_endpoints = ["tcp://localhost:5672","tcp://localhost:5672"]
         #[apim.throttling.blacklist_condition]
         #start_delay = "5m"
@@ -148,6 +153,10 @@ data:
         #traffic_manager_urls = ["tcp://localhost:9611","tcp://localhost:9611"]
         #traffic_manager_auth_urls = ["ssl://localhost:9711","ssl://localhost:9711"]
         #type = "loadbalance"
+        [[apim.throttling.url_group]]
+        traffic_manager_urls = ["tcp://localhost:9611","tcp://apim-1-svc:9611"]
+        traffic_manager_auth_urls = ["ssl://localhost:9711","ssl://apim-1-svc:9711"]
+        type = "loadbalance"
         #[[apim.throttling.url_group]]
         #traffic_manager_urls = ["tcp://localhost:9611","tcp://localhost:9611"]
         #traffic_manager_auth_urls = ["ssl://localhost:9711","ssl://localhost:9711"]
@@ -200,7 +209,7 @@ data:
 kind: ConfigMap
 metadata:
   creationTimestamp: "2019-12-12T09:15:03Z"
-  name: wso2am-pattern-1-am-2-conf
+  name: wso2am-p1-apim-2-conf
   namespace: wso2-system
   resourceVersion: "1794592"
   selfLink: /api/v1/namespaces/wso2-system/configmap/wso2am-pattern-1-am-2-conf

@@ -313,7 +313,7 @@ data:
 kind: ConfigMap
 metadata:
   creationTimestamp: "2019-12-13T04:25:27Z"
-  name: wso2am-pattern-1-am-analytics-dashboard-bin
+  name: wso2am-p1-analytics-dash-bin
   namespace: wso2-system
   resourceVersion: "1821536"
   selfLink: /api/v1/namespaces/wso2-system/configmap/wso2am-pattern-1-am-analytics-dashboard-bin

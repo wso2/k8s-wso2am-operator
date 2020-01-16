@@ -28,7 +28,7 @@ spec:
 #           failureThreshold: 3
 #           periodSeconds: 10
 #        configMaps:
-#          deploymentConfigMap: wso2am-pattern-1-am-1-conf
+#          deploymentConfigMap: wso2am-p1-apim-1-conf
 #          newConfigMap:
 #            - name: custom-sequence-in-cm
 #              mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/in
