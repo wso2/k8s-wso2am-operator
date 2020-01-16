@@ -1,4 +1,4 @@
-## Trouble Shooting Guide - API Operator
+## Trouble Shooting Guide - WSO2AM-K8S-OPERATOR
 
 #### Check logs of wso2am-controller
 
