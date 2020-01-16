@@ -1,107 +1,34 @@
 ## Trouble Shooting Guide - API Operator
 
-#### Check logs in API Operator
-- API operator deploys in a namespace called "wso2-system"
+#### Check logs of wso2am-controller
 
-- Following command will list the available pods in the "wso2-system" namespace.
+The controller will be running in "wso2-system" namespace
+   
+```
+kubectl get pods -n wso2-system
 
-    ```$xslt
-    kubectl get pods -n wso2-system
-    ``` 
-- Output:
-    ```$xslt
-    NAME                             READY   STATUS    RESTARTS   AGE
-    apim-operator-59c665f477-9bw7l   1/1     Running   0          4h23m
-     
-    ```
-- Once you are able to see the apim-operator pod up and running, you can check its logs using the below command.
-    
-    ```$xslt
-    kubectl logs -f -n wso2-system <name of the apim-operator pod>
-    ```
-- Example: 
+Output:
+NAME                               READY   STATUS    RESTARTS   AGE
+wso2am-controller-75c5b84c-vsp4x   1/1     Running   0          76m
 
-    ```$xslt
-    kubectl logs -f -n wso2-system apim-operator-59c665f477-9bw7l
-    ```
-- Once the above command is executed, it will show the logs in the API operator.
+---
 
-#### Identifying Kaniko job related pod & errors
+kubectl logs wso2am-controller-75c5b84c-vsp4x -n wso2-system
 
-- Kaniko job is responsible to create the API microgateway image and push it to the Docker-Hub.
-- If the API microgateway image belongs to a particular API definition is not available in the Docker-Hub, it will build the image using the Kaniko job.
-- If you are creating an API name "online-store", the Kaniko pod related to that would look like below. <br>
-    \<api-name>-kaniko-xxxxxx-xxxx
-- Example:
-      
-    online-store-kaniko-xxxxxx-xxxx (x denotes random alphanumeric values)
+Output:
+W0113 09:00:45.694404       1 client_config.go:543] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.
+I0113 09:00:45.698364       1 controller.go:128] Setting up event handlers
+I0113 09:00:45.698636       1 controller.go:194] Starting Apimanager controller
+I0113 09:00:45.698834       1 controller.go:198] Waiting for informer caches to sync
+I0113 09:00:45.799345       1 controller.go:203] Starting workers
+I0113 09:00:45.799736       1 controller.go:209] Started workers
+I0113 09:02:23.393306       1 controller.go:265] Successfully synced 'default/cluster-1'
+I0113 09:02:23.393748       1 event.go:281] Event(v1.ObjectReference{Kind:"APIManager", Namespace:"default", Name:"cluster-1", UID:"4a2ea188-374e-481e-99e4-497db9472916", APIVersion:"apim
+.wso2.com/v1alpha1", ResourceVersion:"961222", FieldPath:""}): type: 'Normal' reason: 'synced' Apimanager synced successfully
+I0113 09:02:23.739969       1 controller.go:265] Successfully synced 'default/cluster-1'
 
-```$xslt
-kubectl get pods
 ```
 
-```$xslt
-NAME                                   READY   STATUS    RESTARTS   AGE    
-online-storee-kaniko-6dvb8             1/1     Running   0          5s
 
-```
-- If it's in the running "status", it's working fine. If it says "Err", most possibly it can be due to configuration issue related to Docker-Hub user. Hence pushing the image may leads the kaniko pod to a erroneous state.
-- In that case check the following, <br>
-    1. Check the if you have put the proper Docker-Hub username in "\<api-k8s-crd-home>/apim-operator/controller-configs/controller_conf.yaml" 
-    - Check the following configuration in \<api-k8s-crd-home>/apim-operator/controller-configs/controller_conf.yaml.
-    - Replace the \<username-docker-registry> with the proper Docker-Hub username.   
-        ```
-        #docker registry name which the mgw image to be pushed.  eg->  dockerRegistry: username
-        dockerRegistry: <username-docker-registry>
-        ```  
-        ```$xslt
-        kubectl apply -f <api-k8s-crd-home>/apim-operator/controller-configs/controller_conf.yaml
-        ```
-    - Once it's modified, execute the following command to apply the changes in the cluster
-    2. Check if you have provided the Docker-Hub username and password in the docker_secret_template.file.
-    - Open the <api-k8s-crd-home>/apim-operator/controller-configs/docker_secret_template.yaml file. 
-    - Check if you have entered the **base 64 encoded value of username and password** in the following section.
-        ```$xslt
-        data:
-          username: ENTER YOUR BASE64 ENCODED USERNAME
-          password: ENTER YOUR BASE64 ENCODED PASSWORD
-        ``` 
-        ```$xslt
-        kubectl apply -f <api-k8s-crd-home>/apim-operator/controller-configs/docker_secret_template.yaml
-        ```
-#### How to check logs in API
-
-- Once the API is deploy in the Kubernetes cluster, the pod will be names in the following convention.
-  \<api-name>-xxxxx-xxxx (x is a alphanumeric value)
-- If you have deployed online-store API, the pod will be look like below.
-    ```$xslt
-    NAME                                   READY   STATUS      RESTARTS   AGE
-    online-store-794cd7b66-lnnxd           1/1     Running     0          164m
-    ```
-- To check its log, execute the following command.
-    ```$xslt
-    kubectl logs -f online-store-794cd7b66-lnnxd
-    ```   
-    Sample logs of the API as below.
-    ```$xslt
-    [ballerina/http] started HTTPS/WSS endpoint 0.0.0.0:9096
-    [ballerina/http] started HTTPS/WSS endpoint 0.0.0.0:9095
-    [ballerina/http] started HTTP/WS endpoint 0.0.0.0:9090
-    2019-10-27 14:37:49,222 INFO  [wso2/gateway] - HTTPS listener is active on port 9095 
-    2019-10-27 14:37:49,224 INFO  [wso2/gateway] - HTTP listener is active on port 9090
-    ```
-
-#### How to enable debug logs for the API
-
-- If you want to analyze logs in depth, enable the debug logs.
-- For this, you need to add the following entry in the ***\<api-k8s-crds-home>/apim-operator/controller-configs/mgw_conf_mustache.yaml***
-```$xslt
-[b7a.log]
-level="DEBUG"
-```
-- Reapply this configuration separately using the following command.
-```$xslt
-kubectl apply -f <api-k8s-crds-home>/apim-operator/controller-configs/mgw_conf_mustache.yaml
-```
-- Once you apply this, you need to build the API from scratch to reflect these changes to the already deployed APIs.
-
+If the status says "Err", then most possibly it can be due to configuration issue related to Docker-Hub user. 
+Check you have put the appropriate DockerHub image in the _wso2am-k8s-operator/artifacts/install/controller-artifacts/7-controller.yaml_ file.
