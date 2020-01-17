@@ -3,38 +3,114 @@ kind: APIManager
 metadata:
   name: cluster-1
 spec:
-  pattern: Pattern-x
-  profiles:
-    custom:
-      - name: new-api-manager
-        type: api-manager
-        deployment:
-          replicas: 1
-          minReadySeconds: 240
-          imagePullPolicy: Always
-          resources:
-            requests:
-              memory: 2Gi
-              cpu: 2000m
-            limits:
-              memory: 3Gi
-              cpu: 3000m
-          livenessProbe:
-            initialDelaySeconds: 180
-            failureThreshold: 3
-            periodSeconds: 10
-          readinessProbe:
-            initialDelaySeconds: 180
-            failureThreshold: 3
-            periodSeconds: 10
-          configMaps:
-            newConfigMap:
-              - name: custom-sequence-new
-                mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/new
-          persistentVolumeClaim:
-            newClaim:
-              - name: new-pvc-claim-1
-                mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/new
+  pattern: Pattern-1
+  service:
+    type: NodePort
+#  profiles:
+#    - name: analytics-dashboard
+#      deployment:
+#        replicas: 1
+#        minReadySeconds: 100
+#        imagePullPolicy: Always
+#        resources:
+#          requests:
+#            memory: 2Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 3Gi
+#            cpu: 3000m
+#        livenessProbe:
+#          initialDelaySeconds: 60
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 60
+#          failureThreshold: 3
+#          periodSeconds: 10
+#    - name: api-manager-1
+#      deployment:
+#        replicas: 1
+#        minReadySeconds: 240
+#        imagePullPolicy: Always
+#        resources:
+#          requests:
+#            memory: 2Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 3Gi
+#            cpu: 3000m
+#        livenessProbe:
+#          initialDelaySeconds: 180
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 180
+#          failureThreshold: 3
+#          periodSeconds: 10
+
+#        configMaps:
+#          deploymentConfigMap: wso2am-p1-apim-1-conf
+#          newConfigMap:
+#            - name: custom-sequence-in-cm
+#              mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/in
+#            - name: custom-sequence-out-cm
+#              mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/
+#        persistentVolumeClaim:
+#          synapseConfigs: custom-synapse-config
+#          executionPlans: custom-execution-plan
+#          newClaim:
+#            - name: new-pvc-claim-1
+#              mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/vol1
+#            - name: new-pvc-claim-2
+#              mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/vol2
+#
+
+
+
+
+
+#    custom:
+#      - name: new-api-manager
+#        type: api-manager
+#        deployment:
+#          replicas: 1
+#          minReadySeconds: 240
+#          image: wso2/wso2am:3.0.0
+#          imagePullPolicy: Always
+#          resources:
+#            requests:
+#              memory: 2Gi
+#              cpu: 2000m
+#            limits:
+#              memory: 3Gi
+#              cpu: 3000m
+#          livenessProbe:
+#            initialDelaySeconds: 180
+#            failureThreshold: 3
+#            periodSeconds: 10
+#          readinessProbe:
+#            initialDelaySeconds: 180
+#            failureThreshold: 3
+#            periodSeconds: 10
+#          configMaps:
+#            newConfigMap:
+#              - name: custom-sequence-new
+#                mountPath: /home/wso2carbon/wso2am-3.0.0-config/repository/resources/custom-sequences/new
+#          persistentVolumeClaim:
+#            newClaim:
+#              - name: new-pvc-claim-1
+#                mountPath: /home/wso2carbon/wso2-artifact-volume/repository/deployment/server/new
+#        service:
+##          type: NodePort
+#          ports:
+#            - name: pass-through-http
+#              port: 8243
+#            - name: pass-through-https
+#              port: 8243
+#            - name: servlet-http
+#              port: 9763
+#            - name: servlet-https
+#              port: 9443
 
 
 #     api-manager-1:

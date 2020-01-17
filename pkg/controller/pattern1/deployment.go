@@ -35,14 +35,14 @@ import (
 // apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it.
-func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *appsv1.Deployment {
+func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num int) *appsv1.Deployment {
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-1",
 	}
 
-	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager)
+	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager,num)
 
 
 	apim1deployports := []corev1.ContainerPort{}
@@ -77,7 +77,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Profiles.Apimanager1.Deployment.Replicas,
+			Replicas: apimanager.Spec.Replicas,
 			MinReadySeconds:x.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
@@ -198,9 +198,9 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues) *apps
 }
 
 
-func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv1.Deployment {
+func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num int) *appsv1.Deployment {
 
-	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager)
+	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager, num)
 	apim2deployports := []corev1.ContainerPort{}
 	if apimanager.Spec.Service.Type =="LoadBalancer"{
 		apim2deployports = getApim2DeployLBPorts()
@@ -361,7 +361,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues) *appsv
 }
 
 // for handling analytics-dashboard deployment
-func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *appsv1.Deployment {
+func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num int) *appsv1.Deployment {
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
@@ -369,7 +369,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *a
 	runasuser := int64(802)
 	//defaultMode := int32(0407)
 
-	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager)
+	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -562,9 +562,9 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *a
 }
 
 // for handling analytics-worker deployment
-func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues) *appsv1.Deployment {
+func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num int) *appsv1.Deployment {
 
-	workervolumemounts, workervolume := getAnalyticsWorkerVolumes(apimanager)
+	workervolumemounts, workervolume := getAnalyticsWorkerVolumes(apimanager, num)
 
 
 	labels := map[string]string{

@@ -437,11 +437,40 @@ func (c *Controller) syncHandler(key string) error {
 		// Parse the object and look for it’s deployment
 		// Use a Lister to find the deployment object referred to in the Apimanager resource
 		// Get apim instance 1 deployment name using hardcoded value
+
+		am1num :=  0
+		am2num :=  0
+		dashnum := 0
+		worknum := 0
+
+		totalProfiles := len(apimanager.Spec.Profiles)
+
+		i := 0
+
+		if totalProfiles>0 {
+			for i = 0; i < totalProfiles; i++ {
+				if apimanager.Spec.Profiles[i].Name == "api-manager-1" {
+					am1num = i
+				}
+				if apimanager.Spec.Profiles[i].Name == "api-manager-2" {
+					am2num = i
+				}
+				if apimanager.Spec.Profiles[i].Name == "analytics-dashboard" {
+					dashnum = i
+				}
+				if apimanager.Spec.Profiles[i].Name == "analytics-worker" {
+					worknum = i
+				}
+			}
+		}
+
+
+
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			x := pattern1.AssignApim1ConfigMapValues(apimanager,configmap)
-			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x))
+			x := pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
+			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x,am1num))
 			//fmt.Println("aaaaaaaaaa metadata name is ", apimanager.Name)
 			if err != nil {
 				return err
@@ -452,8 +481,8 @@ func (c *Controller) syncHandler(key string) error {
 		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			z := pattern1.AssignApim2ConfigMapValues(apimanager,configmap)
-			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z))
+			z := pattern1.AssignApim2ConfigMapValues(apimanager,configmap,am2num)
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z,am2num))
 			if err != nil {
 				return err
 			}
@@ -463,8 +492,8 @@ func (c *Controller) syncHandler(key string) error {
 		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y))
+			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y,dashnum))
 			if err != nil {
 				return err
 			}
@@ -474,8 +503,8 @@ func (c *Controller) syncHandler(key string) error {
 		workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap)
-			workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y))
+			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
+			workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y,worknum))
 			if err != nil {
 				return err
 			}
@@ -663,30 +692,30 @@ func (c *Controller) syncHandler(key string) error {
 		// If this number of the replicas on the Apimanager resource is specified, and the number does not equal the
 		// current desired replicas on the Deployment, we should update the Deployment resource.
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-			x:= pattern1.AssignApim1ConfigMapValues(apimanager,configmap)
+			x:= pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim1Deployment(apimanager, x))
+			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim1Deployment(apimanager, x,am1num))
 		}
 
 		//for apim instance 2 also
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
-			z := pattern1.AssignApim2ConfigMapValues(apimanager,configmap)
+			z := pattern1.AssignApim2ConfigMapValues(apimanager,configmap,am2num)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
-			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, z))
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, z,am2num))
 		}
 
 		//for analytics dashboard deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
-			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap)
+			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, y))
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, y,dashnum))
 		}
 
 		//for analytics worker deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
-			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap)
+			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, y))
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, y,worknum))
 		}
 
 		//for instance mysql deployment
@@ -814,131 +843,3 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 }
 
-//type configvalues struct {
-//	Livedelay   int32
-//	Liveperiod  int32
-//	Livethres   int32
-//	Readydelay  int32
-//	Readyperiod int32
-//	Readythres  int32
-//	Minreadysec int32
-//	Maxsurge    int32
-//	Maxunavail  int32
-//	Imagepull   string
-//	Amimage     string
-//	Reqcpu      resource.Quantity
-//	Reqmem      resource.Quantity
-//	Limitcpu    resource.Quantity
-//	Limitmem    resource.Quantity
-//
-//}
-//
-//func AssignConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap) *configvalues{
-//	ControlConfigData := configMap.Data
-//
-//	liveDelay,_ := strconv.ParseInt(ControlConfigData["amProbeInitialDelaySeconds"], 10, 32)
-//	liveDelayFromYaml := apimanager.Spec.Profiles[0].LivenessProbe.InitialDelaySeconds
-//	if liveDelayFromYaml != 0{
-//		liveDelay = int64(liveDelayFromYaml)
-//		//utilruntime.HandleError(fmt.Errorf("Live delay not present"))
-//	}
-//	livePeriod,_ := strconv.ParseInt(ControlConfigData["periodSeconds"], 10, 32)
-//	livePeriodFromYaml := apimanager.Spec.Profiles[0].LivenessProbe.PeriodSeconds
-//	if livePeriodFromYaml != 0{
-//		livePeriod = int64(livePeriodFromYaml)
-//	}
-//
-//	liveThres,_ := strconv.ParseInt(ControlConfigData["failureThreshold"], 10, 32)
-//	liveThresFromYaml := apimanager.Spec.Profiles[0].LivenessProbe.FailureThreshold
-//	if liveThresFromYaml != 0{
-//		liveThres = int64(liveThresFromYaml)
-//	}
-//
-//	readyDelay,_ := strconv.ParseInt(ControlConfigData["amProbeInitialDelaySeconds"], 10, 32)
-//	readyDelayFromYaml := apimanager.Spec.Profiles[0].ReadinessProbe.InitialDelaySeconds
-//	if readyDelayFromYaml != 0{
-//		readyDelay = int64(readyDelayFromYaml)
-//	}
-//
-//	readyPeriod,_ := strconv.ParseInt(ControlConfigData["periodSeconds"], 10, 32)
-//	readyPeriodFromYaml := apimanager.Spec.Profiles[0].ReadinessProbe.PeriodSeconds
-//	if readyPeriodFromYaml != 0{
-//		readyPeriod = int64(readyPeriodFromYaml)
-//	}
-//
-//	readyThres,_ := strconv.ParseInt(ControlConfigData["failureThreshold"], 10, 32)
-//	readyThresFromYaml := apimanager.Spec.Profiles[0].ReadinessProbe.FailureThreshold
-//	if readyThresFromYaml != 0{
-//		readyThres = int64(readyThresFromYaml)
-//	}
-//
-//	minReadySec,_ := strconv.ParseInt(ControlConfigData["amMinReadySeconds"], 10, 32)
-//	minReadySecFromYaml := apimanager.Spec.Profiles[0].MinReadySeconds
-//	if minReadySecFromYaml != 0{
-//		minReadySec = int64(minReadySecFromYaml)
-//	}
-//
-//	maxSurges,_ := strconv.ParseInt(ControlConfigData["maxSurge"], 10, 32)
-//	maxSurgeFromYaml := apimanager.Spec.Profiles[0].Strategy.RollingUpdate.MaxSurge
-//	if maxSurgeFromYaml !=0{
-//		maxSurges = int64(maxSurgeFromYaml)
-//	}
-//
-//	maxUnavail,_ := strconv.ParseInt(ControlConfigData["maxUnavailable"], 10, 32)
-//	maxUnavailFromYaml := apimanager.Spec.Profiles[0].Strategy.RollingUpdate.MaxUnavailable
-//	if maxUnavailFromYaml !=0{
-//		maxUnavail = int64(maxUnavailFromYaml)
-//	}
-//
-//	imagePull,_ := ControlConfigData["imagePullPolicy"]
-//	imagePullFromYaml := apimanager.Spec.Profiles[0].ImagePullPolicy
-//	if imagePullFromYaml != ""{
-//		imagePull = imagePullFromYaml
-//	}
-//
-//	amImages:=ControlConfigData["amImage"]
-//
-//
-//	reqCPU := resource.MustParse(ControlConfigData["amRequestsCPU"])
-//	reqCPUFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Resources.Requests.CPU)
-//	if reqCPUFromYaml == resource.MustParse("0"){
-//		reqCPU = 	reqCPUFromYaml
-//	}
-//
-//	reqMem := resource.MustParse(ControlConfigData["amRequestsMemory"])
-//	reqMemFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Resources.Requests.Memory)
-//	if reqMemFromYaml == resource.MustParse("0"){
-//		reqMem = reqCPUFromYaml
-//	}
-//	limitCPU := resource.MustParse(ControlConfigData["amLimitsCPU"])
-//	limitCPUFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Resources.Limits.CPU)
-//	if limitCPUFromYaml == resource.MustParse("0"){
-//		limitCPU = 	limitCPUFromYaml
-//	}
-//	limitMem := resource.MustParse(ControlConfigData["amLimitsMemory"])
-//	limitMemFromYaml,_:=resource.ParseQuantity(apimanager.Spec.Profiles[0].Resources.Limits.Memory)
-//	if limitMemFromYaml == resource.MustParse("0"){
-//		limitMem= 	limitMemFromYaml
-//	}
-//
-//	cmvalues := &configvalues{
-//		Livedelay:   int32(liveDelay),
-//		Liveperiod:  int32(livePeriod),
-//		Livethres:   int32(liveThres),
-//		Readydelay:  int32(readyDelay),
-//		Readyperiod: int32(readyPeriod),
-//		Readythres:  int32(readyThres),
-//		Minreadysec: int32(minReadySec),
-//		Maxsurge:    int32(maxSurges),
-//		Maxunavail:  int32(maxUnavail),
-//		Imagepull:   imagePull,
-//		Amimage:     amImages,
-//		Reqcpu:      reqCPU,
-//		Reqmem:      reqMem,
-//		Limitcpu:    limitCPU,
-//		Limitmem:    limitMem,
-//
-//	}
-//	return cmvalues
-//
-//}

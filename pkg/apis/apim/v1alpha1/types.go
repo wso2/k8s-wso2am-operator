@@ -99,6 +99,7 @@ type Deployment struct {
 	Replicas *int32 `json:"replicas"`
 	MinReadySeconds int32 `json:"minReadySeconds"`
 	//Strategy Strategy `json:"strategy"`
+	Image string `json:"image"`
 	ImagePullPolicy string `json:"imagePullPolicy"`
 	LivenessProbe Probe `json:"livenessProbe"`
 	ReadinessProbe Probe `json:"readinessProbe"`
@@ -106,34 +107,54 @@ type Deployment struct {
 	PersistentVolumeClaim PVC `json:"persistentVolumeClaim"`
 }
 
-type Service struct {
-	Type string `json:"type"`
+type Ports struct {
+	Name string `json:"name"`
+	Port string `json:"port"`
 }
 
-type Custom struct {
+type Service struct {
+	Type string `json:"type"`
+	Ports []Ports `json:"ports"`
+}
+type Profile struct {
 	Name  string `json:"name"`
 	Deployment Deployment `json:"deployment"`
 	Type string `json:"type"`
 
 }
 
+//type Custom struct {
+//	Name  string `json:"name"`
+//	Deployment Deployment `json:"deployment"`
+//	Type string `json:"type"`
+//
+//}
+
 type Artifacts struct {
 	Deployment Deployment `json:"deployment"`
 }
 
-type Profile struct {
-	Apimanager1 Artifacts `json:"api-manager-1"`
-	Apimanager2 Artifacts `json:"api-manager-2"`
-	AnalyticsDashboard Artifacts `json:"analytics-dashboard"`
-	AnalyticsWorker Artifacts `json:"analytics-worker"`
-	Custom []Custom `json:"custom"`
-}
+//type Profile struct {
+//	Apimanager1 Artifacts `json:"api-manager-1"`
+//	Apimanager2 Artifacts `json:"api-manager-2"`
+//	AnalyticsDashboard Artifacts `json:"analytics-dashboard"`
+//	AnalyticsWorker Artifacts `json:"analytics-worker"`
+//	Custom []Custom `json:"custom"`
+//}
 
+//// APIManagerSpec is the spec for a APIManager resource old
+//type APIManagerSpec struct {
+//	Pattern        string             `json:"pattern"`
+//	Replicas       *int32             `json:"replicas"`
+//	Profiles 	Profile  				`json:"profiles"`
+//	Service Service `json:"service"`
+//
+//}
 // APIManagerSpec is the spec for a APIManager resource
 type APIManagerSpec struct {
 	Pattern        string             `json:"pattern"`
 	Replicas       *int32             `json:"replicas"`
-	Profiles 	Profile  				`json:"profiles"`
+	Profiles 	[]Profile  				`json:"profiles"`
 	Service Service `json:"service"`
 
 }
