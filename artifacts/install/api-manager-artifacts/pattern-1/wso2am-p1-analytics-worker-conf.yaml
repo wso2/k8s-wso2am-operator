@@ -160,7 +160,7 @@ data:
     \      isAutoCommit: false\n\n    - name: WSO2_PERMISSIONS_DB\n      description:
     The datasource used for permission feature\n      jndiConfig:\n        name: jdbc/PERMISSION_DB\n
     \       useJndiReference: true\n      definition:\n        type: RDBMS\n        configuration:\n
-    \         jdbcUrl: 'jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/PERMISSION_DB?useSSL=false'\n
+    \         jdbcUrl: 'jdbc:mysql://mysql-svc:3306/PERMISSION_DB?useSSL=false'\n
     \         username: root\n          password: root\n          driverClassName:
     com.mysql.jdbc.Driver\n          maxPoolSize: 10\n          idleTimeout: 60000\n
     \         connectionTestQuery: SELECT 1\n          validationTimeout: 30000\n
@@ -180,7 +180,7 @@ data:
     \      isAutoCommit: false\n\n    - name: APIM_ANALYTICS_DB\n      description:
     \"The datasource used for APIM statistics aggregated data.\"\n      jndiConfig:\n
     \       name: jdbc/APIM_ANALYTICS_DB\n      definition:\n        type: RDBMS\n
-    \       configuration:\n          jdbcUrl: 'jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_STATS_DB?useSSL=false'\n
+    \       configuration:\n          jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_STATS_DB?useSSL=false'\n
     \         username: root\n          password: root\n          driverClassName:
     com.mysql.jdbc.Driver\n          maxPoolSize: 50\n          idleTimeout: 60000\n
     \         connectionTestQuery: SELECT 1\n          validationTimeout: 30000\n
@@ -193,7 +193,7 @@ data:
     \      connectionTestQuery: SELECT 1\n    #       validationTimeout: 30000\n    #
     \      isAutoCommit: false\n\n    - name: AM_DB\n      description: Main datasource
     used by API Manager\n      jndiConfig:\n        name: jdbc/AM_DB\n      definition:\n
-    \       type: RDBMS\n        configuration:\n          jdbcUrl: 'jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_APIMGT_DB?useSSL=false'\n
+    \       type: RDBMS\n        configuration:\n          jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_APIMGT_DB?useSSL=false'\n
     \         username: root\n          password: root\n          driverClassName:
     com.mysql.jdbc.Driver\n          maxPoolSize: 10\n          idleTimeout: 60000\n
     \         connectionTestQuery: SELECT 1\n          validationTimeout: 30000\n
@@ -207,7 +207,7 @@ data:
     \      isAutoCommit: false\n\n    - name: WSO2AM_MGW_ANALYTICS_DB\n      description:
     \"The datasource used for APIM MGW analytics data.\"\n      jndiConfig:\n        name:
     jdbc/WSO2AM_MGW_ANALYTICS_DB\n      definition:\n        type: RDBMS\n        configuration:\n
-    \         jdbcUrl: 'jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_MGW_ANALYTICS_DB?useSSL=false'\n
+    \         jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_MGW_ANALYTICS_DB?useSSL=false'\n
     \         username: root\n          password: root\n          driverClassName:
     com.mysql.jdbc.Driver\n          maxPoolSize: 50\n          idleTimeout: 60000\n
     \         connectionTestQuery: SELECT 1\n          validationTimeout: 30000\n

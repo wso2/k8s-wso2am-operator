@@ -113,6 +113,7 @@ type Service struct {
 type Custom struct {
 	Name  string `json:"name"`
 	Deployment Deployment `json:"deployment"`
+	Type string `json:"type"`
 
 }
 

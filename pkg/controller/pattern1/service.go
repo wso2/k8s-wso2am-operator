@@ -52,7 +52,7 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "apim-1-svc",
+			Name:      "wso2-am-1-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -86,7 +86,7 @@ func Apim2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "apim-2-svc",
+			Name:      "wso2-am-2-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -115,7 +115,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "analytics-dash-svc",
+			Name:      "wso2-am-analytics-dashboard-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -151,7 +151,7 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2apim-analytics-service",
+			Name:      "wso2-am-analytics-worker-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -215,7 +215,7 @@ func MysqlService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2apim-with-analytics-rdbms-service",
+			Name:      "mysql-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),

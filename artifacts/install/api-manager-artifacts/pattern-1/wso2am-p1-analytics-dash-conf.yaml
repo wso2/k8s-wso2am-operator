@@ -111,7 +111,7 @@ data:
     SELECT 1\n        validationTimeout: 30000\n        isAutoCommit: false\n  - name:
     BUSINESS_RULES_DB\n    description: The datasource used for dashboard feature\n
     \   jndiConfig:\n      name: jdbc/BUSINESS_RULES_DB\n      useJndiReference: true\n
-    \   definition:\n      type: RDBMS\n      configuration:\n        jdbcUrl: 'jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_BUSINESS_RULES_DB?useSSL=false'\n
+    \   definition:\n      type: RDBMS\n      configuration:\n        jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_BUSINESS_RULES_DB?useSSL=false'\n
     \       username: root\n        password: root\n        driverClassName: com.mysql.jdbc.Driver\n
     \       maxPoolSize: 20\n        idleTimeout: 60000\n        connectionTestQuery:
     SELECT 1\n        validationTimeout: 30000\n        isAutoCommit: false\n\n  #
@@ -124,19 +124,19 @@ data:
     name: WSO2_PERMISSIONS_DB\n    description: The datasource used for dashboard
     feature\n    jndiConfig:\n      name: jdbc/PERMISSION_DB\n      useJndiReference:
     true\n    definition:\n      type: RDBMS\n      configuration:\n        jdbcUrl:
-    'jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/PERMISSION_DB?useSSL=false'\n
+    'jdbc:mysql://mysql-svc:3306/PERMISSION_DB?useSSL=false'\n
     \       username: root\n        password: root\n        driverClassName: com.mysql.jdbc.Driver\n
     \       maxPoolSize: 10\n        idleTimeout: 60000\n        connectionTestQuery:
     SELECT 1\n        validationTimeout: 30000\n        isAutoCommit: false \n\n  #Data
     source for APIM Analytics\n  - name: APIM_ANALYTICS_DB\n    description: Datasource
     used for APIM Analytics\n    jndiConfig:\n      name: jdbc/APIM_ANALYTICS_DB\n
-    \   definition:\n      type: RDBMS\n      configuration:\n        jdbcUrl: 'jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_STATS_DB?useSSL=false'\n
+    \   definition:\n      type: RDBMS\n      configuration:\n        jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_STATS_DB?useSSL=false'\n
     \       username: root\n        password: root\n        driverClassName: com.mysql.jdbc.Driver\n
     \       maxPoolSize: 50\n        idleTimeout: 60000\n        connectionTestQuery:
     SELECT 1\n        validationTimeout: 30000\n        isAutoCommit: false\n\n   #Main
     datasource used in API Manager\n  - name: AM_DB\n    description: Main datasource
     used by API Manager\n    jndiConfig:\n      name: jdbc/AM_DB\n    definition:\n
-    \     type: RDBMS\n      configuration:\n        jdbcUrl: 'jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_APIMGT_DB?useSSL=false'\n
+    \     type: RDBMS\n      configuration:\n        jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_APIMGT_DB?useSSL=false'\n
     \       username: root\n        password: root\n        driverClassName: com.mysql.jdbc.Driver\n
     \       maxPoolSize: 10\n        idleTimeout: 60000\n        connectionTestQuery:
     SELECT 1\n        validationTimeout: 30000\n        isAutoCommit: false\n\nwso2.business.rules.manager:\n

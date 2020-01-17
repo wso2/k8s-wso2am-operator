@@ -19,13 +19,13 @@ type = "database"
 # password = "wso2carbon"
 [database.apim_db]
 type = "mysql"
-url = "jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_APIMGT_DB?useSSL=false"
+url = "jdbc:mysql://mysql-svc:3306/WSO2AM_APIMGT_DB?useSSL=false"
 username = "wso2carbon"
 password = "wso2carbon"
 driver = "com.mysql.jdbc.Driver"
 [database.shared_db]
 type = "mysql"
-url = "jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_SHARED_DB?autoReconnect=true&amp;useSSL=false"
+url = "jdbc:mysql://mysql-svc:3306/WSO2AM_SHARED_DB?autoReconnect=true&amp;useSSL=false"
 username = "wso2carbon"
 password = "wso2carbon"
 driver = "com.mysql.jdbc.Driver"
@@ -70,19 +70,19 @@ https_endpoint = "https://wso2apim:32008"
 #expiry_time = "2m"
 [apim.analytics]
 enable = true
-store_api_url = "https://wso2apim-analytics-service:7444"
+store_api_url = "https://wso2-am-analytics-worker-svc:7444"
 username = "$ref{super_admin.username}"
 password = "$ref{super_admin.password}"
 event_publisher_type = "default"
 event_publisher_impl = "org.wso2.carbon.apimgt.usage.publisher.APIMgtUsageDataBridgeDataPublisher"
 publish_response_size = true
 [[apim.analytics.url_group]]
-analytics_url =["tcp://wso2apim-analytics-service:7612"]
-analytics_auth_url =["ssl://wso2apim-analytics-service:7712"]
+analytics_url =["tcp://wso2-am-analytics-worker-svc:7612"]
+analytics_auth_url =["ssl://wso2-am-analytics-worker-svc:7712"]
 #type = "loadbalance"
 # [[apim.analytics.url_group]]
-# analytics_url =["tcp://wso2apim-analytics-service:7612"]
-# analytics_auth_url =["ssl://wso2apim-analytics-service:7712"]
+# analytics_url =["tcp://wso2-am-analytics-worker-svc:7612"]
+# analytics_auth_url =["ssl://wso2-am-analytics-worker-svc:7712"]
 # type = "failover"
 #[apim.key_manager]
 #service_url = "https://localhost:${mgt.transport.https.port}/services/"
@@ -151,8 +151,8 @@ enable_decision_connection = false
 #traffic_manager_auth_urls = ["ssl://localhost:9711","ssl://localhost:9711"]
 #type = "loadbalance"
 [[apim.throttling.url_group]]
-traffic_manager_urls = ["tcp://localhost:9611","tcp://apim-1-svc:9611"]
-traffic_manager_auth_urls = ["ssl://localhost:9711","ssl://apim-1-svc:9711"]
+traffic_manager_urls = ["tcp://localhost:9611","tcp://wso2-am-1-svc:9611"]
+traffic_manager_auth_urls = ["ssl://localhost:9711","ssl://wso2-am-1-svc:9711"]
 type = "loadbalance"
 #[[apim.throttling.url_group]]
 #traffic_manager_urls = ["tcp://localhost:9611","tcp://localhost:9611"]

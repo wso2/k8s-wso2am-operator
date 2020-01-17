@@ -312,14 +312,14 @@ func (c *Controller) syncHandler(key string) error {
 
 		apim1deploymentName := "wso2-am-1-"+apimanager.Name
 		apim2deploymentName := "wso2-am-2-"+apimanager.Name
-		apim1serviceName := "apim-1-svc"
-		apim2serviceName := "apim-2-svc"
+		apim1serviceName := "wso2-am-1-svc"
+		apim2serviceName := "wso2-am-2-svc"
 		mysqldeploymentName := "mysql-"+apimanager.Name
-		mysqlserviceName := "wso2apim-with-analytics-rdbms-service"
+		mysqlserviceName := "mysql-svc"
 		dashboardDeploymentName := "wso2-am-analytics-dashboard-"+apimanager.Name
-		dashboardServiceName := "analytics-dash-svc"
+		dashboardServiceName := "wso2-am-analytics-dashboard-svc"
 		workerDeploymentName := "wso2-am-analytics-worker-"+apimanager.Name
-        workerServiceName := "wso2apim-analytics-service"
+        workerServiceName := "wso2-am-analytics-worker-svc"
         
         synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
 		executionPlanPVCName := "wso2am-p1-am-execution-plans"
