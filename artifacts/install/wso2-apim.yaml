@@ -7,10 +7,10 @@ spec:
   service:
     type: NodePort
   profiles:
-    - name: api-manager-new
+    - name: my-api-manager-1
       type: api-manager
       service:
-        name: api-manager-new-svc
+        name: my-api-manager-svc-1
       deployment:
         replicas: 1
         minReadySeconds: 100
@@ -31,7 +31,51 @@ spec:
           failureThreshold: 3
           periodSeconds: 10
         configMaps:
-          deploymentConfigMap: wso2am-pattern-1-am-1-conf
+          deploymentConfigMap: my-api-manager-1-conf
+
+    - name: my-api-manager-2
+      type: api-manager
+      service:
+        name: my-api-manager-svc-2
+      deployment:
+        replicas: 1
+        minReadySeconds: 100
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 2000m
+          limits:
+            memory: 3Gi
+            cpu: 3000m
+        livenessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        configMaps:
+          deploymentConfigMap: my-api-manager-2-conf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #    - name: analytics-new
 #      type: analytics
 #      deployment:

@@ -40,7 +40,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 		"deployment": r.Name,
 
 	}
-	apimXVolumeMount, apimXVolume := getApimXVolumes(apimanager,*r)
+	//apimXVolumeMount, apimXVolume := getApimXVolumes(apimanager,*r)
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -152,11 +152,12 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 									},
 								},
 							},
-							VolumeMounts: apimXVolumeMount,
+							//VolumeMounts: apimXVolumeMount,
 						},
 					},
 
-					Volumes: apimXVolume,
+					//Volumes: apimXVolume,
+
 				},
 			},
 		},
