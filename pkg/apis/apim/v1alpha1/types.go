@@ -113,6 +113,7 @@ type Ports struct {
 }
 
 type Service struct {
+	Name string `json:"name"`
 	Type string `json:"type"`
 	Ports []Ports `json:"ports"`
 }
@@ -120,6 +121,7 @@ type Profile struct {
 	Name  string `json:"name"`
 	Deployment Deployment `json:"deployment"`
 	Type string `json:"type"`
+	Service Service `json:"service"`
 
 }
 

@@ -28,6 +28,7 @@ import (
 	//"github.com/wso2-incubator/wso2am-k8s-operator/artifacts/resources"
 	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
+	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/patternX"
 	//"k8s.io/apimachinery/pkg/api/resource"
 	//"strconv"
 	//v1 "k8s.io/api/core/v1"
@@ -408,6 +409,27 @@ func (c *Controller) syncHandler(key string) error {
 		pvcConfName := "pvc-config"
 		pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
 
+		// Get synapse-configs-pvc name using hardcoded value
+		pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			sconf := pattern1.AssignConfigMapValuesForSynapseConfigsPvc(apimanager, pvcConfWso2)
+			pvc1, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeSynapseConfigsPvc(apimanager, sconf))
+		}
+		// Get execution-plans-pvc name using hardcoded value
+		pvc2, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(executionPlanPVCName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
+			pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
+		}
+		// Get mysql-pvc name using hardcoded value
+		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			sqlconf := pattern1.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
+			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeMysqlPvc(apimanager, sqlconf))
+		}
 
 		//newconfmap := &corev1.ConfigMap{}
 		//newconfmap.Name = configmap.Name
@@ -557,27 +579,7 @@ func (c *Controller) syncHandler(key string) error {
         }
         
         	
-		// Get synapse-configs-pvc name using hardcoded value
-		pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			sconf := pattern1.AssignConfigMapValuesForSynapseConfigsPvc(apimanager, pvcConfWso2)
-			pvc1, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeSynapseConfigsPvc(apimanager, sconf))
-		}
-		// Get execution-plans-pvc name using hardcoded value
-		pvc2, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(executionPlanPVCName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
-			pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
-		}
-		// Get mysql-pvc name using hardcoded value
-		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			sqlconf := pattern1.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
-			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeMysqlPvc(apimanager, sqlconf))
-		}
+
 
 		// If an error occurs during Get/Create, we'll requeue the item so we can
 		// attempt processing again later. This could have been caused by a
@@ -767,7 +769,214 @@ func (c *Controller) syncHandler(key string) error {
 		return nil
 
 	}
-	//if apimanager.Spec.Pattern == "Pattern-2"{}
+
+	if apimanager.Spec.Pattern == "Pattern-X" {
+
+		for _, r := range apimanager.Spec.Profiles {
+
+			if r.Type == "api-manager" {
+
+			apim1deploymentName := r.Name
+
+			//pvcConfName := "pvc-config"
+			//pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
+
+			deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
+			// If the resource doesn't exist, we'll create it
+			if errors.IsNotFound(err) {
+				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.ApimXDeployment(apimanager, &r))
+				if err != nil {
+					return err
+				}
+			}
+			// Get apim instance 1 service name using hardcoded value
+				apimXserviceName := r.Service.Name
+				service, err := c.servicesLister.Services(apimanager.Namespace).Get(apimXserviceName)
+			// If the resource doesn't exist, we'll create it
+			if errors.IsNotFound(err) {
+				service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(patternX.ApimXService(apimanager, &r))
+			}
+
+
+				if err != nil {
+				return err
+			}
+
+			/////////////checking whether resources are controlled by apimanager with same owner reference
+
+			// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+			if !metav1.IsControlledBy(deployment, apimanager) {
+				msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by Apimanager", deployment.Name)
+				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+				return fmt.Errorf(msg)
+			}
+			// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+			if !metav1.IsControlledBy(service, apimanager) {
+				msg := fmt.Sprintf("apimananger service %q already exists and is not managed by Apimanager", service.Name)
+				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+				return fmt.Errorf(msg)
+			}
+
+			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
+				//x:= pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
+				klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r))
+			}
+
+			// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
+			// This could have been caused by a temporary network failure, or any other transient reason.
+			if err != nil {
+				return err
+			}
+
+			// Finally, we update the status block of the Apimanager resource to reflect the current state of the world
+			err = c.updateApimanagerStatus(apimanager, deployment)
+			if err != nil {
+				return err
+			}
+
+		}
+			if r.Type == "analytics"{
+				analyticsdeploymentName := r.Name
+
+				//pvcConfName := "pvc-config"
+				//pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
+
+				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(analyticsdeploymentName)
+				// If the resource doesn't exist, we'll create it
+				if errors.IsNotFound(err) {
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.AnalyticsXDeployment(apimanager, &r))
+					if err != nil {
+						return err
+					}
+				}
+
+				if err != nil {
+					return err
+				}
+
+				/////////////checking whether resources are controlled by apimanager with same owner reference
+
+				// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(deployment, apimanager) {
+					msg := fmt.Sprintf("Analytics Deployment %q already exists and is not managed by Apimanager", deployment.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+
+				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
+					//x:= pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
+					klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.AnalyticsXDeployment(apimanager, &r))
+				}
+
+				// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
+				// This could have been caused by a temporary network failure, or any other transient reason.
+				if err != nil {
+					return err
+				}
+
+				// Finally, we update the status block of the Apimanager resource to reflect the current state of the world
+				err = c.updateApimanagerStatus(apimanager, deployment)
+				if err != nil {
+					return err
+				}
+
+			}
+		//else {
+		//	fmt.Println("sorry no matching type found, so no deployments & services are made")
+		//	}
+
+		}
+
+
+
+		//// Get apim instance 1 service name using hardcoded value
+		//service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
+		//// If the resource doesn't exist, we'll create it
+		//if errors.IsNotFound(err) {
+		//	service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim1Service(apimanager))
+		//}
+
+
+
+		//// Get synapse-configs-pvc name using hardcoded value
+		//pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
+		//// If the resource doesn't exist, we'll create it
+		//if errors.IsNotFound(err) {
+		//	sconf := pattern1.AssignConfigMapValuesForSynapseConfigsPvc(apimanager, pvcConfWso2)
+		//	pvc1, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeSynapseConfigsPvc(apimanager, sconf))
+		//}
+		//// Get execution-plans-pvc name using hardcoded value
+		//pvc2, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(executionPlanPVCName)
+		//// If the resource doesn't exist, we'll create it
+		//if errors.IsNotFound(err) {
+		//	epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
+		//	pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
+		//}
+		//// Get mysql-pvc name using hardcoded value
+		//pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
+		//// If the resource doesn't exist, we'll create it
+		//if errors.IsNotFound(err) {
+		//	sqlconf := pattern1.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
+		//	pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeMysqlPvc(apimanager, sqlconf))
+		//}
+
+		// If an error occurs during Get/Create, we'll requeue the item so we can
+		// attempt processing again later. This could have been caused by a
+		// temporary network failure, or any other transient reason.
+
+
+
+		//
+		//// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		//if !metav1.IsControlledBy(service, apimanager) {
+		//	msg := fmt.Sprintf("service1 %q already exists and is not managed by Apimanager", service.Name)
+		//	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+		//	return fmt.Errorf(msg)
+		//}
+
+
+
+
+		//// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		//if !metav1.IsControlledBy(pvc1, apimanager) {
+		//	msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by Apimanager", pvc1.Name)
+		//	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+		//	return fmt.Errorf(msg)
+		//}
+		//// If the execution-plan pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		//if !metav1.IsControlledBy(pvc2, apimanager) {
+		//	msg := fmt.Sprintf("execution-plans pvc %q already exists and is not managed by Apimanager", pvc2.Name)
+		//	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+		//	return fmt.Errorf(msg)
+		//}
+		//// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		//if !metav1.IsControlledBy(pvc3, apimanager) {
+		//	msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by Apimanager", pvc3.Name)
+		//	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+		//	return fmt.Errorf(msg)
+		//}
+
+
+		///////////check replicas are same as defined for deployments
+
+		// If the Apimanager resource has changed update the deployment
+		// If this number of the replicas on the Apimanager resource is specified, and the number does not equal the
+		// current desired replicas on the Deployment, we should update the Deployment resource.
+
+
+		//////////finally update the deployment resources after done checking
+
+
+
+
+
+		c.recorder.Event(apimanager, corev1.EventTypeNormal, "synced", "Apimanager synced successfully")
+		return nil
+
+	}
+
 	return nil
 }
 
