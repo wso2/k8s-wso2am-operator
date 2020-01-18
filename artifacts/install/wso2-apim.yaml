@@ -23,13 +23,15 @@ spec:
             memory: 3Gi
             cpu: 3000m
         livenessProbe:
-          initialDelaySeconds: 60
+          initialDelaySeconds: 240
           failureThreshold: 3
           periodSeconds: 10
         readinessProbe:
-          initialDelaySeconds: 60
+          initialDelaySeconds: 240
           failureThreshold: 3
           periodSeconds: 10
+        configMaps:
+          deploymentConfigMap: wso2am-pattern-1-am-1-conf
 #    - name: analytics-new
 #      type: analytics
 #      deployment:

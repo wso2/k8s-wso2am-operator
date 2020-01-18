@@ -40,6 +40,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 		"deployment": r.Name,
 
 	}
+	apimXVolumeMount, apimXVolume := getApimXVolumes(apimanager,*r)
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -106,18 +107,6 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 
 							},
 
-							//Lifecycle: &corev1.Lifecycle{
-							//	PreStop:&corev1.Handler{
-							//		Exec:&corev1.ExecAction{
-							//			Command:[]string{
-							//				"sh",
-							//				"-c",
-							//				"${WSO2_SERVER_HOME}/bin/worker.sh stop",
-							//			},
-							//		},
-							//	},
-							//},
-
 							//Resources:corev1.ResourceRequirements{
 							//	Requests:corev1.ResourceList{
 							//		corev1.ResourceCPU:reqCPU,
@@ -163,75 +152,17 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 									},
 								},
 							},
-							//VolumeMounts: []corev1.VolumeMount{
-							//	{
-							//		Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-							//		MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs",
-							//	},
-							//	{
-							//		Name: "wso2am-pattern-1-am-volume-claim-executionplans",
-							//		MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
-							//	},
-							//	{
-							//		Name: "wso2am-pattern-1-am-1-conf",
-							//		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
-							//		SubPath:"deployment.toml",
-							//	},
-							//	//{
-							//	//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-							//	//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
-							//	//	SubPath:"docker-entrypoint.sh",
-							//	//},
-							//},
+							VolumeMounts: apimXVolumeMount,
 						},
 					},
 
-					//Volumes: []corev1.Volume{
-					//	{
-					//		Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-					//		VolumeSource: corev1.VolumeSource{
-					//			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					//				ClaimName:"pvc-synapse-configs",
-					//			},
-					//		},
-					//	},
-					//	{
-					//		Name: "wso2am-pattern-1-am-volume-claim-executionplans",
-					//		VolumeSource: corev1.VolumeSource{
-					//			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					//				ClaimName: "pvc-execution-plans",
-					//			},
-					//		},
-					//	},
-					//	{
-					//		Name: "wso2am-pattern-1-am-1-conf",
-					//		VolumeSource: corev1.VolumeSource{
-					//			ConfigMap: &corev1.ConfigMapVolumeSource{
-					//				LocalObjectReference: corev1.LocalObjectReference{
-					//					//Name: "wso2am-pattern-1-am-1-conf",
-					//
-					//					Name:am1ConfigMap,
-					//				},
-					//			},
-					//		},
-					//	},
-					//	//{
-					//	//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-					//	//	VolumeSource: corev1.VolumeSource{
-					//	//		ConfigMap: &corev1.ConfigMapVolumeSource{
-					//	//			LocalObjectReference: corev1.LocalObjectReference{
-					//	//				Name: "wso2am-pattern-1-am-conf-entrypoint",
-					//	//			},
-					//	//			DefaultMode:&defaultmode,
-					//	//		},
-					//	//	},
-					//	//},
-					//},
+					Volumes: apimXVolume,
 				},
 			},
 		},
 	}
 }
+
 
 func AnalyticsXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile ) *appsv1.Deployment {
 
