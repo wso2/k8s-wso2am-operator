@@ -29,6 +29,8 @@ import (
 	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/patternX"
+
+	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/mysql"
 	//"k8s.io/apimachinery/pkg/api/resource"
 	//"strconv"
 	//v1 "k8s.io/api/core/v1"
@@ -536,8 +538,8 @@ func (c *Controller) syncHandler(key string) error {
 		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.MysqlDeployment(apimanager,y))
+			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
+			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
 			if err != nil {
 				return err
 			}
@@ -575,7 +577,7 @@ func (c *Controller) syncHandler(key string) error {
 		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.MysqlService(apimanager))
+			mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
         }
         
         	
@@ -722,9 +724,9 @@ func (c *Controller) syncHandler(key string) error {
 
 		//for instance mysql deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-			y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
+			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
-			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.MysqlDeployment(apimanager,y))
+			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
 		}
 
 		// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
@@ -911,8 +913,8 @@ func (c *Controller) syncHandler(key string) error {
 		mysqldeploymentName := "mysql-"+apimanager.Name
 		mysqlserviceName := "mysql-svc"
 		//
-		configMapName := "controller-config"
-		configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
+		//configMapName := "controller-config"
+		//configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
 		//
 		//
 		mysqlDbConfName := "wso2am-p1-mysql-dbscripts"
@@ -952,8 +954,8 @@ func (c *Controller) syncHandler(key string) error {
 		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.MysqlDeployment(apimanager,y))
+			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
+			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
 			if err != nil {
 				return err
 			}
@@ -963,7 +965,7 @@ func (c *Controller) syncHandler(key string) error {
 		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.MysqlService(apimanager))
+			mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
 		}
 		if err != nil {
 			return err
@@ -1003,9 +1005,9 @@ func (c *Controller) syncHandler(key string) error {
 		}
 		//for instance mysql deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-			y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
+			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
-			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.MysqlDeployment(apimanager,y))
+			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
 		}
 
 		//for mysql deployment

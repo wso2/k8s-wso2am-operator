@@ -428,7 +428,7 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 
 }
 
-func getMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount, []corev1.Volume) {
+func GetMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount, []corev1.Volume) {
 
 	//for newly created set of configmaps by user
 	var mysqlvolumemounts []corev1.VolumeMount

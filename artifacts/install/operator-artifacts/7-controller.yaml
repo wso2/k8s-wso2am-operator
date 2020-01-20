@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wso2am-controller
+  namespace: wso2-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wso2am-controller
+  template:
+    metadata:
+      labels:
+        app: wso2am-controller
+    spec:
+      containers:
+        - name: wso2am-controller
+          image: keshi96/wso2am-controller:new4
+          imagePullPolicy: Always
+      serviceAccountName: wso2am-pattern-1-svc-account

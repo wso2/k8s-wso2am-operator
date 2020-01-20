@@ -212,30 +212,3 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 }
 
-// // for handling mysql service
-func MysqlService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
-	labels := map[string]string{
-		"deployment": "wso2apim-with-analytics-mysql",
-	}
-	return &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "mysql-svc",
-			Namespace: apimanager.Namespace,
-			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
-			},
-		},
-		Spec: corev1.ServiceSpec{
-			Selector: labels,
-			Type:     "ClusterIP",
-			Ports: []corev1.ServicePort{
-				{
-					Name:       "mysql-port",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       3306,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 3306},
-				},
-			},
-		},
-	}
-}
