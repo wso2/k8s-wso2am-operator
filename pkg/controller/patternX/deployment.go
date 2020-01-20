@@ -36,7 +36,7 @@ import (
 // apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it.
-func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile ) *appsv1.Deployment {
+func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
 
 	labels := map[string]string{
 		"deployment": r.Name,
@@ -54,7 +54,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: r.Deployment.Replicas,
-			MinReadySeconds:r.Deployment.MinReadySeconds,
+			MinReadySeconds:x.Minreadysec,
 
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
@@ -77,7 +77,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 					Containers: []corev1.Container{
 						{
 							Name:  r.Name+"container",
-							Image: "wso2/wso2am:3.0.0",
+							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -88,9 +88,9 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 										},
 									},
 								},
-								InitialDelaySeconds: r.Deployment.LivenessProbe.InitialDelaySeconds,
-								PeriodSeconds:      r.Deployment.LivenessProbe.PeriodSeconds,
-								FailureThreshold: r.Deployment.LivenessProbe.FailureThreshold,
+								InitialDelaySeconds: x.Livedelay,
+								PeriodSeconds:     x.Liveperiod,
+								FailureThreshold: x.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -103,9 +103,9 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 									},
 								},
 
-								InitialDelaySeconds: r.Deployment.ReadinessProbe.InitialDelaySeconds,
-								PeriodSeconds:  r.Deployment.ReadinessProbe.PeriodSeconds,
-								FailureThreshold: r.Deployment.ReadinessProbe.FailureThreshold,
+								InitialDelaySeconds: x.Readydelay,
+								PeriodSeconds:  x.Readyperiod,
+								FailureThreshold: x.Readythres,
 
 							},
 
@@ -120,7 +120,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 							//	},
 							//},
 
-							ImagePullPolicy:corev1.PullPolicy(r.Deployment.ImagePullPolicy),
+							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
 
 							Ports: []corev1.ContainerPort{
 								{
@@ -167,7 +167,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 }
 
 // for handling analytics-dashboard deployment
-func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *appsv1.Deployment {
+func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
 
 	cmdstring := []string{}
 	if apimanager.Spec.Service.Type=="NodePort"{
@@ -202,7 +202,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:r.Deployment.MinReadySeconds,
+			MinReadySeconds:x.Minreadysec,
 
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
@@ -222,9 +222,9 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 										Command:cmdstring,
 									},
 								},
-								InitialDelaySeconds: r.Deployment.LivenessProbe.InitialDelaySeconds,
-								PeriodSeconds:    r.Deployment.LivenessProbe.PeriodSeconds,
-								FailureThreshold: r.Deployment.LivenessProbe.FailureThreshold,
+								InitialDelaySeconds: x.Livedelay,
+								PeriodSeconds:   x.Liveperiod,
+								FailureThreshold: x.Livethres,
 
 							},
 							ReadinessProbe: &corev1.Probe{
@@ -234,9 +234,9 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 									},
 								},
 
-								InitialDelaySeconds: r.Deployment.ReadinessProbe.InitialDelaySeconds,
-								PeriodSeconds:  r.Deployment.ReadinessProbe.PeriodSeconds,
-								FailureThreshold: r.Deployment.ReadinessProbe.FailureThreshold,
+								InitialDelaySeconds: x.Readydelay,
+								PeriodSeconds:  x.Readyperiod,
+								FailureThreshold: x.Readythres,
 
 							},
 
@@ -263,7 +263,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 							//	},
 							//},
 
-							ImagePullPolicy:corev1.PullPolicy(r.Deployment.ImagePullPolicy),
+							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
 
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser:&runasuser,
@@ -362,7 +362,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 }
 
 // for handling analytics-worker deployment
-func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *appsv1.Deployment {
+func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
 	workervolumemounts, workervolume := getWorkerXVolumes(apimanager, *r)
 
 
@@ -380,7 +380,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:r.Deployment.MinReadySeconds,
+			MinReadySeconds: x.Minreadysec,
 
 
 			Selector: &metav1.LabelSelector{
@@ -405,9 +405,10 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 										},
 									},
 								},
-								InitialDelaySeconds: r.Deployment.LivenessProbe.InitialDelaySeconds,
-								PeriodSeconds:     r.Deployment.LivenessProbe.PeriodSeconds,
-								FailureThreshold: r.Deployment.LivenessProbe.FailureThreshold,
+								InitialDelaySeconds: x.Livedelay,
+								PeriodSeconds:   x.Liveperiod,
+								FailureThreshold: x.Livethres,
+
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -420,9 +421,10 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 									},
 								},
 
-								InitialDelaySeconds: r.Deployment.ReadinessProbe.InitialDelaySeconds,
-								PeriodSeconds:     r.Deployment.ReadinessProbe.PeriodSeconds,
-								FailureThreshold: r.Deployment.ReadinessProbe.FailureThreshold,
+								InitialDelaySeconds: x.Readydelay,
+								PeriodSeconds:  x.Readyperiod,
+								FailureThreshold: x.Readythres,
+
 
 							},
 
@@ -449,7 +451,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 							//	},
 							//},
 
-							ImagePullPolicy: corev1.PullPolicy(r.Deployment.ImagePullPolicy),
+							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser:&runasuser,

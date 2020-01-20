@@ -266,7 +266,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	maxSurges,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
 	maxUnavail,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxUnavailable"], 10, 32)
-	amImages:=ControlConfigData["p1-apim-analytics-deployment-image"]
+	amImages:=ControlConfigData["p1-apim-analytics-deployment-dashboard-image"]
 	imagePull,_ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-cpu"])
 	reqMem := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-memory"])
@@ -382,7 +382,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	maxSurges,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
 	maxUnavail,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxUnavailable"], 10, 32)
-	amImages:=ControlConfigData["p1-apim-analytics-deployment-image"]
+	amImages:= ControlConfigData["p1-apim-analytics-deployment-worker-image"]
 	imagePull,_ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-cpu"])
 	reqMem := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-memory"])

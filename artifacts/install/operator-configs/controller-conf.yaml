@@ -54,13 +54,31 @@ data:
   p1-apim-deployment-resources-limits-cpu: "3000m"
   p1-apim-deployment-resources-limits-memory: "3Gi"
 
+  # custom pattern specific configs for apim-instances
+  pX-apim-deployment-image: "wso2/wso2am:3.0.0"
+  pX-apim-deployment-resources-requests-cpu: "2000m"
+  pX-apim-deployment-resources-requests-memory: "2Gi"
+  pX-apim-deployment-resources-limits-cpu: "3000m"
+  pX-apim-deployment-resources-limits-memory: "3Gi"
+
   # pattern specific configs for apim-analytics
-  p1-apim-analytics-deployment-image: "wso2/wso2am-analytics-dashboard:3.0.0"
+  p1-apim-analytics-deployment-dashboard-image: "wso2/wso2am-analytics-dashboard:3.0.0"
+  p1-apim-analytics-deployment-worker-image: "wso2/wso2am-analytics-worker:3.0.0"
   p1-apim-analytics-deployment-resources-requests-cpu: "2000m"
   p1-apim-analytics-deployment-resources-requests-memory: "4Gi"
   p1-apim-analytics-deployment-resources-limits-cpu: "2000m"
   p1-apim-analytics-deployment-resources-limits-memory: "4Gi"
 
+  # custom pattern specific configs for apim-analytics
+  pX-apim-analytics-deployment-dashboard-image: "wso2/wso2am-analytics-dashboard:3.0.0"
+  pX-apim-analytics-deployment-worker-image: "wso2/wso2am-analytics-worker:3.0.0"
+  pX-apim-analytics-deployment-resources-requests-cpu: "2000m"
+  pX-apim-analytics-deployment-resources-requests-memory: "4Gi"
+  pX-apim-analytics-deployment-resources-limits-cpu: "2000m"
+  pX-apim-analytics-deployment-resources-limits-memory: "4Gi"
+
   p1-mysql-replicas: "1"
   p1-mysql-image: "mysql:5.7"
   p1-mysql-imagePullPolicy: "Always"
+
+

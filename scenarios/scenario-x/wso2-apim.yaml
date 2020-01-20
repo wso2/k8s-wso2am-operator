@@ -12,24 +12,24 @@ spec:
       service:
         name: my-api-manager-svc-1
       deployment:
-        replicas: 1
-        minReadySeconds: 100
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 2000m
-          limits:
-            memory: 3Gi
-            cpu: 3000m
-        livenessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
+#        replicas: 1
+#        minReadySeconds: 100
+#        imagePullPolicy: Always
+#        resources:
+#          requests:
+#            memory: 2Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 3Gi
+#            cpu: 3000m
+#        livenessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
         configMaps:
           deploymentConfigMap: my-api-manager-1-conf
 
@@ -38,24 +38,24 @@ spec:
       service:
         name: my-api-manager-svc-2
       deployment:
-        replicas: 1
-        minReadySeconds: 100
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 2000m
-          limits:
-            memory: 3Gi
-            cpu: 3000m
-        livenessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
+#        replicas: 1
+#        minReadySeconds: 100
+#        imagePullPolicy: Always
+#        resources:
+#          requests:
+#            memory: 2Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 3Gi
+#            cpu: 3000m
+#        livenessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
         configMaps:
           deploymentConfigMap: my-api-manager-2-conf
 
@@ -64,24 +64,24 @@ spec:
       service:
         name: my-analy-dash-svc
       deployment:
-        replicas: 1
-        minReadySeconds: 100
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 2000m
-          limits:
-            memory: 3Gi
-            cpu: 3000m
-        livenessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
+#        replicas: 1
+#        minReadySeconds: 100
+#        imagePullPolicy: Always
+#        resources:
+#          requests:
+#            memory: 2Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 3Gi
+#            cpu: 3000m
+#        livenessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
         configMaps:
           deploymentConfigMap: my-dash-conf
 
@@ -91,24 +91,24 @@ spec:
       service:
         name: my-analy-worker-svc
       deployment:
-        replicas: 1
-        minReadySeconds: 100
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 2000m
-          limits:
-            memory: 3Gi
-            cpu: 3000m
-        livenessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
-        readinessProbe:
-          initialDelaySeconds: 240
-          failureThreshold: 3
-          periodSeconds: 10
+#        replicas: 1
+#        minReadySeconds: 100
+#        imagePullPolicy: Always
+#        resources:
+#          requests:
+#            memory: 2Gi
+#            cpu: 2000m
+#          limits:
+#            memory: 3Gi
+#            cpu: 3000m
+#        livenessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
+#        readinessProbe:
+#          initialDelaySeconds: 240
+#          failureThreshold: 3
+#          periodSeconds: 10
         configMaps:
           deploymentConfigMap: my-worker-conf
 
