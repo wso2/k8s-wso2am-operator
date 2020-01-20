@@ -35,101 +35,50 @@ In this document, we will walk through the following.
    
 <details>
 <summary>Advanced</summary>
-<br>
-<ul><li>GCP Users:</li>
-    
+<br>    
 #### Running External-nfs
 
 **Prerequisites**
-1. NFS Server Ip
+ * A pre-configured Network File System (NFS) to be used as the persistent volume for artifact sharing and persistence. In the NFS server instance, create a Linux system user account named wso2carbon with user id 802 and a system group named wso2 with group id 802. Add the wso2carbon user to the group wso2.
 
-2. Create Paths inside the server
 ```
-sudo mkdir -p $HOME/test/wso2-apim/pattern-1/synapse-configs
-sudo mkdir -p $HOME/test/wso2-apim/pattern-1/executionplans
-sudo mkdir -p $HOME/test/wso2-apim/pattern-1/mysql
+    groupadd --system -g 802 wso2
+    useradd --system -g 802 -u 802 wso2carbon 
+```
+    
+1.Setup a Network File System (NFS) to be used for persistent storage.
+Create and export unique directories within the NFS server instance for each Kubernetes Persistent Volume resource     defined in the <KUBERNETES_HOME>/artifacts/install/persistent-volumes/persistent-volume-for-external-nfs.yaml file.
+
+2.Grant ownership to wso2carbon user and wso2 group, for each of the previously created directories. 
+
+```
+    sudo chown -R wso2carbon:wso2 <directory_name>
 ```
 
-Before running the controller, do the following steps.
+3.Grant read-write-execute permissions to the wso2carbon user, for each of the previously created directories.
+
+```
+    chmod -R 700 <directory_name>
+```
+
+4.Update the StorageClassName in the <KUBERNETES_HOME>/artifacts/install/persistent-volumes/storage-class.yaml file as you want.
+
+Then, apply the following command to create a new Storage Class,
+
+```
+    kubectl create -f <KUBERNETES_HOME>/artifacts/install/persistent-volumes/storage-class.yaml 
+```
+
+5.Update each Kubernetes Persistent Volume resource with the corresponding Namespace (NAME_SPACE), NFS server IP (NFS_SERVER_IP) and exported, NFS server directory path (NFS_LOCATION_PATH) in the <KUBERNETES_HOME>/artifacts/install/persistent-volumes/persistent-volume-for-external-nfs.yaml file.
       
-1. Create a new file with the name “pv.yaml” and copy the following code and paste it there. 
+Then, deploy the persistent volume resource as follows,
 
 ```
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: wso2am-pattern-1-shared-apim-synapse-configs-pv
-spec:
-  accessModes:
-  - ReadWriteMany
-  capacity:
-    storage: 1Gi
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    path: “$HOME/test/wso2-apim/pattern-1/synapse-configs”
-    server: “enter_your_server_ip”
- 
----
-
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: wso2am-pattern-1-shared-apim-executionplans-pv
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    path: “$HOME/test/wso2-apim/pattern-1/executionplans”
-    server: “enter_your_server_ip”
- 
----
- 
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: wso2apim-with-analytics-mysql-pv
-spec:
-  capacity:
-    storage: 20Gi
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  Nfs:
-    path: “$HOME/test/wso2-apim/pattern-1/mysql”
-    server: “enter_your_server_ip”
-  
-```
-then change the server IP and run the following command with the namespace.
-
-```
-kubectl create -f pv.yaml -n <USER-NAMESPACE>
+    kubectl create -f <KUBERNETES_HOME>/artifacts/install/persistent-volumes/persistent-volume-for-external-nfs.yaml -n <USER-NAMESPACE>
 ```
 
-Create a new Configmap for PVC  using below template with the name of “pvc-conf.yaml” and replace the “nfs” value with the name of your storage class.
-```
-kind: ConfigMap
-apiVersion: v1
-metadata:
- name: pvc-config
- namespace: wso2-system
-data:
- wso2amP1AmSynapseConfigsPvcName: "wso2am-p1-am-synapse-configs"
- wso2amP1AmExecutionPlansPvcName: "wso2am-p1-am-execution-plans"
- wso2amAmMysqlPvcName: "wso2am-p1-mysql"
- 
- wso2amPvcAccessmode: "ReadWriteMany"
- 
- wso2amPvcSynapseConfigsStorage: "1Gi"
- wso2amPvcExecutionPlansStorage: "1Gi"
- wso2amPvcMysqlStorage: "20Gi"
- 
- # for internal-nfs-server-provisioner
- storageClassName: "nfs"
- 
-```
+6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/install/controller-configs/pvc-config.yaml file.
+
 
 <li>Minikube Users:</li>
     _HostPath setup_
