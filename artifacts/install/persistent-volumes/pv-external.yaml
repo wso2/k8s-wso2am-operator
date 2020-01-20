@@ -11,12 +11,12 @@ spec:
     storage: 1Gi
   persistentVolumeReclaimPolicy: Retain
   claimRef:
-    namespace: test
+    namespace: "NAME_SPACE"
     name: wso2am-p1-am-synapse-configs
-  storageClassName: new
+  storageClassName: "STORAGE_CLASS_NAME"
   nfs:
-    path: /test/wso2-apim/pattern-1/synapse-configs
-    server: 192.168.114.18
+    path: "NFS_LOCATION_PATH"
+    server: "NFS_SERVER_IP"
  
 ---
 
@@ -33,12 +33,12 @@ spec:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   claimRef:
-    namespace: test
+    namespace: "NAME_SPACE"
     name: wso2am-p1-am-execution-plans
-  storageClassName: new
+  storageClassName: "STORAGE_CLASS_NAME"
   nfs:
-    path: /test/wso2-apim/pattern-1/executionplans
-    server: 192.168.114.18
+    path: "NFS_LOCATION_PATH"
+    server: "NFS_SERVER_IP"
  
 ---
  
@@ -55,9 +55,9 @@ spec:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   claimRef:
-    namespace: test
+    namespace: "NAME_SPACE"
     name: wso2am-p1-mysql
-  storageClassName: new
+  storageClassName: "STORAGE_CLASS_NAME"
   nfs:
-    path: /test/wso2-apim/pattern-1/mysql
-    server: 192.168.114.18
+    path: "NFS_LOCATION_PATH"
+    server: "NFS_SERVER_IP"
