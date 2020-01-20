@@ -133,6 +133,38 @@ func getApim2SvcLBPorts() []corev1.ServicePort {
 
 }
 
+
+func getDashNPPorts() []corev1.ServicePort {
+	var dashports []corev1.ServicePort
+	dashports = append(dashports, corev1.ServicePort{
+		Name:       "analytics-dashboard",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       32201,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
+		NodePort:   32201,
+	})
+
+	return dashports
+
+}
+
+func getDashLBPorts() []corev1.ServicePort {
+	var dashports []corev1.ServicePort
+	dashports = append(dashports, corev1.ServicePort{
+		Name:       "pass-through-http",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       32201,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
+	})
+
+	return dashports
+
+}
+
+
+
+
+
 func getApim1DeployNPPorts() []corev1.ContainerPort {
 	var apim1deployports []corev1.ContainerPort
 	apim1deployports = append(apim1deployports, corev1.ContainerPort{

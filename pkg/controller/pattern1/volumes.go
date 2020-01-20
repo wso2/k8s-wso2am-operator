@@ -257,6 +257,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 	dashconfigmap := "wso2am-p1-analytics-dash-conf-"+apimanager.Name
 	var dashvolumemounts []corev1.VolumeMount
 	var dashvolume []corev1.Volume
+
 	dashvolumemounts=append(dashvolumemounts,corev1.VolumeMount{
 		Name: defaultdashconf,
 		MountPath: "/home/wso2carbon/wso2-config-volume/conf/dashboard/deployment.yaml",

@@ -107,9 +107,12 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
 	servType :=""
+	dashports := []corev1.ServicePort{}
 	if apimanager.Spec.Service.Type=="NodePort"{
+		dashports = getDashNPPorts()
 		servType = "NodePort"
 	} else {
+		dashports = getDashLBPorts()
 		servType = "LoadBalancer"
 	}
 
@@ -124,15 +127,16 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
 			Type:    corev1.ServiceType(servType),
-			Ports: []corev1.ServicePort{
-				{
-					Name:       "analytics-dashboard",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       32201,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
-					NodePort:   32201,
-				},
-			},
+			Ports: 	dashports,
+				//[]corev1.ServicePort{
+				//{
+				//	Name:       "analytics-dashboard",
+				//	Protocol:   corev1.ProtocolTCP,
+				//	Port:       32201,
+				//	TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
+				//	NodePort:   32201,
+				//},
+			//},
 		},
 	}
 }

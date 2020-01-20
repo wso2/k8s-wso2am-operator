@@ -363,6 +363,21 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 // for handling analytics-dashboard deployment
 func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num int) *appsv1.Deployment {
 
+	cmdstring := []string{}
+	if apimanager.Spec.Service.Type=="NodePort"{
+		cmdstring = []string{
+			"/bin/sh",
+			"-c",
+			"nc -z localhost 32201",
+		}
+	} else {
+		cmdstring = []string{
+			"/bin/sh",
+			"-c",
+			"nc -z localhost 32201",
+		}
+	}
+
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
@@ -411,11 +426,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
-										Command:[]string{
-											"/bin/sh",
-											"-c",
-											"nc -z localhost 32201",
-										},
+										Command:cmdstring,
 									},
 								},
 								InitialDelaySeconds: y.Livedelay,
@@ -426,11 +437,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
-										Command:[]string{
-											"/bin/sh",
-											"-c",
-											"nc -z localhost 32201",
-										},
+										Command:cmdstring,
 									},
 								},
 
