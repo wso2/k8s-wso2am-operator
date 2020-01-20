@@ -262,8 +262,6 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 		Name: defaultdashconf,
 		MountPath: "/home/wso2carbon/wso2-config-volume/conf/dashboard/deployment.yaml",
 		SubPath:"deployment.yaml",
-
-
 	})
 
 	dashvolume =append(dashvolume,corev1.Volume{
@@ -276,8 +274,6 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 			},
 		},
 	})
-
-
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 

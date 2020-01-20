@@ -23,6 +23,8 @@ package patternX
 import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	//"k8s.io/apimachinery/pkg/util/intstr"
+
 	//v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -164,13 +166,31 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 	}
 }
 
+// for handling analytics-dashboard deployment
+func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *appsv1.Deployment {
 
-func AnalyticsXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile ) *appsv1.Deployment {
+	cmdstring := []string{}
+	if apimanager.Spec.Service.Type=="NodePort"{
+		cmdstring = []string{
+			"/bin/sh",
+			"-c",
+			"nc -z localhost 32201",
+		}
+	} else {
+		cmdstring = []string{
+			"/bin/sh",
+			"-c",
+			"nc -z localhost 32201",
+		}
+	}
 
 	labels := map[string]string{
-		"deployment": r.Name,
-
+		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
+	runasuser := int64(802)
+	//defaultMode := int32(0407)
+
+	dashVolumeMount, dashVolume := getDashboardXVolumes(apimanager,*r)
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -181,7 +201,7 @@ func AnalyticsXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: r.Deployment.Replicas,
+			Replicas: apimanager.Spec.Replicas,
 			MinReadySeconds:r.Deployment.MinReadySeconds,
 
 			Selector: &metav1.LabelSelector{
@@ -192,20 +212,189 @@ func AnalyticsXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
-					HostAliases: []corev1.HostAlias{
+					Containers: []corev1.Container{
 						{
-							IP: "127.0.0.1",
-							Hostnames: []string{
-								"wso2-am",
-								"wso2-gateway",
+							Name:  "wso2am-pattern-1-analytics-dashboard",
+							Image: "wso2/wso2am-analytics-dashboard:3.0.0",
+							LivenessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec:&corev1.ExecAction{
+										Command:cmdstring,
+									},
+								},
+								InitialDelaySeconds: r.Deployment.LivenessProbe.InitialDelaySeconds,
+								PeriodSeconds:    r.Deployment.LivenessProbe.PeriodSeconds,
+								FailureThreshold: r.Deployment.LivenessProbe.FailureThreshold,
+
 							},
+							ReadinessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec:&corev1.ExecAction{
+										Command:cmdstring,
+									},
+								},
+
+								InitialDelaySeconds: r.Deployment.ReadinessProbe.InitialDelaySeconds,
+								PeriodSeconds:  r.Deployment.ReadinessProbe.PeriodSeconds,
+								FailureThreshold: r.Deployment.ReadinessProbe.FailureThreshold,
+
+							},
+
+							Lifecycle: &corev1.Lifecycle{
+								PreStop:&corev1.Handler{
+									Exec:&corev1.ExecAction{
+										Command:[]string{
+											"sh",
+											"-c",
+											"${WSO2_SERVER_HOME}/bin/dashboard.sh stop",
+										},
+									},
+								},
+							},
+
+							//Resources:corev1.ResourceRequirements{
+							//	Requests:corev1.ResourceList{
+							//		corev1.ResourceCPU:y.Reqcpu,
+							//		corev1.ResourceMemory:y.Reqmem,
+							//	},
+							//	Limits:corev1.ResourceList{
+							//		corev1.ResourceCPU:y.Limitcpu,
+							//		corev1.ResourceMemory:y.Limitmem,
+							//	},
+							//},
+
+							ImagePullPolicy:corev1.PullPolicy(r.Deployment.ImagePullPolicy),
+
+							SecurityContext: &corev1.SecurityContext{
+								RunAsUser:&runasuser,
+							},
+
+							Ports: []corev1.ContainerPort{
+								//{
+								//	ContainerPort: 9713,
+								//	Protocol:      "TCP",
+								//},
+								{
+									ContainerPort: 9643,
+									Protocol:      "TCP",
+								},
+								//{
+								//	ContainerPort: 9613,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 7713,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 9091,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 7613,
+								//	Protocol:      "TCP",
+								//},
+
+
+								/////////////////////////////////
+								//{
+								//	ContainerPort: 32269,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 32169,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 30269,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 30169,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//{
+								//	ContainerPort: 9713,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 9643,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 9613,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 7713,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 9091,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 7613,
+								//	Protocol:      "TCP",
+								//},
+
+							},
+
+							VolumeMounts: dashVolumeMount,
+
 						},
 					},
 
+					// ServiceAccountName: "wso2am-pattern-1-svc-account",
+					ImagePullSecrets:[]corev1.LocalObjectReference{
+						{
+							Name:"wso2am-pattern-1-creds",
+						},
+					},
+
+					Volumes: dashVolume,
+
+				},
+			},
+		},
+	}
+}
+
+// for handling analytics-worker deployment
+func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *appsv1.Deployment {
+	workervolumemounts, workervolume := getWorkerXVolumes(apimanager, *r)
+
+
+	labels := map[string]string{
+		"deployment": r.Name,
+	}
+	runasuser := int64(802)
+	return &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      r.Name,
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: apimanager.Spec.Replicas,
+			MinReadySeconds:r.Deployment.MinReadySeconds,
+
+
+			Selector: &metav1.LabelSelector{
+				MatchLabels: labels,
+			},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: labels,
+				},
+				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  r.Name+"container",
-							Image: "wso2/wso2am-analytics-dashboard:3.0.0",
+							Name:  "wso2am-pattern-1-analytics-worker",
+							Image: "wso2/wso2am-analytics-worker:3.0.0",
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -217,7 +406,7 @@ func AnalyticsXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 									},
 								},
 								InitialDelaySeconds: r.Deployment.LivenessProbe.InitialDelaySeconds,
-								PeriodSeconds:      r.Deployment.LivenessProbe.PeriodSeconds,
+								PeriodSeconds:     r.Deployment.LivenessProbe.PeriodSeconds,
 								FailureThreshold: r.Deployment.LivenessProbe.FailureThreshold,
 							},
 							ReadinessProbe: &corev1.Probe{
@@ -232,122 +421,98 @@ func AnalyticsXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 								},
 
 								InitialDelaySeconds: r.Deployment.ReadinessProbe.InitialDelaySeconds,
-								PeriodSeconds:  r.Deployment.ReadinessProbe.PeriodSeconds,
+								PeriodSeconds:     r.Deployment.ReadinessProbe.PeriodSeconds,
 								FailureThreshold: r.Deployment.ReadinessProbe.FailureThreshold,
 
 							},
 
-							//Lifecycle: &corev1.Lifecycle{
-							//	PreStop:&corev1.Handler{
-							//		Exec:&corev1.ExecAction{
-							//			Command:[]string{
-							//				"sh",
-							//				"-c",
-							//				"${WSO2_SERVER_HOME}/bin/worker.sh stop",
-							//			},
-							//		},
-							//	},
-							//},
-
-							//Resources:corev1.ResourceRequirements{
-							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:reqCPU,
-							//		corev1.ResourceMemory:reqMemFromYaml,
-							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:limitCPUFromYaml,
-							//		corev1.ResourceMemory:limitMemFromYaml,
-							//	},
-							//},
-
-							ImagePullPolicy:corev1.PullPolicy(r.Deployment.ImagePullPolicy),
-
-							Ports: []corev1.ContainerPort{
-								{
-									ContainerPort: 9643,
-									Protocol:      "TCP",
-								},
-							},
-							Env: []corev1.EnvVar{
-								// {
-								// 	Name:  "HOST_NAME",
-								// 	Value: "wso2-am",
-								// },
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
+							Lifecycle: &corev1.Lifecycle{
+								PreStop:&corev1.Handler{
+									Exec:&corev1.ExecAction{
+										Command:[]string{
+											"sh",
+											"-c",
+											"${WSO2_SERVER_HOME}/bin/worker.sh stop",
 										},
 									},
 								},
 							},
-							//VolumeMounts: []corev1.VolumeMount{
-							//	{
-							//		Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-							//		MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs",
+
+							//Resources:corev1.ResourceRequirements{
+							//	Requests:corev1.ResourceList{
+							//		corev1.ResourceCPU:y.Reqcpu,
+							//		corev1.ResourceMemory:y.Reqmem,
 							//	},
-							//	{
-							//		Name: "wso2am-pattern-1-am-volume-claim-executionplans",
-							//		MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
+							//	Limits:corev1.ResourceList{
+							//		corev1.ResourceCPU:y.Limitcpu,
+							//		corev1.ResourceMemory:y.Limitmem,
 							//	},
-							//	{
-							//		Name: "wso2am-pattern-1-am-1-conf",
-							//		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
-							//		SubPath:"deployment.toml",
-							//	},
-							//	//{
-							//	//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-							//	//	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
-							//	//	SubPath:"docker-entrypoint.sh",
-							//	//},
 							//},
+
+							ImagePullPolicy: corev1.PullPolicy(r.Deployment.ImagePullPolicy),
+
+							SecurityContext: &corev1.SecurityContext{
+								RunAsUser:&runasuser,
+							},
+
+							Ports: []corev1.ContainerPort{
+								{
+									ContainerPort: 9764,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 9444,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7612,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7712,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 9091,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7071,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7444,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7575,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7576,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7577,
+									Protocol:      "TCP",
+								},
+							},
+
+							VolumeMounts: workervolumemounts,
+						},
+					},
+					ImagePullSecrets:[]corev1.LocalObjectReference{
+						{
+							Name:"wso2am-pattern-1-creds",
 						},
 					},
 
-					//Volumes: []corev1.Volume{
-					//	{
-					//		Name: "wso2am-pattern-1-am-volume-claim-synapse-configs",
-					//		VolumeSource: corev1.VolumeSource{
-					//			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					//				ClaimName:"pvc-synapse-configs",
-					//			},
-					//		},
-					//	},
-					//	{
-					//		Name: "wso2am-pattern-1-am-volume-claim-executionplans",
-					//		VolumeSource: corev1.VolumeSource{
-					//			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-					//				ClaimName: "pvc-execution-plans",
-					//			},
-					//		},
-					//	},
-					//	{
-					//		Name: "wso2am-pattern-1-am-1-conf",
-					//		VolumeSource: corev1.VolumeSource{
-					//			ConfigMap: &corev1.ConfigMapVolumeSource{
-					//				LocalObjectReference: corev1.LocalObjectReference{
-					//					//Name: "wso2am-pattern-1-am-1-conf",
-					//
-					//					Name:am1ConfigMap,
-					//				},
-					//			},
-					//		},
-					//	},
-					//	//{
-					//	//	Name: "wso2am-pattern-1-am-conf-entrypoint",
-					//	//	VolumeSource: corev1.VolumeSource{
-					//	//		ConfigMap: &corev1.ConfigMapVolumeSource{
-					//	//			LocalObjectReference: corev1.LocalObjectReference{
-					//	//				Name: "wso2am-pattern-1-am-conf-entrypoint",
-					//	//			},
-					//	//			DefaultMode:&defaultmode,
-					//	//		},
-					//	//	},
-					//	//},
-					//},
+					Volumes: workervolume,
 				},
 			},
 		},
 	}
 }
+
+
+

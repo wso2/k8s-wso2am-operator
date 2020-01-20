@@ -69,22 +69,22 @@ https_endpoint = "https://wso2apim:8243"
 #[apim.cache.tags]
 #expiry_time = "2m"
 
-#[apim.analytics]
-#enable = true
-#store_api_url = "https://wso2-am-analytics-worker-svc:7444"
-#username = "$ref{super_admin.username}"
-#password = "$ref{super_admin.password}"
-#event_publisher_type = "default"
-#event_publisher_impl = "org.wso2.carbon.apimgt.usage.publisher.APIMgtUsageDataBridgeDataPublisher"
-#publish_response_size = true
-#[[apim.analytics.url_group]]
-#analytics_url =["tcp://wso2-am-analytics-worker-svc:7612"]
-#analytics_auth_url =["ssl://wso2-am-analytics-worker-svc:7712"]
+[apim.analytics]
+enable = true
+store_api_url = "https://my-analy-dash-svc:7444"
+username = "$ref{super_admin.username}"
+password = "$ref{super_admin.password}"
+event_publisher_type = "default"
+event_publisher_impl = "org.wso2.carbon.apimgt.usage.publisher.APIMgtUsageDataBridgeDataPublisher"
+publish_response_size = true
+[[apim.analytics.url_group]]
+analytics_url =["tcp://my-analy-dash-svc:7612"]
+analytics_auth_url =["ssl://my-analy-dash-svc:7712"]
 
 #type = "loadbalance"
 # [[apim.analytics.url_group]]
-# analytics_url =["tcp://wso2-am-analytics-worker-svc:7612"]
-# analytics_auth_url =["ssl://wso2-am-analytics-worker-svc:7712"]
+# analytics_url =["tcp://my-analy-dash-svc:7612"]
+# analytics_auth_url =["ssl://my-analy-dash-svc:7712"]
 # type = "failover"
 #[apim.key_manager]
 #service_url = "https://localhost:${mgt.transport.https.port}/services/"

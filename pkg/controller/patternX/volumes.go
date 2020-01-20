@@ -65,3 +65,70 @@ func getApimXVolumes(apimanager *apimv1alpha1.APIManager, r apimv1alpha1.Profile
 
 }
 
+func getDashboardXVolumes(apimanager *apimv1alpha1.APIManager, r apimv1alpha1.Profile) ([]corev1.VolumeMount, []corev1.Volume) {
+
+
+	defaultdashconf :=  r.Deployment.Configmaps.DeploymentConfigmap
+	var dashxvolumemounts []corev1.VolumeMount
+	var dashxvolume []corev1.Volume
+
+	dashxvolumemounts=append(dashxvolumemounts,corev1.VolumeMount{
+		Name: defaultdashconf,
+		MountPath: "/home/wso2carbon/wso2-config-volume/conf/dashboard/deployment.yaml",
+		SubPath:"deployment.yaml",
+
+
+	})
+
+	dashxvolume =append(dashxvolume,corev1.Volume{
+		Name: defaultdashconf,
+		VolumeSource: corev1.VolumeSource{
+			ConfigMap: &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: defaultdashconf,
+				},
+			},
+		},
+	})
+
+	return dashxvolumemounts, dashxvolume
+
+}
+
+
+func getWorkerXVolumes(apimanager *apimv1alpha1.APIManager, r apimv1alpha1.Profile) ([]corev1.VolumeMount, []corev1.Volume) {
+
+	defaultdeployConf :=  r.Deployment.Configmaps.DeploymentConfigmap
+
+	var workerxvolumemounts []corev1.VolumeMount
+	var workerxvolume []corev1.Volume
+
+	//adding default deploymentConfigmap
+	workerxvolumemounts=append(workerxvolumemounts,corev1.VolumeMount{
+		Name:             defaultdeployConf,
+		MountPath: "/home/wso2carbon/wso2-config-volume/conf/worker",
+		//SubPath:"deployment.yaml",
+
+	})
+
+	workerxvolume =append(workerxvolume,corev1.Volume{
+		Name: defaultdeployConf,
+		VolumeSource: corev1.VolumeSource{
+			ConfigMap: &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: defaultdeployConf,
+				},
+			},
+		},
+	})
+	return workerxvolumemounts, workerxvolume
+
+}
+
+
+
+// for loop if iser specify any other volumes in wso2-apim.yaml
+
+
+
+

@@ -847,20 +847,33 @@ func (c *Controller) syncHandler(key string) error {
 
 
 		}
-			if r.Type == "analytics"{
-				analyticsdeploymentName := r.Name
+
+			if r.Type == "analytics-dashboard" {
+
+
+				dashdeploymentName := r.Name
 
 				//pvcConfName := "pvc-config"
 				//pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
 
-				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(analyticsdeploymentName)
+				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashdeploymentName)
 				// If the resource doesn't exist, we'll create it
 				if errors.IsNotFound(err) {
-					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.AnalyticsXDeployment(apimanager, &r))
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.DashboardXDeployment(apimanager, &r))
 					if err != nil {
 						return err
 					}
 				}
+				// Get apim instance 1 service name using hardcoded value
+				apimXserviceName := r.Service.Name
+				service, err := c.servicesLister.Services(apimanager.Namespace).Get(apimXserviceName)
+				// If the resource doesn't exist, we'll create it
+				if errors.IsNotFound(err) {
+					service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(patternX.DashboardXService(apimanager, &r))
+				}
+
+
+
 
 				if err != nil {
 					return err
@@ -870,15 +883,24 @@ func (c *Controller) syncHandler(key string) error {
 
 				// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(deployment, apimanager) {
-					msg := fmt.Sprintf("Analytics Deployment %q already exists and is not managed by Apimanager", deployment.Name)
+					msg := fmt.Sprintf("dashboard deployment %q already exists and is not managed by Apimanager", deployment.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+				// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(service, apimanager) {
+					msg := fmt.Sprintf("dashboard service %q already exists and is not managed by Apimanager", service.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
 
+
+
+
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
 					//x:= pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
 					klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.AnalyticsXDeployment(apimanager, &r))
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r))
 				}
 
 
@@ -894,6 +916,78 @@ func (c *Controller) syncHandler(key string) error {
 					return err
 				}
 
+
+			}
+
+			if r.Type == "analytics-worker" {
+
+
+				workerdeploymentName := r.Name
+
+				//pvcConfName := "pvc-config"
+				//pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
+
+				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerdeploymentName)
+				// If the resource doesn't exist, we'll create it
+				if errors.IsNotFound(err) {
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.WorkerXDeployment(apimanager, &r))
+					if err != nil {
+						return err
+					}
+				}
+				// Get apim instance 1 service name using hardcoded value
+				apimXserviceName := r.Service.Name
+				service, err := c.servicesLister.Services(apimanager.Namespace).Get(apimXserviceName)
+				// If the resource doesn't exist, we'll create it
+				if errors.IsNotFound(err) {
+					service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(patternX.WorkerXService(apimanager, &r))
+				}
+
+
+
+
+				if err != nil {
+					return err
+				}
+
+				/////////////checking whether resources are controlled by apimanager with same owner reference
+
+				// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(deployment, apimanager) {
+					msg := fmt.Sprintf("worker deployment %q already exists and is not managed by Apimanager", deployment.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+				// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(service, apimanager) {
+					msg := fmt.Sprintf("worker service %q already exists and is not managed by Apimanager", service.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+
+
+
+
+				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
+					//x:= pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
+					klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.WorkerXDeployment(apimanager, &r))
+				}
+
+
+				// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
+				// This could have been caused by a temporary network failure, or any other transient reason.
+				if err != nil {
+					return err
+				}
+
+				// Finally, we update the status block of the Apimanager resource to reflect the current state of the world
+				err = c.updateApimanagerStatus(apimanager, deployment)
+				if err != nil {
+					return err
+				}
+
+
 			}
 		//else {
 		//	fmt.Println("sorry no matching type found, so no deployments & services are made")
@@ -902,7 +996,6 @@ func (c *Controller) syncHandler(key string) error {
 		}
 
 
-		//////////////////////
 
 
 		synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"

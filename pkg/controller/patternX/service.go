@@ -85,3 +85,99 @@ func ApimXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *
 		},
 	}
 }
+
+
+func DashboardXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *corev1.Service {
+	labels := map[string]string{
+		"deployment": r.Name,
+	}
+
+
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      r.Service.Name,
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: labels,
+			Type:   "LoadBalancer",
+			Ports: 	[]corev1.ServicePort{
+				{
+					Name:       "analytics-dashboard",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       32201,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
+
+				},
+			},
+		},
+	}
+}
+
+func WorkerXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *corev1.Service {
+	labels := map[string]string{
+		"deployment": r.Name,
+	}
+
+
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:     r.Service.Name,
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: labels,
+			Type:     "LoadBalancer",
+			Ports: []corev1.ServicePort{
+				{
+					Name:       "thrift",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       7612,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7612},
+
+				},
+				{
+					Name:       "thrift-ssl",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       7712,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7712},
+
+				},
+				{
+					Name:       "rest-api-port-1",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       9444,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9444},
+
+				},
+				{
+					Name:       "rest-api-port-2",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       9091,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9091},
+
+				},
+				{
+					Name:       "rest-api-port-3",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       7071,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7071},
+
+				},
+				{
+					Name:       "rest-api-port-4",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       7444,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7444},
+
+				},
+			},
+		},
+	}
+}
