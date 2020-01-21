@@ -1,4 +1,4 @@
-### Scenario 2 : Exposing via NodePort Service Type
+## Scenario 2 : Exposing via NodePort Service Type
 
 1. Go inside root folder _wso2am-k8s-operator_
 
