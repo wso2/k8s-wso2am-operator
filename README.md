@@ -36,7 +36,7 @@ In this document, we will walk through the following.
 <details>
 <summary>Advanced</summary>
 <br>    
-#### Running External-nfs
+<h3>Running External-nfs</h3>
 
 **Prerequisites**
  * A pre-configured Network File System (NFS) to be used as the persistent volume for artifact sharing and persistence. In the NFS server instance, create a Linux system user account named wso2carbon with user id 802 and a system group named wso2 with group id 802. Add the wso2carbon user to the group wso2.
@@ -79,9 +79,26 @@ Then, deploy the persistent volume resource as follows,
 
 6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/install/controller-configs/pvc-config.yaml file.
 
+<h3>Using Minikube Hostpath</h3>
 
-<li>Minikube Users:</li>
-    _HostPath setup_
+1. Log into Minikube Filesystem via the command,
+
+```
+    minikube ssh
+```
+
+2. Create unique directories within the Minikube filesystem for each Kubernetes Persistent Volume resource defined in the <KUBERNETES_HOME>/artifacts/install/persistent-volumes/pv-hostpath.yaml file.
+
+3. Grant permission to mysql directory using the command,
+```
+    sudo chown 999:999 <mysq-direactory-path>
+```
+4. Then, deploy the persistent volumes as follows,
+```
+    kubectl create -f <KUBERNETES_HOME>/artifacts/install/persistent-volumes/pv-hostpath.yaml -n <USER-NAMESPACE>
+```
+That is all, Now run the flow in order from start.
+
  </ul>
 </details>
 
