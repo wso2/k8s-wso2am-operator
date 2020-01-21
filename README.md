@@ -196,4 +196,13 @@ mysql-svc                               ClusterIP      10.43.242.130   <none>   
    _APIM Devportal_ - https://wso2apim:9443/devportal
 
 
+### Clean up
+
+Execute the following commands if you wish to clean up the Kubernetes cluster by removing all the applied artifacts and configurations related to wso2am-k8s-operator.
+
+```
+    kubectl delete -f artifacts/install/operator-artifacts/
+    kubectl delete -f artifacts/install/operator-configs/
+    kubectl delete -f artifacts/install/api-manager-artifacts/pattern-1/
+ ```
   
