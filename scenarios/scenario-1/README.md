@@ -1,6 +1,6 @@
 ## Scenario 1
 
-##### Deploying WSO2 API Manager with a simple Custom Resource Definition.
+##### Deploying WSO2 API Manager with a simple and shortest Custom Resource YAML
 ```
 wso2-apim.yaml
 --------------
@@ -14,7 +14,7 @@ spec:
 
 Apply the above yaml file using the command
 ```
-kubectl apply -f wso2-apim.yaml
+kubectl apply -f scenarios/scenario-1/wso2-apim.yaml
 
 Output:
 apimanager.apim.wso2.com/cluster-1 created
