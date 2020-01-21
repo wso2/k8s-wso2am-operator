@@ -77,7 +77,7 @@ Then, deploy the persistent volume resource as follows,
     kubectl create -f <KUBERNETES_HOME>/artifacts/install/persistent-volumes/persistent-volume-for-external-nfs.yaml -n <USER-NAMESPACE>
 ```
 
-6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/install/controller-configs/pvc-config.yaml file.
+6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/install/operator-configs/pvc-config.yaml file.
 
 <h3>Using Minikube Hostpath</h3>
 
@@ -106,10 +106,10 @@ That is all, Now run the flow in order from start.
 
   
     
-3. Apply the command to create the controller-artifacts (in wso2-system namespace)
+3. Apply the command to create the operator-artifacts (in wso2-system namespace)
 
 ``` 
-    kubectl apply -f artifacts/install/controller-artifacts/ 
+    kubectl apply -f artifacts/install/operator-artifacts/ 
 
     Output: 
 
@@ -121,13 +121,13 @@ That is all, Now run the flow in order from start.
     deployment.apps/wso2am-controller created
 
 ```
-4. Apply the command below to create controller-configs (in wso2-system namespace)
+4. Apply the command below to create operator-configs (in wso2-system namespace)
 ```
-    kubectl apply -f artifacts/install/controller-configs/
+    kubectl apply -f artifacts/install/operator-configs/
     
     Output:
     
-    configmap/controller-config created
+    configmap/operator-config created
     configmap/pvc-config created
 ```
 
