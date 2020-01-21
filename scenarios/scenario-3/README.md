@@ -1,4 +1,4 @@
-## Scenario-3 : Override deafult configuration values
+## Scenario-3 : Override default configuration values
 
 You can override the default configuration values of relavant artifacts.
 
@@ -32,7 +32,7 @@ For the above profiles, you can override the fields such as,
   - FailureTHreshold
 * imagePullPolicy
 
-You can specify to any or all of the profiles using the given wso2-apim.yaml file and applying the command,
+You can specify to any or all of the profiles using the given wso2-apim.yaml file. A sample configuration values for 1 of the profile is given, you can include required profiles as an array. Then apply the command,
 
 ```
   kubectl apply -f scenarios/scenario-3/wso2-apim.yaml
