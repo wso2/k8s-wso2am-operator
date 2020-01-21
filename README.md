@@ -81,6 +81,8 @@ Then, deploy the persistent volume resource as follows,
 
 <h3>Using Minikube Hostpath</h3>
 
+Minikube runs a single-node Kubernetes cluster inside a Virtual Machine. Therefore the accessmode ReadWriteMany does not support it, and only ReadWriteOnce supports it. Therefore it is preferred to use other storage methods rather than mnikube hostpath. 
+
 1. Log into Minikube Filesystem via the command,
 
 ```
