@@ -6,10 +6,11 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strings"
+    "strings"
+    "fmt"
 )
  
- type PvcConfig struct {
+type PvcConfig struct {
 	 Name string
 	 AccessModes        []v1.PersistentVolumeAccessMode
 	 ClaimSize          string
@@ -37,9 +38,13 @@ func GetAccessModesFromString(modes string) []v1.PersistentVolumeAccessMode {
 
 func AssignConfigMapValuesForMysqlPvc(apimanager *apimv1alpha1.APIManager, pvcConfWso2 *v1.ConfigMap) *PvcConfig {
 
-	ControlConfigData := pvcConfWso2.Data
-
-	name, _ := ControlConfigData["wso2amMysqlPvcName"]
+    ControlConfigData := pvcConfWso2.Data
+    
+    fmt.Println(ControlConfigData)
+    name, ok := ControlConfigData["wso2amMysqlPvcName"]
+    if !ok {
+        fmt.Println("sql error")
+    }
 	accessModes, _ := ControlConfigData["wso2amPvcAccessmode"]
 	claimSize, _ := ControlConfigData["wso2amPvcMysqlStorage"]
 	storageClass, _ := ControlConfigData["storageClassName"]
@@ -85,3 +90,4 @@ func MakeMysqlPvc(apimanager *apimv1alpha1.APIManager, sqlconf *PvcConfig) *core
 		},
 	}
 }
+

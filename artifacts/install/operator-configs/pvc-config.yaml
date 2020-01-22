@@ -18,10 +18,10 @@ metadata:
   name: pvc-config
   namespace: wso2-system
 data:
-  wso2amMysqlPvcName: "wso2am-p1-mysql"
 
   wso2amP1SynapseConfigsPvcName: "wso2am-p1-am-synapse-configs"
   wso2amP1ExecutionPlansPvcName: "wso2am-p1-am-execution-plans"
+  wso2amMysqlPvcName: "wso2am-p1-mysql"
   
   wso2amPvcAccessmode: "ReadWriteMany"
 
