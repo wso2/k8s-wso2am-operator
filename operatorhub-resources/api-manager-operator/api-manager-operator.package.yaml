@@ -1,0 +1,4 @@
+packageName: api-manager-operator
+channels:
+  - name: stable
+    currentCSV: api-manager-operator.v1.0.0
