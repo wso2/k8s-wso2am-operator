@@ -13,7 +13,7 @@ In this document, we will walk through the following.
 
 ### Installation Prerequisites
 * [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
-* [Helm](http://docs.shippable.com/deploy/tutorial/deploy-to-gcp-gke-helm/)
+* [Helm](https://helm.sh/docs/intro/install/)
 
 ## Steps:
 1. Download and extract the wso2am-k8s-operator-1.0.0.zip
