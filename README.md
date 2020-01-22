@@ -16,8 +16,7 @@ In this document, we will walk through the following.
 * [Helm](https://helm.sh/docs/intro/install/)
 
 ## Steps:
-1. Download and extract the wso2am-k8s-operator-1.0.0.zip
-
+1. Download [wso2am-k8s-operator-1.0.0.zip](https://github.com/wso2-incubator/wso2am-k8s-operator/releases/download/1.0.0/wso2am-k8s-operator-1.0.1.zip) and extract it.
 
 2. Setup the required Storage
 ```
