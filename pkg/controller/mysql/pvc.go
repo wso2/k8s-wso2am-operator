@@ -6,19 +6,18 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-    "strings"
-    "fmt"
+	"strings"
 )
- 
-type PvcConfig struct {
-	 Name string
-	 AccessModes        []v1.PersistentVolumeAccessMode
-	 ClaimSize          string
-	 StorageClass       *string
-	 PVCConfigmap       string
- }
 
- // GetAccessModesFromString returns an array of AccessModes from a string created by GetAccessModesAsString
+type PvcConfig struct {
+	Name         string
+	AccessModes  []v1.PersistentVolumeAccessMode
+	ClaimSize    string
+	StorageClass *string
+	PVCConfigmap string
+}
+
+// GetAccessModesFromString returns an array of AccessModes from a string created by GetAccessModesAsString
 func GetAccessModesFromString(modes string) []v1.PersistentVolumeAccessMode {
 	strmodes := strings.Split(modes, ",")
 	accessModes := []v1.PersistentVolumeAccessMode{}
@@ -38,13 +37,9 @@ func GetAccessModesFromString(modes string) []v1.PersistentVolumeAccessMode {
 
 func AssignConfigMapValuesForMysqlPvc(apimanager *apimv1alpha1.APIManager, pvcConfWso2 *v1.ConfigMap) *PvcConfig {
 
-    ControlConfigData := pvcConfWso2.Data
-    
-    fmt.Println(ControlConfigData)
-    name, ok := ControlConfigData["wso2amMysqlPvcName"]
-    if !ok {
-        fmt.Println("sql error")
-    }
+	ControlConfigData := pvcConfWso2.Data
+
+	name, _ := ControlConfigData["wso2amMysqlPvcName"]
 	accessModes, _ := ControlConfigData["wso2amPvcAccessmode"]
 	claimSize, _ := ControlConfigData["wso2amPvcMysqlStorage"]
 	storageClass, _ := ControlConfigData["storageClassName"]
@@ -52,11 +47,11 @@ func AssignConfigMapValuesForMysqlPvc(apimanager *apimv1alpha1.APIManager, pvcCo
 	pvcConfigMap := "pvc-config"
 
 	pvc3cmvalues := &PvcConfig{
-		Name:               name,
-		AccessModes:        GetAccessModesFromString(accessModes),
-		ClaimSize:          claimSize,
-		StorageClass:       &storageClass,
-		PVCConfigmap:       pvcConfigMap,
+		Name:         name,
+		AccessModes:  GetAccessModesFromString(accessModes),
+		ClaimSize:    claimSize,
+		StorageClass: &storageClass,
+		PVCConfigmap: pvcConfigMap,
 	}
 	return pvc3cmvalues
 }
@@ -73,7 +68,7 @@ func MakeMysqlPvc(apimanager *apimv1alpha1.APIManager, sqlconf *PvcConfig) *core
 
 	return &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: sqlconf.Name,
+			Name:      sqlconf.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -90,4 +85,3 @@ func MakeMysqlPvc(apimanager *apimv1alpha1.APIManager, sqlconf *PvcConfig) *core
 		},
 	}
 }
-
