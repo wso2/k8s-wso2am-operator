@@ -332,6 +332,7 @@ func (c *Controller) syncHandler(key string) error {
 		/////////checking whether resourecs already exits, else create one
 		configMapName := "controller-config"
 		configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
+
 		//configmap2, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(configMapName)
 		//if errors.IsNotFound(err){
 		//	configmap2, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, configmap))
@@ -432,6 +433,8 @@ func (c *Controller) syncHandler(key string) error {
 			sqlconf := pattern1.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
 			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeMysqlPvc(apimanager, sqlconf))
 		}
+
+
 
 		//newconfmap := &corev1.ConfigMap{}
 		//newconfmap.Name = configmap.Name
