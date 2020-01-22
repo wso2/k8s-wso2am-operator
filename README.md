@@ -22,11 +22,8 @@ In this document, we will walk through the following.
 * [Helm](http://docs.shippable.com/deploy/tutorial/deploy-to-gcp-gke-helm/)
 
 ## Steps:
-1. Clone the wso2am-k8s-operator repository
+1. Download and extract the wso2am-k8s-operator-1.0.1.zip
 
-``` 
-    git clone https://github.com/wso2-incubator/wso2am-k8s-operator.git 
-```
 
 2. Setup the required Storage
 ```
