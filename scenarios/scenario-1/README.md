@@ -1,6 +1,4 @@
-## Scenario 1
-
-##### Deploying WSO2 API Manager with a simple and shortest Custom Resource YAML
+## Scenario-1 : Applying Simple and shortest Custom Resource YAML
 ```
 wso2-apim.yaml
 --------------

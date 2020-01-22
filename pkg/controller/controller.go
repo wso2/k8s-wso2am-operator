@@ -430,8 +430,8 @@ func (c *Controller) syncHandler(key string) error {
 		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			sqlconf := pattern1.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
-			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeMysqlPvc(apimanager, sqlconf))
+			sqlconf := mysql.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
+			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(mysql.MakeMysqlPvc(apimanager, sqlconf))
 		}
 
 

@@ -174,11 +174,11 @@ That is all, Now run the flow in order from start.
 kubectl get svc
 
 NAME                                    TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                                                                     AGE
-analytics-dash-svc                      LoadBalancer   10.43.246.200   34.93.74.215     32201:31562/TCP                                                                             118m
-apim-1-svc                              LoadBalancer   10.43.245.163   35.244.26.60     8280:32339/TCP,8243:32247/TCP,9763:30327/TCP,9443:31757/TCP                                 118m
-apim-2-svc                              LoadBalancer   10.43.244.31    34.93.171.163    8280:32289/TCP,8243:31366/TCP,9763:30954/TCP,9443:31909/TCP                                 118m
-wso2apim-analytics-service              LoadBalancer   10.43.252.140   35.200.217.231   7612:30414/TCP,7712:32469/TCP,9444:32169/TCP,9091:30755/TCP,7071:30125/TCP,7444:31236/TCP   118m
-wso2apim-with-analytics-rdbms-service   ClusterIP      10.43.242.130   <none>           3306/TCP                                                                                    118m
+wso2-am-1-svc                           LoadBalancer   10.43.245.163   35.244.26.60     8280:32339/TCP,8243:32247/TCP,9763:30327/TCP,9443:31757/TCP                                 118m
+wso2-am-2-svc                           LoadBalancer   10.43.244.31    34.93.171.163    8280:32289/TCP,8243:31366/TCP,9763:30954/TCP,9443:31909/TCP                                 118m
+Wso2-am-analytics-dashboard-svc         LoadBalancer   10.43.246.200   34.93.74.215     32201:31562/TCP                                                                             118m
+wso2-am-analytics-worker-svc            LoadBalancer   10.43.252.140   35.200.217.231   7612:30414/TCP,7712:32469/TCP,9444:32169/TCP,9091:30755/TCP,7071:30125/TCP,7444:31236/TCP   118m
+mysql-svc                               ClusterIP      10.43.242.130   <none>           3306/TCP                                                                                    118m
 
 ```
 9. To access the portals, get the EXTERNAL-IP of any of the 2 apim services (apim-1-svc /apim-2-svc) and add it to your /etc/hosts file of your machine.
@@ -196,4 +196,13 @@ wso2apim-with-analytics-rdbms-service   ClusterIP      10.43.242.130   <none>   
    _APIM Devportal_ - https://wso2apim:9443/devportal
 
 
+### Clean up
+
+Execute the following commands if you wish to clean up the Kubernetes cluster by removing all the applied artifacts and configurations related to wso2am-k8s-operator.
+
+```
+    kubectl delete -f artifacts/install/operator-artifacts/
+    kubectl delete -f artifacts/install/operator-configs/
+    kubectl delete -f artifacts/install/api-manager-artifacts/pattern-1/
+ ```
   
