@@ -7,22 +7,16 @@ Deploying WSO2 APIM Patterns in kubernetes through a simple command. Introducing
 ## Quick Start Guide
 
 In this document, we will walk through the following.
-* Deploy a default pattern in Kubernetes
-* Deploy other patterns
-* Deploy Custom pattern
-* Expose Service via NodePort (default-LoadBalancer)
-* Override Configurations (configmap, pvc, deploy-config)
-* Add new Configurations (configmap, pvc)
-* Invoke the API
+* Setup strorage 
+* Deploy pattern-1 in Kubernetes
+* Access publisher and devportal
 
 ### Installation Prerequisites
-* [Golang](https://golang.org/doc/install) v1.12+ 
 * [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
-* [Docker](https://docs.docker.com/install/) & [DockerHub](https://hub.docker.com/) / private docker registry account
 * [Helm](http://docs.shippable.com/deploy/tutorial/deploy-to-gcp-gke-helm/)
 
 ## Steps:
-1. Download and extract the wso2am-k8s-operator-1.0.1.zip
+1. Download and extract the wso2am-k8s-operator-1.0.0.zip
 
 
 2. Setup the required Storage
