@@ -192,7 +192,5 @@ Execute the following commands if you wish to clean up the Kubernetes cluster by
 
 ```
     kubectl delete -f artifacts/install/operator-artifacts/
-    kubectl delete -f artifacts/install/operator-configs/
-    kubectl delete -f artifacts/install/api-manager-artifacts/pattern-1/
- ```
+```
   
