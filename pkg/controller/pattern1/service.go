@@ -114,7 +114,10 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	if apimanager.Spec.Service.Type=="NodePort"{
 		dashports = getDashNPPorts()
 		servType = "NodePort"
-	} else {
+	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
+		dashports = getDashLBPorts()
+		servType = "LoadBalancer"
+	}	else {
 		dashports = getDashLBPorts()
 		servType = "LoadBalancer"
 	}
@@ -152,6 +155,8 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	servType :=""
 	if apimanager.Spec.Service.Type=="NodePort"{
 		servType = "NodePort"
+	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
+		servType = "LoadBalancer"
 	} else {
 		servType = "LoadBalancer"
 	}
@@ -222,13 +227,16 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 
 	}
 
-	apimsvs1ports:= []corev1.ServicePort{}
+	apimcommonsvsports:= []corev1.ServicePort{}
 	servType :=""
 	if apimanager.Spec.Service.Type=="NodePort"{
-		apimsvs1ports = getApimCommonSvcNPPorts()
+		apimcommonsvsports = getApimCommonSvcNPPorts()
 		servType = "NodePort"
-	} else{
-		apimsvs1ports = getApimCommonSvcLBPorts()
+	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
+		apimcommonsvsports = getDashLBPorts()
+		servType = "LoadBalancer"
+	}else{
+		apimcommonsvsports = getApimCommonSvcLBPorts()
 		servType = "LoadBalancer"
 	}
 
@@ -245,8 +253,10 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
 			Type:    corev1.ServiceType(servType),
-			Ports: apimsvs1ports,
+			Ports: apimcommonsvsports,
 
 		},
 	}
 }
+
+

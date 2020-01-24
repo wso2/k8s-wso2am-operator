@@ -48,7 +48,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 
 	apim1deployports := []corev1.ContainerPort{}
 	if apimanager.Spec.Service.Type =="LoadBalancer"{
-		apim1deployports = getApim1DeployLBPorts()
+		apim1deployports = getApimDeployLBPorts()
 	}
 	if apimanager.Spec.Service.Type =="NodePort"{
 		apim1deployports = getApim1DeployNPPorts()
@@ -145,7 +145,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 										Command:[]string{
 											"sh",
 											"-c",
-											"${WSO2_SERVER_HOME}/bin/worker.sh stop",
+											"${WSO2_SERVER_HOME}/bin/wso2server.sh stop",
 										},
 									},
 								},
@@ -204,7 +204,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager, num)
 	apim2deployports := []corev1.ContainerPort{}
 	if apimanager.Spec.Service.Type =="LoadBalancer"{
-		apim2deployports = getApim2DeployLBPorts()
+		apim2deployports = getApimDeployLBPorts()
 	}
 	if apimanager.Spec.Service.Type =="NodePort"{
 		apim2deployports = getApim2DeployNPPorts()
@@ -306,7 +306,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 										Command:[]string{
 											"sh",
 											"-c",
-											"${WSO2_SERVER_HOME}/bin/worker.sh stop",
+											"${WSO2_SERVER_HOME}/bin/wso2server.sh stop",
 										},
 									},
 								},
@@ -375,7 +375,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 		cmdstring = []string{
 			"/bin/sh",
 			"-c",
-			"nc -z localhost 32201",
+			"nc -z localhost 9643",
 		}
 	}
 
@@ -478,30 +478,30 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 							},
 
 							Ports: []corev1.ContainerPort{
-								//{
-								//	ContainerPort: 9713,
-								//	Protocol:      "TCP",
-								//},
+								{
+									ContainerPort: 9713,
+									Protocol:      "TCP",
+								},
 								{
 									ContainerPort: 9643,
 									Protocol:      "TCP",
 								},
-								//{
-								//	ContainerPort: 9613,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7713,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 9091,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7613,
-								//	Protocol:      "TCP",
-								//},
+								{
+									ContainerPort: 9613,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7713,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 9091,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7613,
+									Protocol:      "TCP",
+								},
 
 
 								/////////////////////////////////

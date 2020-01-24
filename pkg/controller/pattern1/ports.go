@@ -36,138 +36,6 @@ func getApimSvcCIPorts() []corev1.ServicePort {
 
 }
 
-
-
-
-
-func getApim1SvcNPPorts() []corev1.ServicePort {
-	var apimsvs1ports []corev1.ServicePort
-	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "pass-through-http",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       30838, //8280,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30838},
-		NodePort:   32004,
-	})
-	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "pass-through-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       30801, //8243,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30801},
-		NodePort:   32003,
-	})
-	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "servlet-http",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       32321, //9763,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32321},
-		NodePort:   32002,
-	})
-	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "servlet-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       32001, //9443
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32001},
-		NodePort:   32001,
-	})
-	return apimsvs1ports
-
-}
-
-func getApim2SvcNPPorts() []corev1.ServicePort {
-	var apimsvs2ports []corev1.ServicePort
-	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "pass-through-http",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       30843,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30843},
-		NodePort:   32009,
-	})
-	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "pass-through-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       30806,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30806},
-		NodePort:   32008,
-	})
-	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "servlet-http",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       32326,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32326},
-		NodePort:   32007,
-	})
-	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "servlet-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       32006,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32006},
-		NodePort:   32006,
-	})
-	return apimsvs2ports
-
-}
-
-func getApim1SvcLBPorts() []corev1.ServicePort {
-	var apimsvs1ports []corev1.ServicePort
-	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "binary",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9611,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
-	})
-	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "binary-secure",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9711,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
-	})
-	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "jms-tcp",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       5672,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
-	})
-	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "servlet-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9443,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-	})
-	return apimsvs1ports
-
-}
-
-func getApim2SvcLBPorts() []corev1.ServicePort {
-	var apimsvs2ports []corev1.ServicePort
-	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "binary",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9611,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
-	})
-	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "binary-secure",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9711,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
-	})
-	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "jms-tcp",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       5672,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
-	})
-	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "servlet-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9443,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-	})
-	return apimsvs2ports
-
-}
-
 func getDashNPPorts() []corev1.ServicePort {
 	var dashports []corev1.ServicePort
 	dashports = append(dashports, corev1.ServicePort{
@@ -187,8 +55,8 @@ func getDashLBPorts() []corev1.ServicePort {
 	dashports = append(dashports, corev1.ServicePort{
 		Name:       "pass-through-http",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       32201,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
+		Port:       9643,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
 	})
 
 	return dashports
@@ -308,7 +176,7 @@ func getApim2DeployNPPorts() []corev1.ContainerPort {
 
 }
 
-func getApim1DeployLBPorts() []corev1.ContainerPort {
+func getApimDeployLBPorts() []corev1.ContainerPort {
 	var apim1deployports []corev1.ContainerPort
 	apim1deployports = append(apim1deployports, corev1.ContainerPort{
 		ContainerPort: 8280,
@@ -330,24 +198,170 @@ func getApim1DeployLBPorts() []corev1.ContainerPort {
 
 }
 
-func getApim2DeployLBPorts() []corev1.ContainerPort {
-	var apim2deployports []corev1.ContainerPort
-	apim2deployports = append(apim2deployports, corev1.ContainerPort{
-		ContainerPort: 8280,
-		Protocol:      "TCP",
-	})
-	apim2deployports = append(apim2deployports, corev1.ContainerPort{
-		ContainerPort: 8243,
-		Protocol:      "TCP",
-	})
-	apim2deployports = append(apim2deployports, corev1.ContainerPort{
-		ContainerPort: 9763,
-		Protocol:      "TCP",
-	})
-	apim2deployports = append(apim2deployports, corev1.ContainerPort{
-		ContainerPort: 9443,
-		Protocol:      "TCP",
-	})
-	return apim2deployports
+//func getApim2DeployLBPorts() []corev1.ContainerPort {
+//	var apim2deployports []corev1.ContainerPort
+//	apim2deployports = append(apim2deployports, corev1.ContainerPort{
+//		ContainerPort: 8280,
+//		Protocol:      "TCP",
+//	})
+//	apim2deployports = append(apim2deployports, corev1.ContainerPort{
+//		ContainerPort: 8243,
+//		Protocol:      "TCP",
+//	})
+//	apim2deployports = append(apim2deployports, corev1.ContainerPort{
+//		ContainerPort: 9763,
+//		Protocol:      "TCP",
+//	})
+//	apim2deployports = append(apim2deployports, corev1.ContainerPort{
+//		ContainerPort: 9443,
+//		Protocol:      "TCP",
+//	})
+//	return apim2deployports
+//
+//}
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//func getApim1SvcNPPorts() []corev1.ServicePort {
+//	var apimsvs1ports []corev1.ServicePort
+//	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+//		Name:       "pass-through-http",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       30838, //8280,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30838},
+//		NodePort:   32004,
+//	})
+//	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+//		Name:       "pass-through-https",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       30801, //8243,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30801},
+//		NodePort:   32003,
+//	})
+//	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+//		Name:       "servlet-http",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       32321, //9763,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32321},
+//		NodePort:   32002,
+//	})
+//	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+//		Name:       "servlet-https",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       32001, //9443
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32001},
+//		NodePort:   32001,
+//	})
+//	return apimsvs1ports
+//
+//}
+//
+//func getApim2SvcNPPorts() []corev1.ServicePort {
+//	var apimsvs2ports []corev1.ServicePort
+//	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
+//		Name:       "pass-through-http",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       30843,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30843},
+//		NodePort:   32009,
+//	})
+//	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
+//		Name:       "pass-through-https",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       30806,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30806},
+//		NodePort:   32008,
+//	})
+//	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
+//		Name:       "servlet-http",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       32326,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32326},
+//		NodePort:   32007,
+//	})
+//	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
+//		Name:       "servlet-https",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       32006,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32006},
+//		NodePort:   32006,
+//	})
+//	return apimsvs2ports
+//
+//}
+//
+//func getApim1SvcLBPorts() []corev1.ServicePort {
+//	var apimsvs1ports []corev1.ServicePort
+//	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+//		Name:       "binary",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       9611,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
+//	})
+//	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+//		Name:       "binary-secure",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       9711,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
+//	})
+//	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+//		Name:       "jms-tcp",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       5672,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
+//	})
+//	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+//		Name:       "servlet-https",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       9443,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+//	})
+//	return apimsvs1ports
+//
+//}
+//
+//func getApim2SvcLBPorts() []corev1.ServicePort {
+//	var apimsvs2ports []corev1.ServicePort
+//	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
+//		Name:       "binary",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       9611,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
+//	})
+//	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
+//		Name:       "binary-secure",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       9711,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
+//	})
+//	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
+//		Name:       "jms-tcp",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       5672,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
+//	})
+//	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
+//		Name:       "servlet-https",
+//		Protocol:   corev1.ProtocolTCP,
+//		Port:       9443,
+//		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+//	})
+//	return apimsvs2ports
+//
+//}

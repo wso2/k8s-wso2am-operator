@@ -492,52 +492,6 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-
-
-		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			x := pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
-			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x,am1num))
-			//fmt.Println("aaaaaaaaaa metadata name is ", apimanager.Name)
-			if err != nil {
-				return err
-			}
-		}
-
-		// Get apim instance 2 deployment name using hardcoded value
-		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			z := pattern1.AssignApim2ConfigMapValues(apimanager,configmap,am2num)
-			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z,am2num))
-			if err != nil {
-				return err
-			}
-		}
-
-		// Get analytics dashboard deployment name using hardcoded value
-		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y,dashnum))
-			if err != nil {
-				return err
-			}
-		}
-
-		// Get analytics worker deployment name using hardcoded value
-		workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
-			workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y,worknum))
-			if err != nil {
-				return err
-			}
-		}
-
 		// Get mysql deployment name using hardcoded value
 		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 		// If the resource doesn't exist, we'll create it
@@ -548,6 +502,64 @@ func (c *Controller) syncHandler(key string) error {
 				return err
 			}
 		}
+
+		time.Sleep(15 * time.Second)
+
+		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			x := pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
+			//mysqdeploy, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
+			if mysqldeployment.Status.AvailableReplicas >0 {
+				//deployment.Status.AvailableReplicas > 0
+				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x, am1num))
+				//fmt.Println("aaaaaaaaaa metadata name is ", apimanager.Name)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		// Get apim instance 2 deployment name using hardcoded value
+		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			z := pattern1.AssignApim2ConfigMapValues(apimanager,configmap,am2num)
+			if mysqldeployment.Status.AvailableReplicas >0 {
+				deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z, am2num))
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		// Get analytics dashboard deployment name using hardcoded value
+		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
+			if mysqldeployment.Status.AvailableReplicas >0 {
+				dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y, dashnum))
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		// Get analytics worker deployment name using hardcoded value
+		workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
+			if mysqldeployment.Status.AvailableReplicas >0 {
+				workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+
 
 		// Get apim instance 1 service name using hardcoded value
 		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)

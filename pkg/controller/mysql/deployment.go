@@ -45,6 +45,28 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 						{
 							Name:  "wso2apim-with-analytics-mysql",
 							Image: "mysql:5.7",
+							//ReadinessProbe: &corev1.Probe{
+							//	Handler: corev1.Handler{
+							//		Exec:&corev1.ExecAction{
+							//			Command:[]string{
+							//				 "sh",
+							//				 "-c",
+							//				 "mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD}",
+							//				//"mysql",
+							//				//"-h",
+							//				//"127.0.0.1",
+							//				//"-p$MYSQL_ROOT_PASSWORD",
+							//				//"-e",
+							//				//"SELECT 1",
+							//			},
+							//		},
+							//	},
+							//
+							//	InitialDelaySeconds:5,
+							//	PeriodSeconds:2,
+							//	FailureThreshold:1,
+							//
+							//},
 							ImagePullPolicy: "Always",
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser: &runasuser,

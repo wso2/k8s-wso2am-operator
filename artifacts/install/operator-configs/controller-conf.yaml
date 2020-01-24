@@ -27,10 +27,10 @@ data:
   apim-deployment-maxSurge: "1"
   apim-deployment-maxUnavailable: "0"
   apim-deployment-imagePullPolicy: "Always"
-  apim-deployment-livenessProbe-initialDelaySeconds: "120"
+  apim-deployment-livenessProbe-initialDelaySeconds: "240"
   apim-deployment-livenessProbe-periodSeconds: "10"
   apim-deployment-livenessProbe-failureThreshold: "3"
-  apim-deployment-readinessProbe-initialDelaySeconds: "120"
+  apim-deployment-readinessProbe-initialDelaySeconds: "240"
   apim-deployment-readinessProbe-periodSeconds: "10"
   apim-deployment-readinessProbe-failureThreshold: "3"
 

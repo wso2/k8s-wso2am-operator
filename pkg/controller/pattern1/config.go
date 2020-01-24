@@ -512,7 +512,6 @@ func AssignMysqlConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v
 func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.ConfigMap) *corev1.ConfigMap {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
-		"node": "wso2am-pattern-1-am-1",
 	}
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
