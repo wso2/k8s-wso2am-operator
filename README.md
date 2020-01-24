@@ -14,6 +14,7 @@ In this document, we will walk through the following.
 ### Installation Prerequisites
 * [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
 * [Helm](https://helm.sh/docs/intro/install/)
+* Minimum CPU : **8vCPU** & Minimum Memory : **12GB** for the K8S Cluster
 
 ## Steps:
 1. Download [wso2am-k8s-operator-1.0.0.zip](https://github.com/wso2-incubator/wso2am-k8s-operator/releases/download/1.0.0/wso2am-k8s-operator-1.0.0.zip) and extract it.
@@ -186,13 +187,21 @@ mysql-svc                               ClusterIP      10.43.242.130   <none>   
    _APIM Devportal_ - https://wso2apim:9443/devportal
 
 
+## Sample Scenarios
+
+1. [Scenario-1 : Applying Simple and shortest Custom Resource YAML](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-1)
+2. [Scenario-2 : Exposing via NodePort Service Type](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-2)
+3. [Scenario-3 : Override Deployment Configuration values](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-3)
+4. [Scenario-4 : Override ConfigMaps and PersistentVolumeClaims](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-4)
+5. [Scenario-5 : Add New Configmaps and Persistent Volume Claims](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-5)
+6. [Scenario-6 : Deploying Custom Pattern](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-6)
+7. [Scenario-7 : Running External-NFS](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-7)
+
 ### Clean up
 
 Execute the following commands if you wish to clean up the Kubernetes cluster by removing all the applied artifacts and configurations related to wso2am-k8s-operator.
 
 ```
     kubectl delete -f artifacts/install/operator-artifacts/
-    kubectl delete -f artifacts/install/operator-configs/
-    kubectl delete -f artifacts/install/api-manager-artifacts/pattern-1/
- ```
+```
   
