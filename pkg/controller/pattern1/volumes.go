@@ -1,7 +1,6 @@
 package pattern1
 
 import (
-	"fmt"
 	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -24,13 +23,8 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 		deployConfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployConfFromYaml != "" {
 			deployconfigmap = deployConfFromYaml
-			fmt.Print("aaaaaaaaaaaa11111111 there is a deployment configmap")
 		}
-		// else {
-		//	deployconfigmap = "wso2am-p1-apim-1-conf-"+apimanager.Name
-		//	fmt.Print("aaaaaaaaaaaa111111111 there is Noooooo deployment configmap")
-		//
-		//}
+
 		synapseConfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
 		if synapseConfFromYaml != "" {
 			synapseConf = synapseConfFromYaml
@@ -94,13 +88,13 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 	//adding default synapseConfigs pvc
 	am1volumemounts=append(am1volumemounts,corev1.VolumeMount{
 		Name:             synapseConf,
-		MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs",
+		MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/synapse-configs",
 
 	})
 	//adding default executionPlans pvc
 	am1volumemounts=append(am1volumemounts,corev1.VolumeMount{
 		Name:             execPlan,
-		MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
+		MountPath:"/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
 	})
 
 	am1volume =append(am1volume,corev1.Volume{
@@ -156,7 +150,7 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 		deployConfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployConfFromYaml != "" {
 			deployconfigmap = deployConfFromYaml
-			fmt.Print("aaaaaaaaaaaa11111111 there is a deployment configmap")
+			//fmt.Print("aaaaaaaaaaaa11111111 there is a deployment configmap")
 		}
 		// else {
 		//	deployconfigmap = "wso2am-p1-apim-1-conf-"+apimanager.Name
@@ -214,8 +208,6 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 	}
 
 
-
-
 	//adding default deploymentConfigmap
 	am1volumemounts=append(am1volumemounts,corev1.VolumeMount{
 		Name:             deployconfigmap,
@@ -226,13 +218,13 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 	//adding default synapseConfigs pvc
 	am1volumemounts=append(am1volumemounts,corev1.VolumeMount{
 		Name:             synapseConf,
-		MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs",
+		MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/synapse-configs",
 
 	})
 	//adding default executionPlans pvc
 	am1volumemounts=append(am1volumemounts,corev1.VolumeMount{
 		Name:             execPlan,
-		MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
+		MountPath:"/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
 	})
 
 	am1volume =append(am1volume,corev1.Volume{

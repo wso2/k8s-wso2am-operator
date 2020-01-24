@@ -317,6 +317,7 @@ func (c *Controller) syncHandler(key string) error {
 		apim2deploymentName := "wso2-am-2-"+apimanager.Name
 		apim1serviceName := "wso2-am-1-svc"
 		apim2serviceName := "wso2-am-2-svc"
+		apimcommonservice := "wso2-am-svc"
 		mysqldeploymentName := "mysql-"+apimanager.Name
 		mysqlserviceName := "mysql-svc"
 		dashboardDeploymentName := "wso2-am-analytics-dashboard-"+apimanager.Name
@@ -576,6 +577,13 @@ func (c *Controller) syncHandler(key string) error {
 			workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerService(apimanager))
 		}
 
+		// Get apim instance 2 service name using hardcoded value
+		commonservice, err := c.servicesLister.Services(apimanager.Namespace).Get(apimcommonservice)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			commonservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.ApimCommonService(apimanager))
+		}
+
 		// Get mysql service name using hardcoded value
 		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 		// If the resource doesn't exist, we'll create it
@@ -657,6 +665,14 @@ func (c *Controller) syncHandler(key string) error {
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
+
+		// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(commonservice, apimanager) {
+			msg := fmt.Sprintf("common Service %q already exists and is not managed by Apimanager", commonservice.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
 
 		// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(mysqlservice, apimanager) {

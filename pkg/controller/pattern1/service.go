@@ -38,15 +38,16 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"node": "wso2am-pattern-1-am-1",
 	}
 
-	apimsvs1ports:= []corev1.ServicePort{}
-	servType :=""
-	if apimanager.Spec.Service.Type=="NodePort"{
-		apimsvs1ports = getApim1SvcNPPorts()
-		servType = "NodePort"
-	} else{
-		apimsvs1ports = getApim1SvcLBPorts()
-		servType = "LoadBalancer"
-	}
+	//apimsvs1ports:= []corev1.ServicePort{}
+	apimsvs1ports := getApimSvcCIPorts()
+	servType :="ClusterIP"
+	//if apimanager.Spec.Service.Type=="NodePort"{
+	//	apimsvs1ports = getApim1SvcNPPorts()
+	//	servType = "NodePort"
+	//} else{
+	//	apimsvs1ports = getApim1SvcLBPorts()
+	//	servType = "LoadBalancer"
+	//}
 
 
 
@@ -73,15 +74,17 @@ func Apim2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-2",
 	}
-	apimsvs2ports:= []corev1.ServicePort{}
-	servType :=""
-	if apimanager.Spec.Service.Type=="NodePort"{
-		apimsvs2ports = getApim2SvcNPPorts()
-		servType = "NodePort"
-	} else {
-		apimsvs2ports = getApim2SvcLBPorts()
-		servType = "LoadBalancer"
-	}
+	apimsvs2ports := getApimSvcCIPorts()
+	servType :="ClusterIP"
+	//apimsvs2ports:= []corev1.ServicePort{}
+	//servType :=""
+	//if apimanager.Spec.Service.Type=="NodePort"{
+	//	apimsvs2ports = getApim2SvcNPPorts()
+	//	servType = "NodePort"
+	//} else {
+	//	apimsvs2ports = getApim2SvcLBPorts()
+	//	servType = "LoadBalancer"
+	//}
 
 
 	return &corev1.Service{
@@ -212,3 +215,38 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 }
 
+//for common service
+func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
+	labels := map[string]string{
+		"deployment": "wso2am-pattern-1-am",
+
+	}
+
+	apimsvs1ports:= []corev1.ServicePort{}
+	servType :=""
+	if apimanager.Spec.Service.Type=="NodePort"{
+		apimsvs1ports = getApimCommonSvcNPPorts()
+		servType = "NodePort"
+	} else{
+		apimsvs1ports = getApimCommonSvcLBPorts()
+		servType = "LoadBalancer"
+	}
+
+
+
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "wso2-am-svc",
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: labels,
+			Type:    corev1.ServiceType(servType),
+			Ports: apimsvs1ports,
+
+		},
+	}
+}

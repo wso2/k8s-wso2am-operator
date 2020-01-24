@@ -5,6 +5,41 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+
+func getApimSvcCIPorts() []corev1.ServicePort {
+	var apimsvs1ports []corev1.ServicePort
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "binary",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9611,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "binary-secure",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9711,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "jms-tcp",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       5672,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "servlet-https",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9443,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+	})
+	return apimsvs1ports
+
+}
+
+
+
+
+
 func getApim1SvcNPPorts() []corev1.ServicePort {
 	var apimsvs1ports []corev1.ServicePort
 	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
@@ -76,22 +111,22 @@ func getApim2SvcNPPorts() []corev1.ServicePort {
 func getApim1SvcLBPorts() []corev1.ServicePort {
 	var apimsvs1ports []corev1.ServicePort
 	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "pass-through-http",
+		Name:       "binary",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       8280,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
+		Port:       9611,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
 	})
 	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "pass-through-https",
+		Name:       "binary-secure",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       8243,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+		Port:       9711,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
 	})
 	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
-		Name:       "servlet-http",
+		Name:       "jms-tcp",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       9763,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
+		Port:       5672,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
 	})
 	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
 		Name:       "servlet-https",
@@ -106,22 +141,22 @@ func getApim1SvcLBPorts() []corev1.ServicePort {
 func getApim2SvcLBPorts() []corev1.ServicePort {
 	var apimsvs2ports []corev1.ServicePort
 	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "pass-through-http",
+		Name:       "binary",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       8280,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
+		Port:       9611,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
 	})
 	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "pass-through-https",
+		Name:       "binary-secure",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       8243,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+		Port:       9711,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
 	})
 	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
-		Name:       "servlet-http",
+		Name:       "jms-tcp",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       9763,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
+		Port:       5672,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
 	})
 	apimsvs2ports = append(apimsvs2ports, corev1.ServicePort{
 		Name:       "servlet-https",
@@ -132,7 +167,6 @@ func getApim2SvcLBPorts() []corev1.ServicePort {
 	return apimsvs2ports
 
 }
-
 
 func getDashNPPorts() []corev1.ServicePort {
 	var dashports []corev1.ServicePort
@@ -161,6 +195,71 @@ func getDashLBPorts() []corev1.ServicePort {
 
 }
 
+
+
+func getApimCommonSvcNPPorts() []corev1.ServicePort {
+	var apimsvs1ports []corev1.ServicePort
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "pass-through-http",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       30838, //8280,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30838},
+		NodePort:   32004,
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "pass-through-https",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       30801, //8243,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 30801},
+		NodePort:   32003,
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "servlet-http",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       32321, //9763,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32321},
+		NodePort:   32002,
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "servlet-https",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       32001, //9443
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32001},
+		NodePort:   32001,
+	})
+	return apimsvs1ports
+
+}
+
+func getApimCommonSvcLBPorts() []corev1.ServicePort {
+	var apimsvs1ports []corev1.ServicePort
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "pass-through-http",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       8280,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "pass-through-https",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       8243,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "servlet-http",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9763,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "servlet-https",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9443,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+	})
+	return apimsvs1ports
+
+}
 
 
 
