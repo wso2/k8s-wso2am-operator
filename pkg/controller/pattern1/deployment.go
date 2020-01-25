@@ -504,48 +504,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 								},
 
 
-								/////////////////////////////////
-								//{
-								//	ContainerPort: 32269,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 32169,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 30269,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 30169,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//{
-								//	ContainerPort: 9713,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 9643,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 9613,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7713,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 9091,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7613,
-								//	Protocol:      "TCP",
-								//},
+
 
 							},
 
@@ -623,7 +582,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 										Command:[]string{
 											"/bin/sh",
 											"-c",
-											"nc -z localhost 7712",
+											"nc -z localhost 9444",
 										},
 									},
 								},
@@ -637,7 +596,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 										Command:[]string{
 											"/bin/sh",
 											"-c",
-											"nc -z localhost 7712",
+											"nc -z localhost 9444",
 										},
 									},
 								},
@@ -706,18 +665,18 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 									ContainerPort: 7444,
 									Protocol:      "TCP",
 								},
-								{
-									ContainerPort: 7575,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7576,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7577,
-									Protocol:      "TCP",
-								},
+								//{
+								//	ContainerPort: 7575,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 7576,
+								//	Protocol:      "TCP",
+								//},
+								//{
+								//	ContainerPort: 7577,
+								//	Protocol:      "TCP",
+								//},
 							},
 
 							VolumeMounts: workervolumemounts,

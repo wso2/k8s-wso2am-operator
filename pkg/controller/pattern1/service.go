@@ -178,42 +178,42 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7612,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7612},
-					NodePort:   32020,
+					//NodePort:   32020,
 				},
 				{
 					Name:       "thrift-ssl",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7712,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7712},
-					NodePort:   32011,
+					//NodePort:   32011,
 				},
 				{
 					Name:       "rest-api-port-1",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9444,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9444},
-					NodePort:   32012,
+					//NodePort:   32012,
 				},
 				{
 					Name:       "rest-api-port-2",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9091,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9091},
-					NodePort:   32013,
+					//NodePort:   32013,
 				},
 				{
 					Name:       "rest-api-port-3",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7071,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7071},
-					NodePort:   32014,
+					//NodePort:   32014,
 				},
 				{
 					Name:       "rest-api-port-4",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7444,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7444},
-					NodePort:   32015,
+					//NodePort:   32015,
 				},
 			},
 		},
@@ -235,7 +235,7 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
 		apimcommonsvsports = getDashLBPorts()
 		servType = "LoadBalancer"
-	}else{
+	} else{
 		apimcommonsvsports = getApimCommonSvcLBPorts()
 		servType = "LoadBalancer"
 	}

@@ -132,7 +132,6 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 
 }
 
-
 func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
 	//defaultdeployConf :=  "wso2am-p1-apim-1-conf-"+apimanager.Name
@@ -261,7 +260,6 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 	return am1volumemounts, am1volume
 
 }
-
 
 func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
