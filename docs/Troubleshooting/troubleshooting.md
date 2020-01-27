@@ -38,9 +38,9 @@ kubectl get pods
 Output:
 NAME                                                      READY   STATUS    RESTARTS   AGE
 mysql-cluster-1-5998bf6df7-jvkq6                          1/1     Running   0          6m
-wso2-am-1-cluster-1-66cb576bd5-n6szh                      0/1     Running   0          6m
+wso2-am-1-cluster-1-66cb576bd5-n6szh                      0/1     Running   2          6m
 wso2-am-2-cluster-1-5fc65bbf7c-65bp4                      0/1     Running   2          6m
-wso2-am-analytics-dashboard-cluster-1-577fbd446d-7tpm2    1/1     Running   2          6m
+wso2-am-analytics-dashboard-cluster-1-577fbd446d-7tpm2    1/1     Running   0          6m
 wso2-am-analytics-worker-cluster-1-5fb86bf777-dwgkw       1/1     Running   0          6m
 ```
 Then,
