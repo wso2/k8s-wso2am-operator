@@ -14,9 +14,9 @@ In this document, we will walk through the following.
 ### Installation Prerequisites
 * [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
 * [Helm](https://helm.sh/docs/intro/install/)
+* [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/)
 * Minimum CPU : **8vCPU** 
 * Minimum Memory : **12GB** 
-* [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/)
 
 ## Steps:
 1. Download [wso2am-k8s-operator-1.0.0.zip](https://github.com/wso2-incubator/wso2am-k8s-operator/releases/download/1.0.0/wso2am-k8s-operator-1.0.0.zip) and extract it.
