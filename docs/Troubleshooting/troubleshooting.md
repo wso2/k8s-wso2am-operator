@@ -30,5 +30,29 @@ I0113 09:02:23.739969       1 controller.go:265] Successfully synced 'default/cl
 ```
 
 
-If the status says "Err", then most possibly it can be due to configuration issue related to Docker-Hub user. 
-Check you have put the appropriate DockerHub image in the _wso2am-k8s-operator/artifacts/install/controller-artifacts/7-controller.yaml_ file.
+#### If your pods keep on restarting, and if you see the following output,
+
+```
+kubectl get pods 
+
+Output:
+NAME                                                      READY   STATUS    RESTARTS   AGE
+mysql-cluster-1-5998bf6df7-jvkq6                          1/1     Running   0          6m
+wso2-am-1-cluster-1-66cb576bd5-n6szh                      0/1     Running   2          6m
+wso2-am-2-cluster-1-5fc65bbf7c-65bp4                      0/1     Running   2          6m
+wso2-am-analytics-dashboard-cluster-1-577fbd446d-7tpm2    1/1     Running   0          6m
+wso2-am-analytics-worker-cluster-1-5fb86bf777-dwgkw       1/1     Running   0          6m
+```
+Then,
+- Check your Internet Connection
+- Check whether the cluster is created with enough resources specified
+- Try to delete the pod using the following command
+   ```
+      kubectl delete pod <POD_NAME>
+   ```
+ 
+- See the logs of the pods, if they throw any errors, using the command,
+   ```
+      kubectl logs <POD_NAME>
+   ```
+
