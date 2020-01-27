@@ -1,8 +1,8 @@
-### API Operator Docs
+### WSO2AM K8S Operator Docs
 
-###### Welcome to API Operator doc space.
+###### Welcome to WSO2AM K8S Operator doc space.
 
-You can find the content you need to be working with the API operator in this doc space.
+You can find the content you need to be working with the WSO2AM K8S Operator in this doc space.
 
 1. [Getting started](GettingStarted)
     - [Overview](GettingStarted/overview.md)
