@@ -16,3 +16,8 @@ spec:
       deployment:
         configMaps:
           deploymentConfigMap: my-nodeport-conf-2
+
+    - name: analytics-dashboard
+      deployment:
+        configMaps:
+          deploymentConfigMap: my-dash-conf

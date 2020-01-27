@@ -51,7 +51,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		apim1deployports = getApimDeployLBPorts()
 	}
 	if apimanager.Spec.Service.Type =="NodePort"{
-		apim1deployports = getApim1DeployNPPorts()
+		apim1deployports = getApimDeployNPPorts()
 	}
 
 	cmdstring := []string{}
@@ -207,7 +207,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 		apim2deployports = getApimDeployLBPorts()
 	}
 	if apimanager.Spec.Service.Type =="NodePort"{
-		apim2deployports = getApim2DeployNPPorts()
+		apim2deployports = getApimDeployNPPorts()
 	}
 
 
@@ -221,7 +221,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 		cmdstring = []string{
 			"/bin/sh",
 			"-c",
-			"nc -z localhost 32006",
+			"nc -z localhost 32001",
 		}
 	} else {
 		cmdstring = []string{
@@ -364,6 +364,14 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 // for handling analytics-dashboard deployment
 func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num int) *appsv1.Deployment {
 
+	dashdeployports := []corev1.ContainerPort{}
+	if apimanager.Spec.Service.Type =="LoadBalancer"{
+		dashdeployports = getDashDeployLBPorts()
+	}
+	if apimanager.Spec.Service.Type =="NodePort"{
+		dashdeployports = getDashDeployNPPorts()
+	}
+
 	cmdstring := []string{}
 	if apimanager.Spec.Service.Type=="NodePort"{
 		cmdstring = []string{
@@ -477,36 +485,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 								RunAsUser:&runasuser,
 							},
 
-							Ports: []corev1.ContainerPort{
-								{
-									ContainerPort: 9713,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9643,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9613,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7713,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9091,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7613,
-									Protocol:      "TCP",
-								},
-
-
-
-
-							},
+							Ports:dashdeployports,
 
 							VolumeMounts: dashVolumeMount,
 

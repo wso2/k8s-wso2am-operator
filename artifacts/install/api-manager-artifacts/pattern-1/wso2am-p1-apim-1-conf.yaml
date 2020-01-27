@@ -122,6 +122,8 @@ data:
         #enable_comments = true
         #enable_ratings = true
         #enable_forum = true
+        [transport.https.properties]
+        proxyPort = 443
         [apim.cors]
         allow_origins = "*"
         allow_methods = ["GET","PUT","POST","DELETE","PATCH","OPTIONS"]

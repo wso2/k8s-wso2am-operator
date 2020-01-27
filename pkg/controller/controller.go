@@ -53,12 +53,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	appsinformers "k8s.io/client-go/informers/apps/v1"
 	coreinformers "k8s.io/client-go/informers/core/v1"
+	externsionsv1beta1informers "k8s.io/client-go/informers/extensions/v1beta1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	appslisters "k8s.io/client-go/listers/apps/v1"
 	corelisters "k8s.io/client-go/listers/core/v1"
 	corev1listers "k8s.io/client-go/listers/core/v1"
+	extensionsv1beta1listers "k8s.io/client-go/listers/extensions/v1beta1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
@@ -80,6 +82,7 @@ type Controller struct {
 	sampleclientset clientset.Interface     		// sampleclientset is a clientset for our own API group
 	deploymentsLister appslisters.DeploymentLister
 	servicesLister    corelisters.ServiceLister
+	ingressLister extensionsv1beta1listers.IngressLister   //for ingress lister
 	deploymentsSynced cache.InformerSynced
 	servicesSynced    cache.InformerSynced
 	apimanagerslister listers.APIManagerLister
@@ -102,6 +105,7 @@ func NewController(
 	kubeclientset kubernetes.Interface,
 	sampleclientset clientset.Interface,
 	deploymentInformer appsinformers.DeploymentInformer,
+	ingressinformer externsionsv1beta1informers.IngressInformer,
 	serviceInformer coreinformers.ServiceInformer,
     configmapInformer coreinformers.ConfigMapInformer,
     persistentVolumeClaimInformer coreinformers.PersistentVolumeClaimInformer,
@@ -122,6 +126,7 @@ func NewController(
 		deploymentsLister: deploymentInformer.Lister(),
 		deploymentsSynced: deploymentInformer.Informer().HasSynced,
 		servicesLister:    serviceInformer.Lister(),
+		ingressLister:    ingressinformer.Lister(),
 		servicesSynced:    serviceInformer.Informer().HasSynced,
         configMapLister:   configmapInformer.Lister(),
         persistentVolumeClaimsLister: persistentVolumeClaimInformer.Lister(),
@@ -190,6 +195,10 @@ func NewController(
 		DeleteFunc: controller.handleObject,
 	})
 
+	ingressinformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    controller.handleObject,
+		DeleteFunc: controller.handleObject,
+	})
 
 	return controller
 }
@@ -559,7 +568,16 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-
+		// Get apim instance 1 service name using hardcoded value
+		apimingressname := "wso2-am-p1-ingress"
+		amingress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(apimingressname)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			amingress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.ApimIngress(apimanager))
+			if err != nil {
+				return err
+			}
+		}
 
 		// Get apim instance 1 service name using hardcoded value
 		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
@@ -646,6 +664,13 @@ func (c *Controller) syncHandler(key string) error {
 		//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(mysqldeployment, apimanager) {
 			msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
+
+		// If the apim ingress is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(amingress, apimanager) {
+			msg := fmt.Sprintf("am ingress %q already exists and is not managed by Apimanager", amingress.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}

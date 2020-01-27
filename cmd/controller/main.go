@@ -82,8 +82,9 @@ func main() {
 
 	controller := controller.NewController(kubeClient, exampleClient,
 		kubeInformerFactory.Apps().V1().Deployments(),
+		kubeInformerFactory.Extensions().V1beta1().Ingresses(),
 		kubeInformerFactory.Core().V1().Services(),
-        kubeInformerFactory.Core().V1().ConfigMaps(),
+	    kubeInformerFactory.Core().V1().ConfigMaps(),
         kubeInformerFactory.Core().V1().PersistentVolumeClaims(),
 		exampleInformerFactory.Apim().V1alpha1().APIManagers())
 

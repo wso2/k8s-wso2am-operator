@@ -224,7 +224,6 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
-
 	}
 
 	apimcommonsvsports:= []corev1.ServicePort{}
@@ -232,15 +231,16 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	if apimanager.Spec.Service.Type=="NodePort"{
 		apimcommonsvsports = getApimCommonSvcNPPorts()
 		servType = "NodePort"
-	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
-		apimcommonsvsports = getDashLBPorts()
+	}else if apimanager.Spec.Service.Type=="LoadBalancer"{
+		apimcommonsvsports = getApimCommonSvcLBPorts()
 		servType = "LoadBalancer"
+	}else if apimanager.Spec.Service.Type=="ClusterIP"{
+		apimcommonsvsports = getApimCommonSvcCIPorts()
+		servType = "ClusterIP"
 	} else{
 		apimcommonsvsports = getApimCommonSvcLBPorts()
 		servType = "LoadBalancer"
 	}
-
-
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
