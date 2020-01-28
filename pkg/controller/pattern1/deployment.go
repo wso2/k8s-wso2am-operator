@@ -367,11 +367,13 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 	dashdeployports := []corev1.ContainerPort{}
 	if apimanager.Spec.Service.Type =="LoadBalancer"{
 		dashdeployports = getDashDeployLBPorts()
-	}
-	if apimanager.Spec.Service.Type =="NodePort"{
+	}else if apimanager.Spec.Service.Type =="NodePort"{
 		dashdeployports = getDashDeployNPPorts()
+	}else if  apimanager.Spec.Service.Type =="ClusterIP" {
+		dashdeployports = getDashDeployLBPorts()
+	} else {
+		dashdeployports = getDashDeployLBPorts()
 	}
-
 	cmdstring := []string{}
 	if apimanager.Spec.Service.Type=="NodePort"{
 		cmdstring = []string{
@@ -511,7 +513,6 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num int) *appsv1.Deployment {
 
 	workervolumemounts, workervolume := getAnalyticsWorkerVolumes(apimanager, num)
-
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-worker",
