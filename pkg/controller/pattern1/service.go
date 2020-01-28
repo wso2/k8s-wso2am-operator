@@ -152,6 +152,8 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		servType = "NodePort"
 	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
 		servType = "LoadBalancer"
+	}  else if apimanager.Spec.Service.Type=="ClusterIP"{
+		servType = "ClusterIP"
 	} else {
 		servType = "LoadBalancer"
 	}
