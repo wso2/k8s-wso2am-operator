@@ -117,7 +117,10 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
 		dashports = getDashLBPorts()
 		servType = "LoadBalancer"
-	}	else {
+	} else if apimanager.Spec.Service.Type=="ClusterIP" {
+		dashports = getDashCIPorts()
+		servType = "ClusterIP"
+	} else {
 		dashports = getDashLBPorts()
 		servType = "LoadBalancer"
 	}
@@ -134,15 +137,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 			Selector: labels,
 			Type:    corev1.ServiceType(servType),
 			Ports: 	dashports,
-				//[]corev1.ServicePort{
-				//{
-				//	Name:       "analytics-dashboard",
-				//	Protocol:   corev1.ProtocolTCP,
-				//	Port:       32201,
-				//	TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
-				//	NodePort:   32201,
-				//},
-			//},
+
 		},
 	}
 }

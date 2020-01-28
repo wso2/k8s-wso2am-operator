@@ -106,8 +106,8 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 						{
 							IP: "127.0.0.1",
 							Hostnames: []string{
-								"wso2-am",
-								"wso2-gateway",
+								"wso2apim",
+								"wso2apim-gateway",
 							},
 						},
 					},
@@ -268,8 +268,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 						{
 							IP: "127.0.0.1",
 							Hostnames: []string{
-								"wso2-am",
-								"wso2-gateway",
+								"wso2apim",
+								"wso2apim-gateway",
 							},
 						},
 					},

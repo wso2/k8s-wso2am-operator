@@ -135,9 +135,10 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
 	//defaultdeployConf :=  "wso2am-p1-apim-1-conf-"+apimanager.Name
+
 	deployconfigmap := "wso2am-p1-apim-2-conf-"+apimanager.Name
-	synapseConf := "wso2am-pattern-1-am-volume-claim-synapse-configs"
-	execPlan := "wso2am-pattern-1-am-volume-claim-executionplans"
+	synapseConf := "wso2am-p1-am-synapse-configs"
+	execPlan := "wso2am-p1-am-execution-plans"
 
 	var am1volumemounts []corev1.VolumeMount
 	var am1volume []corev1.Volume

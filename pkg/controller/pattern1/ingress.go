@@ -58,3 +58,99 @@ func ApimIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 		},
 	}
 }
+
+func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
+
+	//labels := map[string]string{
+	//	"deployment": "wso2am-pattern-1-am",
+	//}
+	return &v1beta1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:     "wso2-am-gateway-p1-ingress",
+			Namespace: apimanager.Namespace,
+			Annotations: map[string]string{
+				"kubernetes.io/ingress.class": "nginx",
+				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
+			},
+			//Labels:   labels,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: v1beta1.IngressSpec{
+			Rules: []networkv1.IngressRule{
+				{
+					Host: "wso2apim-gateway",
+					IngressRuleValue: v1beta1.IngressRuleValue{
+						HTTP: &v1beta1.HTTPIngressRuleValue{
+							Paths: []networkv1.HTTPIngressPath{
+								{
+									Path: "/",
+									Backend: networkv1.IngressBackend{
+										ServiceName: "wso2-am-svc",
+										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			TLS: []v1beta1.IngressTLS{
+				{
+					Hosts:[]string{
+						"wso2apim-gateway",
+					},
+				},
+			},
+		},
+	}
+}
+
+func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
+
+	//labels := map[string]string{
+	//	"deployment": "wso2am-pattern-1-am",
+	//}
+	return &v1beta1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:     "wso2-am-analytics-dashboard-p1-ingress",
+			Namespace: apimanager.Namespace,
+			Annotations: map[string]string{
+				"kubernetes.io/ingress.class": "nginx",
+				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
+			},
+			//Labels:   labels,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+			},
+		},
+		Spec: v1beta1.IngressSpec{
+			Rules: []networkv1.IngressRule{
+				{
+					Host: "wso2apim-analytics-dashboard",
+					IngressRuleValue: v1beta1.IngressRuleValue{
+						HTTP: &v1beta1.HTTPIngressRuleValue{
+							Paths: []networkv1.HTTPIngressPath{
+								{
+									Path: "/",
+									Backend: networkv1.IngressBackend{
+										ServiceName: "wso2-am-svc",
+										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			TLS: []v1beta1.IngressTLS{
+				{
+					Hosts:[]string{
+						"wso2apim-analytics-dashboard",
+					},
+				},
+			},
+		},
+	}
+}

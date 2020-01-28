@@ -381,14 +381,14 @@ data:
         adminUsername: admin
         adminPassword: admin
         kmDcrUrl: https://wso2-am-svc:9443/client-registration/v0.15/register
-        kmTokenUrlForRedirection: https://wso2apim:9443/oauth2
+        kmTokenUrlForRedirection: https://wso2apim/oauth2
         kmTokenUrl: https://wso2-am-svc:9443/oauth2
         kmUsername: admin
         kmPassword: admin
         portalAppContext: analytics-dashboard
         businessRulesAppContext : business-rules
         cacheTimeout: 900
-        baseUrl: https://wso2apim-analytics:9643
+        baseUrl: https://wso2apim-analytics-dashboard
         grantType: authorization_code
         publisherUrl: https://wso2-am-svc:9443
         externalLogoutUrl: https://wso2apim/oidc/logout

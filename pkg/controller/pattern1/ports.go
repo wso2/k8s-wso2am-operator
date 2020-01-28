@@ -155,7 +155,18 @@ func getDashLBPorts() []corev1.ServicePort {
 	return dashports
 
 }
+func getDashCIPorts() []corev1.ServicePort {
+		var dashports []corev1.ServicePort
+		dashports = append(dashports, corev1.ServicePort{
+		Name:       "pass-through-http",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9643,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
+	})
 
+return dashports
+
+}
 
 
 //container ports

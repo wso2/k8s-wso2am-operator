@@ -4,5 +4,16 @@ metadata:
   name: cluster-1
 spec:
   pattern: Pattern-1
+
   service:
     type: ClusterIP
+  profiles:
+    - name: api-manager-1
+      deployment:
+        configMaps:
+          deploymentConfigMap: mydeploy1
+    #
+    - name: api-manager-2
+      deployment:
+        configMaps:
+          deploymentConfigMap: mydeploy2
