@@ -1,4 +1,4 @@
-## Scenario 2 : Exposing using Ingresses
+## Scenario 8 : Exposing using Ingresses
 
 1. Go inside root folder _wso2am-k8s-operator_
 
