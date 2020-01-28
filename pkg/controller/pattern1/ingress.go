@@ -135,7 +135,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2-am-svc",
+										ServiceName: "wso2-am-analytics-dashboard-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
 									},
 								},
