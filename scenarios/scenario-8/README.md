@@ -7,7 +7,8 @@
 ```
 kubectl create configmap <AM-1-DEPLOYMENT-CONFIGMAP> --from-file=wso2am-k8s-operator/scenarios/scenario-2/am-1/deployment.toml
 ```
-3. Similarly, create a new configmap **wso2am-pattern-1-am-2-conf** for API Manager instance 1 using the command,
+3. Similarly, create a new configmap **<AM-2-DEPLOYMENT-CONFIGMAP>** for API Manager instance 1 using the command,
+  
 ```
 kubectl create configmap <AM-2-DEPLOYMENT-CONFIGMAP> --from-file=wso2am-k8s-operator/scenarios/scenario-2/am-2/deployment.toml
 ```
