@@ -386,7 +386,7 @@ auth.configs:
     portalAppContext: analytics-dashboard
     businessRulesAppContext : business-rules
     cacheTimeout: 900
-    baseUrl: https://wso2apim-analytics:32201
+    baseUrl: https://wso2apim-analytics-dashboard:32201
     grantType: authorization_code
     publisherUrl: https://wso2-am-svc:32001
     externalLogoutUrl: https://wso2apim/oidc/logout

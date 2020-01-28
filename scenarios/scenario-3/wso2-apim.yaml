@@ -12,11 +12,11 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: 2Gi
-            cpu: 2000m
+            memory: 1Gi
+            cpu: 1000m
           limits:
-            memory: 3Gi
-            cpu: 3000m
+            memory: 1Gi
+            cpu: 1000m
         livenessProbe:
           initialDelaySeconds: 240
           failureThreshold: 3
