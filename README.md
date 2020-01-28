@@ -171,24 +171,82 @@ wso2-am-1-svc                           LoadBalancer   10.43.245.163   35.244.26
 wso2-am-2-svc                           LoadBalancer   10.43.244.31    34.93.171.163    8280:32289/TCP,8243:31366/TCP,9763:30954/TCP,9443:31909/TCP                                 118m
 Wso2-am-analytics-dashboard-svc         LoadBalancer   10.43.246.200   34.93.74.215     32201:31562/TCP                                                                             118m
 wso2-am-analytics-worker-svc            LoadBalancer   10.43.252.140   35.200.217.231   7612:30414/TCP,7712:32469/TCP,9444:32169/TCP,9091:30755/TCP,7071:30125/TCP,7444:31236/TCP   118m
+wso2-am-svc
 mysql-svc                               ClusterIP      10.43.242.130   <none>           3306/TCP                                                                                    118m
 
 ```
-9. To access the portals, get the EXTERNAL-IP of any of the 2 apim services (apim-1-svc /apim-2-svc) and add it to your /etc/hosts file of your machine.
-```
-/etc/hosts
-----------
-35.244.26.60       wso2apim
+9. For accessing the portals via,
 
-```
+- LoadBalancer: 
+    Copy the <EXTERNAL-IP> of wso2-am-svc, wso2-am-analytics-dashboard-svc and add it to **/etc/hosts** file as below,
+    
+    ```
+    /etc/hosts
+    ----------
+    <EXTERNAL-IP-OF-WSO2-AM-SVC>                       wso2apim
+    <EXTERNAL-IP-OF-WSO2-AM-ANALYTICS-DASHBOARD-SVC>    wso2apim-analytics-dashboard 
+        
+    ```
+
+- NodePort:
+    Get the external-ip of one of the nodes in the cluster using the command,
+    
+    ```
+        kubectl get nodes -o wide
+        
+    ```
+    Then add that ip to the **/etc/hosts** file,
+    ```
+    /etc/hosts
+    ----------
+    <EXTERNAL-IP-OF-ONE-OF-THE-NODES>                       wso2apim
+    <EXTERNAL-IP-OF-ONE-OF-THE-NODES>    wso2apim-analytics-dashboard 
+        
+    ```
+- ClusterIP:
+    Get the external address of the ingresses using the command,
+    ```
+        kubectl get ingress
+        
+        Output:
+        NAME                                     HOSTS                          ADDRESS         PORTS     AGE
+        wso2-am-analytics-dashboard-p1-ingress   wso2apim-analytics-dashboard   34.93.244.141   80, 443   24m
+        wso2-am-gateway-p1-ingress               wso2apim-gateway               34.93.244.141   80, 443   24m
+        wso2-am-p1-ingress                       wso2apim                       34.93.244.141   80, 443   24m
+
+    ```
+    Then add add those ingresses with the Host Names and Addresses obtained in **/etc/hosts/**,
+    ```
+    /etc/hosts
+    ----------
+    <EXTERNAL-ADDRESS>       wso2apim-analytics-dashboard              
+    <EXTERNAL-ADDRESS>       wso2apim-gateway
+    <EXTERNAL-ADDRESS>       wso2apim 
+    ```
+        
+
 
 10. Finally you can successfully access the following portals.
+
+- LoadBalancer:
    
    _APIM Publisher_ - https://wso2apim:9443/publisher
    
    _APIM Devportal_ - https://wso2apim:9443/devportal
 
+- NodePOrt:
+    
+   _APIM Publisher_ - https://wso2apim:32001/publisher
+   
+   _APIM Devportal_ - https://wso2apim:32001/devportal
+   
+- ClusterIP:
 
+   _APIM Publisher_ - https://wso2apim:443/publisher
+
+   _APIM Devportal_ - https://wso2apim:443/devportal
+
+   
 ## Sample Scenarios
 
 1. [Scenario-1 : Applying Simple and shortest Custom Resource YAML](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-1)
@@ -198,6 +256,7 @@ mysql-svc                               ClusterIP      10.43.242.130   <none>   
 5. [Scenario-5 : Add New Configmaps and Persistent Volume Claims](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-5)
 6. [Scenario-6 : Deploying Custom Pattern](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-6)
 7. [Scenario-7 : Running External-NFS](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-7)
+8. [Scenario-8 : Exposing using Ingresses](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-8)
 
 ### Clean up
 
