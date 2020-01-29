@@ -48,4 +48,10 @@ kubectl apply -f scenarios/scenario-2/wso2-apim.yaml
     
     
   Finally, WSO2 API Manager will be exposed via NodePort Service Type successfully.
+  
+  Access the portals using below urls.
+      
+   _APIM Publisher_ - https://wso2apim:32001/publisher
+   
+   _APIM Devportal_ - https://wso2apim:32001/devportal
 
