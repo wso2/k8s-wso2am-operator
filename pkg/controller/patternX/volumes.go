@@ -25,13 +25,13 @@ func getApimXVolumes(apimanager *apimv1alpha1.APIManager, r apimv1alpha1.Profile
 	//adding default synapseConfigs pvc
 	amXvolumemounts=append(amXvolumemounts,corev1.VolumeMount{
 		Name:      "wso2am-px-synapse-conf",
-		MountPath: "/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/synapse-configs",
+		MountPath: "/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/synapse-configs",
 
 	})
 	//adding default executionPlans pvc
 	amXvolumemounts=append(amXvolumemounts,corev1.VolumeMount{
 		Name:        "wso2am-px-execution-conf",
-		MountPath:"/home/wso2carbon/wso2-artifact-volume/repository/deployment/server/executionplans",
+		MountPath:"/home/wso2carbon/wso2am-3.0.0/repository/deployment/server/executionplans",
 	})
 
 	amXvolume =append(amXvolume,corev1.Volume{
@@ -124,11 +124,4 @@ func getWorkerXVolumes(apimanager *apimv1alpha1.APIManager, r apimv1alpha1.Profi
 	return workerxvolumemounts, workerxvolume
 
 }
-
-
-
-// for loop if iser specify any other volumes in wso2-apim.yaml
-
-
-
 

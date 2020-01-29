@@ -38,16 +38,9 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"node": "wso2am-pattern-1-am-1",
 	}
 
-	//apimsvs1ports:= []corev1.ServicePort{}
+
 	apimsvs1ports := getApimSvcCIPorts()
 	servType :="ClusterIP"
-	//if apimanager.Spec.Service.Type=="NodePort"{
-	//	apimsvs1ports = getApim1SvcNPPorts()
-	//	servType = "NodePort"
-	//} else{
-	//	apimsvs1ports = getApim1SvcLBPorts()
-	//	servType = "LoadBalancer"
-	//}
 
 
 
@@ -76,15 +69,7 @@ func Apim2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 	apimsvs2ports := getApimSvcCIPorts()
 	servType :="ClusterIP"
-	//apimsvs2ports:= []corev1.ServicePort{}
-	//servType :=""
-	//if apimanager.Spec.Service.Type=="NodePort"{
-	//	apimsvs2ports = getApim2SvcNPPorts()
-	//	servType = "NodePort"
-	//} else {
-	//	apimsvs2ports = getApim2SvcLBPorts()
-	//	servType = "LoadBalancer"
-	//}
+
 
 
 	return &corev1.Service{

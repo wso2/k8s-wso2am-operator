@@ -271,6 +271,3 @@ func getDashDeployNPPorts() []corev1.ContainerPort {
 	return dashdeployports
 }
 
-
-
-

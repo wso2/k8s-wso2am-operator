@@ -8,7 +8,6 @@ import (
 
 func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	//defaultdeployConf :=  "wso2am-p1-apim-1-conf-"+apimanager.Name
 	deployconfigmap := "wso2am-p1-apim-1-conf-"+apimanager.Name
 	synapseConf := "wso2am-p1-am-synapse-configs"
 	execPlan := "wso2am-p1-am-execution-plans"
@@ -33,8 +32,8 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 		if execPlanFromYaml != "" {
 			execPlan = execPlanFromYaml
 		}
-		//for newly created set of configmaps by user
 
+		//for newly created set of configmaps by user
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			am1volumemounts = append(am1volumemounts, corev1.VolumeMount{
 				Name:      c.Name,
@@ -150,13 +149,8 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 		deployConfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployConfFromYaml != "" {
 			deployconfigmap = deployConfFromYaml
-			//fmt.Print("aaaaaaaaaaaa11111111 there is a deployment configmap")
 		}
-		// else {
-		//	deployconfigmap = "wso2am-p1-apim-1-conf-"+apimanager.Name
-		//	fmt.Print("aaaaaaaaaaaa111111111 there is Noooooo deployment configmap")
-		//
-		//}
+
 		synapseConfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
 		if synapseConfFromYaml != "" {
 			synapseConf = synapseConfFromYaml
@@ -165,8 +159,8 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 		if execPlanFromYaml != "" {
 			execPlan = execPlanFromYaml
 		}
-		//for newly created set of configmaps by user
 
+		//for newly created set of configmaps by user
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			am1volumemounts = append(am1volumemounts, corev1.VolumeMount{
 				Name:      c.Name,
@@ -277,9 +271,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 		if dashconfFromYaml != "" {
 			dashconfigmap = dashconfFromYaml
 		}
-		//else {
-		//	dashconfigmap = "wso2am-p1-analytics-dash-conf-"+apimanager.Name
-		//}
+
 
 		//for newly created set of configmaps by user
 
@@ -366,9 +358,6 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 		if workerconfFromYaml != "" {
 			deployconfigmap = workerconfFromYaml
 		}
-		//else {
-		//	deployconfigmap = "wso2am-p1-analytics-worker-conf-"+apimanager.Name
-		//}
 
 		//for newly created set of configmaps by user
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {

@@ -111,12 +111,12 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 
 							//Resources:corev1.ResourceRequirements{
 							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:reqCPU,
-							//		corev1.ResourceMemory:reqMemFromYaml,
+							//		corev1.ResourceCPU:x.Reqcpu,
+							//		corev1.ResourceMemory:x.Reqmem,
 							//	},
 							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:limitCPUFromYaml,
-							//		corev1.ResourceMemory:limitMemFromYaml,
+							//		corev1.ResourceCPU:x.Limitcpu,
+							//		corev1.ResourceMemory:x.Limitmem,
 							//	},
 							//},
 
@@ -254,12 +254,12 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 
 							//Resources:corev1.ResourceRequirements{
 							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:y.Reqcpu,
-							//		corev1.ResourceMemory:y.Reqmem,
+							//		corev1.ResourceCPU:x.Reqcpu,
+							//		corev1.ResourceMemory:x.Reqmem,
 							//	},
 							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:y.Limitcpu,
-							//		corev1.ResourceMemory:y.Limitmem,
+							//		corev1.ResourceCPU:x.Limitcpu,
+							//		corev1.ResourceMemory:x.Limitmem,
 							//	},
 							//},
 
@@ -270,74 +270,32 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 							},
 
 							Ports: []corev1.ContainerPort{
-								//{
-								//	ContainerPort: 9713,
-								//	Protocol:      "TCP",
-								//},
+
+								{
+									ContainerPort: 9713,
+									Protocol:      "TCP",
+								},
 								{
 									ContainerPort: 9643,
 									Protocol:      "TCP",
 								},
-								//{
-								//	ContainerPort: 9613,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7713,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 9091,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7613,
-								//	Protocol:      "TCP",
-								//},
+								{
+									ContainerPort: 9613,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7713,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 9091,
+									Protocol:      "TCP",
+								},
+								{
+									ContainerPort: 7613,
+									Protocol:      "TCP",
+								},
 
-
-								/////////////////////////////////
-								//{
-								//	ContainerPort: 32269,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 32169,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 30269,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 30169,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//{
-								//	ContainerPort: 9713,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 9643,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 9613,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7713,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 9091,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7613,
-								//	Protocol:      "TCP",
-								//},
 
 							},
 
@@ -346,7 +304,6 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 						},
 					},
 
-					// ServiceAccountName: "wso2am-pattern-1-svc-account",
 					ImagePullSecrets:[]corev1.LocalObjectReference{
 						{
 							Name:"wso2am-pattern-1-creds",
@@ -442,12 +399,12 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 
 							//Resources:corev1.ResourceRequirements{
 							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:y.Reqcpu,
-							//		corev1.ResourceMemory:y.Reqmem,
+							//		corev1.ResourceCPU:x.Reqcpu,
+							//		corev1.ResourceMemory:x.Reqmem,
 							//	},
 							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:y.Limitcpu,
-							//		corev1.ResourceMemory:y.Limitmem,
+							//		corev1.ResourceCPU:x.Limitcpu,
+							//		corev1.ResourceMemory:x.Limitmem,
 							//	},
 							//},
 

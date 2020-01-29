@@ -108,8 +108,8 @@ func DashboardXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 				{
 					Name:       "analytics-dashboard",
 					Protocol:   corev1.ProtocolTCP,
-					Port:       32201,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
+					Port:       9643,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
 
 				},
 			},

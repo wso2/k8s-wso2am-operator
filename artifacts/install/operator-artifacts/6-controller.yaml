@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: wso2am-controller
-          image: keshi96/wso2am-controller:new17
+          image: keshi96/wso2am-controller:finaltag
           imagePullPolicy: Always
       serviceAccountName: wso2am-pattern-1-svc-account
