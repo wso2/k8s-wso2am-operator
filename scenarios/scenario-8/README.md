@@ -32,13 +32,13 @@ wso2-am-p1-ingress                       wso2apim                       34.93.24
         
 Then add add those ingresses with the Host Names and Addresses obtained in **/etc/hosts/**,
     
-    ```
-    /etc/hosts
-    ----------
-    <EXTERNAL-ADDRESS>       wso2apim-analytics-dashboard              
-    <EXTERNAL-ADDRESS>       wso2apim-gateway
-    <EXTERNAL-ADDRESS>       wso2apim 
-    ```
+```
+/etc/hosts
+----------
+<EXTERNAL-ADDRESS>       wso2apim-analytics-dashboard              
+<EXTERNAL-ADDRESS>       wso2apim-gateway
+<EXTERNAL-ADDRESS>       wso2apim 
+```
         
 
 Now WSO2 API Manager will be exposed via Ingresses and ClusterIP Service Type successfully.
