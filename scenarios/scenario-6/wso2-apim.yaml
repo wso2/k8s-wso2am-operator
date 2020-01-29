@@ -4,7 +4,7 @@ kind: APIManager
 metadata:
   name: cluster-1
 spec:
-  pattern: Pattern-1
+  pattern: Pattern-X
   service:
     type: NodePort
   profiles:
