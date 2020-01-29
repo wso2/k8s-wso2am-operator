@@ -77,8 +77,8 @@ data:
   pX-apim-analytics-deployment-resources-limits-cpu: "2000m"
   pX-apim-analytics-deployment-resources-limits-memory: "4Gi"
 
-  p1-mysql-replicas: "1"
-  p1-mysql-image: "mysql:5.7"
-  p1-mysql-imagePullPolicy: "Always"
+  mysql-replicas: "1"
+  mysql-image: "mysql:5.7"
+  mysql-imagePullPolicy: "Always"
 
 

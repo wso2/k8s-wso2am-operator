@@ -422,20 +422,7 @@ func (c *Controller) syncHandler(key string) error {
 		pvcConfName := "pvc-config"
 		pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
 
-		// Get synapse-configs-pvc name using hardcoded value
-		pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			sconf := pattern1.AssignConfigMapValuesForSynapseConfigsPvc(apimanager, pvcConfWso2)
-			pvc1, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeSynapseConfigsPvc(apimanager, sconf))
-		}
-		// Get execution-plans-pvc name using hardcoded value
-		pvc2, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(executionPlanPVCName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
-			pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
-		}
+		
 		// Get mysql-pvc name using hardcoded value
 		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
 		// If the resource doesn't exist, we'll create it
@@ -500,6 +487,45 @@ func (c *Controller) syncHandler(key string) error {
 				}
 			}
 		}
+
+		if totalProfiles >0 &&  apimanager.Spec.Profiles[am1num].Name=="api-manager-1"{	 
+			synapseConfFromYaml := apimanager.Spec.Profiles[am1num].Deployment.PersistentVolumeClaim.SynapseConfigs
+			if synapseConfFromYaml != "" {
+				synapseConfigsPVCName = synapseConfFromYaml
+			}
+			execPlanFromYaml := apimanager.Spec.Profiles[am1num].Deployment.PersistentVolumeClaim.ExecutionPlans
+			if execPlanFromYaml != "" {
+				executionPlanPVCName = execPlanFromYaml
+			}
+		}
+
+		if totalProfiles >0 &&  apimanager.Spec.Profiles[am2num].Name=="api-manager-2"{	 
+			synapseConfFromYaml := apimanager.Spec.Profiles[am2num].Deployment.PersistentVolumeClaim.SynapseConfigs
+			if synapseConfFromYaml != "" {
+				synapseConfigsPVCName = synapseConfFromYaml
+			}
+			execPlanFromYaml := apimanager.Spec.Profiles[am2num].Deployment.PersistentVolumeClaim.ExecutionPlans
+			if execPlanFromYaml != "" {
+				executionPlanPVCName = execPlanFromYaml
+			}
+		}
+
+		// Get synapse-configs-pvc name using hardcoded value
+		pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			sconf := pattern1.AssignConfigMapValuesForSynapseConfigsPvc(apimanager, pvcConfWso2)
+			pvc1, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeSynapseConfigsPvc(apimanager, sconf))
+		}
+		// Get execution-plans-pvc name using hardcoded value
+		pvc2, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(executionPlanPVCName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
+			pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
+		}
+
+		fmt.Println(synapseConfigsPVCName)
 
 		// Get mysql deployment name using hardcoded value
 		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
