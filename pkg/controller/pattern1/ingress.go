@@ -10,9 +10,7 @@ import (
 
 func ApimIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 
-	//labels := map[string]string{
-	//	"deployment": "wso2am-pattern-1-am",
-	//}
+
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:     "wso2-am-p1-ingress",
@@ -24,7 +22,6 @@ func ApimIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 				"nginx.ingress.kubernetes.io/session-cookie-name": "route",
 				"nginx.ingress.kubernetes.io/session-cookie-hash": "sha1",
 			},
-			//Labels:   labels,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
 			},
@@ -61,9 +58,6 @@ func ApimIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 
 func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 
-	//labels := map[string]string{
-	//	"deployment": "wso2am-pattern-1-am",
-	//}
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:     "wso2-am-gateway-p1-ingress",
@@ -72,7 +66,6 @@ func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 				"kubernetes.io/ingress.class": "nginx",
 				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
 			},
-			//Labels:   labels,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
 			},
@@ -109,9 +102,6 @@ func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 
 func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 
-	//labels := map[string]string{
-	//	"deployment": "wso2am-pattern-1-am",
-	//}
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:     "wso2-am-analytics-dashboard-p1-ingress",
@@ -120,7 +110,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 				"kubernetes.io/ingress.class": "nginx",
 				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
 			},
-			//Labels:   labels,
+
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
 			},

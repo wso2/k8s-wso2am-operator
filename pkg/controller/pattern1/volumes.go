@@ -6,8 +6,8 @@ import (
 )
 
 func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
-
-	deployconfigmap := "wso2am-p1-apim-1-conf-" + apimanager.Name
+  
+	deployconfigmap := "wso2am-p1-apim-1-conf-"+apimanager.Name
 	synapseConf := "wso2am-p1-am-synapse-configs"
 	execPlan := "wso2am-p1-am-execution-plans"
 
@@ -247,9 +247,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 		if dashconfFromYaml != "" {
 			dashconfigmap = dashconfFromYaml
 		}
-		//else {
-		//	dashconfigmap = "wso2am-p1-analytics-dash-conf-"+apimanager.Name
-		//}
+
 
 		//for newly created set of configmaps by user
 
@@ -331,9 +329,6 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 		if workerconfFromYaml != "" {
 			deployconfigmap = workerconfFromYaml
 		}
-		//else {
-		//	deployconfigmap = "wso2am-p1-analytics-worker-conf-"+apimanager.Name
-		//}
 
 		//for newly created set of configmaps by user
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
