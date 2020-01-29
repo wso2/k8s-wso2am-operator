@@ -167,12 +167,12 @@ That is all, Now run the flow in order from start.
 kubectl get svc
 
 NAME                                    TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                                                                     AGE
-wso2-am-1-svc                           LoadBalancer   10.43.245.163   35.244.26.60     8280:32339/TCP,8243:32247/TCP,9763:30327/TCP,9443:31757/TCP                                 118m
-wso2-am-2-svc                           LoadBalancer   10.43.244.31    34.93.171.163    8280:32289/TCP,8243:31366/TCP,9763:30954/TCP,9443:31909/TCP                                 118m
+wso2-am-1-svc                           ClusterIP   10.43.245.163   <none>     8280:32339/TCP,8243:32247/TCP,9763:30327/TCP,9443:31757/TCP                                 118m
+wso2-am-2-svc                           ClusterIP   10.43.244.31    <none>    8280:32289/TCP,8243:31366/TCP,9763:30954/TCP,9443:31909/TCP                                 118m
 Wso2-am-analytics-dashboard-svc         LoadBalancer   10.43.246.200   34.93.74.215     32201:31562/TCP                                                                             118m
 wso2-am-analytics-worker-svc            LoadBalancer   10.43.252.140   35.200.217.231   7612:30414/TCP,7712:32469/TCP,9444:32169/TCP,9091:30755/TCP,7071:30125/TCP,7444:31236/TCP   118m
 wso2-am-svc
-mysql-svc                               ClusterIP      10.43.242.130   <none>           3306/TCP                                                                                    118m
+mysql-svc                               LoadBalancer      10.43.242.130   <none>           3306/TCP                                                                                    118m
 
 ```
 9. For accessing the portals via,
@@ -183,47 +183,12 @@ mysql-svc                               ClusterIP      10.43.242.130   <none>   
     ```
     /etc/hosts
     ----------
-    <EXTERNAL-IP-OF-WSO2-AM-SVC>                       wso2apim
+    <EXTERNAL-IP-OF-WSO2-AM-SVC>                        wso2apim
     <EXTERNAL-IP-OF-WSO2-AM-ANALYTICS-DASHBOARD-SVC>    wso2apim-analytics-dashboard 
         
     ```
 
-- NodePort:
-    Get the external-ip of one of the nodes in the cluster using the command,
-    
-    ```
-        kubectl get nodes -o wide
-        
-    ```
-    Then add that ip to the **/etc/hosts** file,
-    ```
-    /etc/hosts
-    ----------
-    <EXTERNAL-IP-OF-ONE-OF-THE-NODES>                       wso2apim
-    <EXTERNAL-IP-OF-ONE-OF-THE-NODES>    wso2apim-analytics-dashboard 
-        
-    ```
-- ClusterIP:
-    Get the external address of the ingresses using the command,
-    ```
-        kubectl get ingress
-        
-        Output:
-        NAME                                     HOSTS                          ADDRESS         PORTS     AGE
-        wso2-am-analytics-dashboard-p1-ingress   wso2apim-analytics-dashboard   34.93.244.141   80, 443   24m
-        wso2-am-gateway-p1-ingress               wso2apim-gateway               34.93.244.141   80, 443   24m
-        wso2-am-p1-ingress                       wso2apim                       34.93.244.141   80, 443   24m
 
-    ```
-    Then add add those ingresses with the Host Names and Addresses obtained in **/etc/hosts/**,
-    ```
-    /etc/hosts
-    ----------
-    <EXTERNAL-ADDRESS>       wso2apim-analytics-dashboard              
-    <EXTERNAL-ADDRESS>       wso2apim-gateway
-    <EXTERNAL-ADDRESS>       wso2apim 
-    ```
-        
 
 
 10. Finally you can successfully access the following portals.
@@ -234,17 +199,7 @@ mysql-svc                               ClusterIP      10.43.242.130   <none>   
    
    _APIM Devportal_ - https://wso2apim:9443/devportal
 
-- NodePOrt:
-    
-   _APIM Publisher_ - https://wso2apim:32001/publisher
    
-   _APIM Devportal_ - https://wso2apim:32001/devportal
-   
-- ClusterIP:
-
-   _APIM Publisher_ - https://wso2apim:443/publisher
-
-   _APIM Devportal_ - https://wso2apim:443/devportal
 
    
 ## Sample Scenarios
