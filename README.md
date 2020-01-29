@@ -166,13 +166,15 @@ That is all, Now run the flow in order from start.
 ```
 kubectl get svc
 
-NAME                                    TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)                                                                                     AGE
-wso2-am-1-svc                           ClusterIP   10.43.245.163   <none>     8280:32339/TCP,8243:32247/TCP,9763:30327/TCP,9443:31757/TCP                                 118m
-wso2-am-2-svc                           ClusterIP   10.43.244.31    <none>    8280:32289/TCP,8243:31366/TCP,9763:30954/TCP,9443:31909/TCP                                 118m
-Wso2-am-analytics-dashboard-svc         LoadBalancer   10.43.246.200   34.93.74.215     32201:31562/TCP                                                                             118m
-wso2-am-analytics-worker-svc            LoadBalancer   10.43.252.140   35.200.217.231   7612:30414/TCP,7712:32469/TCP,9444:32169/TCP,9091:30755/TCP,7071:30125/TCP,7444:31236/TCP   118m
-wso2-am-svc
-mysql-svc                               LoadBalancer      10.43.242.130   <none>           3306/TCP                                                                                    118m
+NAME                                     TYPE           CLUSTER-IP    EXTERNAL-IP    PORT(S)                                                                                     AGE
+
+mysql-svc                                ClusterIP      10.0.13.146   <none>         3306/TCP                                                                                    5m54s
+wso2-am-1-svc                            ClusterIP      10.0.5.21     <none>         9611/TCP,9711/TCP,5672/TCP,9443/TCP                                                         5m54s
+wso2-am-2-svc                            ClusterIP      10.0.14.65    <none>         9611/TCP,9711/TCP,5672/TCP,9443/TCP                                                         5m54s
+wso2-am-analytics-dashboard-svc          LoadBalancer   10.0.4.120    34.93.83.85    9643:32126/TCP                                                                              5m54s
+wso2-am-analytics-worker-svc             LoadBalancer   10.0.1.233    35.200.145.7   7612:32328/TCP,7712:31382/TCP,9444:30857/TCP,9091:30081/TCP,7071:30080/TCP,7444:32321/TCP   5m54s
+wso2-am-svc                              LoadBalancer   10.0.13.20    34.93.86.89    8280:31992/TCP,8243:30819/TCP,9763:31620/TCP,9443:32739/TCP                                 5m54s
+                                                      118m
 
 ```
 9. For accessing the portals via,
