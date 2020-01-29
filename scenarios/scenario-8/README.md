@@ -42,3 +42,10 @@ Then add add those ingresses with the Host Names and Addresses obtained in **/et
         
 
 Now WSO2 API Manager will be exposed via Ingresses and ClusterIP Service Type successfully.
+
+Access the portals using below urls.
+
+   _APIM Publisher_ - https://wso2apim:443/publisher
+
+   _APIM Devportal_ - https://wso2apim:443/devportal
+
