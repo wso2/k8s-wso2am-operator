@@ -10,8 +10,8 @@ spec:
         configMaps:
           newConfigMap:
             - name: <NEW_CONFIGMAP_1>
-              mountapth: <NEW_MOUNTPATH_FOR_CONFIGMAP_1>
+              mountPath: <NEW_MOUNTPATH_FOR_CONFIGMAP_1>
         persistentVolumeClaim:
           newClaim:
             - name: <NEW_CLAIM_1>
-              mountpath: <NEW_MOUNTPATH_FOR_CLAIM_1>
+              mountPath: <NEW_MOUNTPATH_FOR_CLAIM_1>
