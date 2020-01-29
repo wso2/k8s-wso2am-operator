@@ -19,4 +19,25 @@ kubectl create configmap <AM-2-DEPLOYMENT-CONFIGMAP> --from-file=wso2am-k8s-oper
 kubectl apply -f scenarios/scenario-8/wso2-apim.yaml
 ```
 
+Get the external address of the ingresses using the command,
+    ```
+        kubectl get ingress
+        
+        Output:
+        NAME                                     HOSTS                          ADDRESS         PORTS     AGE
+        wso2-am-analytics-dashboard-p1-ingress   wso2apim-analytics-dashboard   34.93.244.141   80, 443   24m
+        wso2-am-gateway-p1-ingress               wso2apim-gateway               34.93.244.141   80, 443   24m
+        wso2-am-p1-ingress                       wso2apim                       34.93.244.141   80, 443   24m
+
+    ```
+    Then add add those ingresses with the Host Names and Addresses obtained in **/etc/hosts/**,
+    ```
+    /etc/hosts
+    ----------
+    <EXTERNAL-ADDRESS>       wso2apim-analytics-dashboard              
+    <EXTERNAL-ADDRESS>       wso2apim-gateway
+    <EXTERNAL-ADDRESS>       wso2apim 
+    ```
+        
+
 Now WSO2 API Manager will be exposed via Ingresses and ClusterIP Service Type successfully.
