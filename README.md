@@ -177,10 +177,10 @@ wso2-am-svc                              LoadBalancer   10.0.13.20    34.93.86.8
                                                   
 
 ```
-9. For accessing the portals via,
-
-- LoadBalancer: 
-    Copy the <EXTERNAL-IP> of wso2-am-svc, wso2-am-analytics-dashboard-svc and add it to **/etc/hosts** file as below,
+9. For accessing the portals via LoadBalancer.
+ 
+   Copy the <EXTERNAL-IP> of wso2-am-svc & wso2-am-analytics-dashboard-svc.
+   Add it to **/etc/hosts** file as below,
     
     ```
     /etc/hosts
@@ -190,12 +190,7 @@ wso2-am-svc                              LoadBalancer   10.0.13.20    34.93.86.8
         
     ```
 
-
-
-
-10. Finally you can successfully access the following portals.
-
-- LoadBalancer:
+10. Finally you can successfully access the following portals in LoadBalancer.
    
    _APIM Publisher_ - https://wso2apim:9443/publisher
    
