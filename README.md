@@ -13,7 +13,7 @@ In this document, we will walk through the following.
 
 ### Installation Prerequisites
 * [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
-* [Helm](https://helm.sh/docs/intro/install/)
+* [Helm](https://helm.sh/docs/intro/install/) v3.0.0 or above
 * [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/)
 * Minimum CPU : **8vCPU** 
 * Minimum Memory : **12GB** 
@@ -23,7 +23,7 @@ In this document, we will walk through the following.
 
 2. Setup the required Storage
 ```
-    helm install stable/nfs-server-provisioner
+    helm install stable/nfs-server-provisioner --generate-name
 ```
    
 <details>
