@@ -5,6 +5,7 @@ metadata:
   name: cluster-1
 spec:
   pattern: Pattern-X
+  useVolume: false
   service:
     type: NodePort
   profiles:
