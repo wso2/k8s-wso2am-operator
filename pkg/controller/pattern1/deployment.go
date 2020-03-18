@@ -433,7 +433,8 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-dashboard",
-							Image: "wso2/wso2am-analytics-dashboard:3.0.0",
+							// Image: "wso2/wso2am-analytics-dashboard:3.0.0",
+							Image: "pubudu/wso2am-analytics-dashboard:3.1.0-rc1",
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -555,7 +556,8 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-worker",
-							Image: "wso2/wso2am-analytics-worker:3.0.0",
+							// Image: "wso2/wso2am-analytics-worker:3.0.0",
+							Image: "pubudu/wso2am-analytics-worker:3.1.0-rc1",
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{

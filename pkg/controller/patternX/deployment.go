@@ -180,7 +180,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 		cmdstring = []string{
 			"/bin/sh",
 			"-c",
-			"nc -z localhost 32201",
+			"nc -z localhost 9643",
 		}
 	}
 
@@ -215,7 +215,8 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-dashboard",
-							Image: "wso2/wso2am-analytics-dashboard:3.0.0",
+							// Image: "wso2/wso2am-analytics-dashboard:3.0.0",
+							Image: "pubudu/wso2am-analytics-dashboard:3.1.0-rc1",
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -351,7 +352,8 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-worker",
-							Image: "wso2/wso2am-analytics-worker:3.0.0",
+							// Image: "wso2/wso2am-analytics-worker:3.0.0",
+							Image: "pubudu/wso2am-analytics-worker:3.1.0-rc1",
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
