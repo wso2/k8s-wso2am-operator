@@ -859,6 +859,10 @@ func (c *Controller) syncHandler(key string) error {
 			fmt.Println("Configmap not found!")
 		}
 
+		var apimVolDefined bool = false
+		var dashVolDefined bool = false
+		var workerVolDefined bool = false
+
 
 		for _, r := range apimanager.Spec.Profiles {
 
@@ -866,6 +870,8 @@ func (c *Controller) syncHandler(key string) error {
 
 
 			apim1deploymentName := r.Name
+			apimpvc := r.Deployment.PersistentVolumeClaim
+			apimVolDefined = apimpvc.SynapseConfigs != "" && apimpvc.ExecutionPlans != ""
 
 			deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 			// If the resource doesn't exist, we'll create it
@@ -932,6 +938,8 @@ func (c *Controller) syncHandler(key string) error {
 
 
 				dashdeploymentName := r.Name
+				dashpvc := r.Deployment.PersistentVolumeClaim
+				dashVolDefined = dashpvc.SynapseConfigs != "" && dashpvc.ExecutionPlans != ""
 
 				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashdeploymentName)
 				// If the resource doesn't exist, we'll create it
@@ -1003,7 +1011,8 @@ func (c *Controller) syncHandler(key string) error {
 
 
 				workerdeploymentName := r.Name
-
+				workerpvc := r.Deployment.PersistentVolumeClaim
+				workerVolDefined = workerpvc.SynapseConfigs != "" && workerpvc.ExecutionPlans != ""
 
 				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerdeploymentName)
 				// If the resource doesn't exist, we'll create it
@@ -1076,7 +1085,7 @@ func (c *Controller) syncHandler(key string) error {
 
 		}
 
-		if apimanager.Spec.UseVolume {
+		if apimVolDefined && dashVolDefined && workerVolDefined {
 
 
 			synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"

@@ -12,7 +12,10 @@ func getApimXVolumes(apimanager *apimv1alpha1.APIManager, r apimv1alpha1.Profile
 	var amXvolumemounts []corev1.VolumeMount
 	var amXvolume []corev1.Volume
 
-	if apimanager.Spec.UseVolume {
+	apimpvc := r.Deployment.PersistentVolumeClaim
+	apimVolDefined := apimpvc.SynapseConfigs != "" && apimpvc.ExecutionPlans != ""
+
+	if apimVolDefined {
 
 		defaultdeployConf :=  r.Deployment.Configmaps.DeploymentConfigmap
 		defaultsynapseconf := "wso2am-p1-am-synapse-configs"
@@ -73,7 +76,10 @@ func getDashboardXVolumes(apimanager *apimv1alpha1.APIManager, r apimv1alpha1.Pr
 	var dashxvolumemounts []corev1.VolumeMount
 	var dashxvolume []corev1.Volume
 
-	if apimanager.Spec.UseVolume {
+	dashpvc := r.Deployment.PersistentVolumeClaim
+	dashVolDefined := dashpvc.SynapseConfigs != "" && dashpvc.ExecutionPlans != ""
+
+	if dashVolDefined {
 
 		defaultdashconf :=  r.Deployment.Configmaps.DeploymentConfigmap
 
@@ -107,7 +113,10 @@ func getWorkerXVolumes(apimanager *apimv1alpha1.APIManager, r apimv1alpha1.Profi
 	var workerxvolumemounts []corev1.VolumeMount
 	var workerxvolume []corev1.Volume
 
-	if apimanager.Spec.UseVolume {
+	workerpvc := r.Deployment.PersistentVolumeClaim
+	workerVolDefined := workerpvc.SynapseConfigs != "" && workerpvc.ExecutionPlans != ""
+
+	if workerVolDefined {
 
 		defaultdeployConf :=  r.Deployment.Configmaps.DeploymentConfigmap		
 		// adding default deploymentConfigmap

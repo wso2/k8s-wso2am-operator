@@ -158,7 +158,6 @@ type APIManagerSpec struct {
 	Replicas       *int32             `json:"replicas"`
 	Profiles 	[]Profile  				`json:"profiles"`
 	Service Service `json:"service"`
-	UseVolume bool `json:"useVolume"`
 
 }
 
