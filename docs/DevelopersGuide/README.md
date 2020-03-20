@@ -48,11 +48,11 @@
     Removing intermediate container 9deb5f5ab0da
     ---> f6083fe77956
     Successfully built f6083fe77956
-    Successfully tagged rakhitharr/wso2am-controller:latest
+    Successfully tagged wso2/wso2am-controller:latest
 
 ```
 ```
-    The push refers to repository [docker.io/rakhitharr/wso2am-controller]
+    The push refers to repository [docker.io/wso2/wso2am-controller]
     affab6de580c: Pushed 
 
 ```
