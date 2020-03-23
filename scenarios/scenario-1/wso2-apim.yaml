@@ -4,6 +4,7 @@ metadata:
   name: cluster-1
 spec:
   pattern: Pattern-1
+  expose: ""
 
 #  profiles:
 #    - name: api-manager-1
