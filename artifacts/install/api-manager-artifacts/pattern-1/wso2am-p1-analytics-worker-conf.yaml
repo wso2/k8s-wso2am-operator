@@ -1,4 +1,8 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2am-p1-analytics-worker-conf
+  namespace: wso2-system
 data:
     deployment.yaml: |
       ################################################################################
@@ -19,14 +23,15 @@ data:
         # Carbon Configuration Parameters
       wso2.carbon:
         type: wso2-apim-analytics
-          # value to uniquely identify a server
+        # value to uniquely identify a server
         id: wso2-am-analytics
-          # server name
+        # server name
         name: WSO2 API Manager Analytics Server
-          # ports used by this server
+        # ports used by this server
         ports:
-            # port offset
+          # port offset
           offset: 1
+
       wso2.transport.http:
         transportProperties:
           -
@@ -38,6 +43,7 @@ data:
           -
             name: "latency.metrics.enabled"
             value: true
+
         listenerConfigurations:
           -
             id: "default"
@@ -51,9 +57,11 @@ data:
             keyStoreFile: "${carbon.home}/resources/security/wso2carbon.jks"
             keyStorePassword: wso2carbon
             certPass: wso2carbon
+
         senderConfigurations:
           -
             id: "http-sender"
+
       siddhi.stores.query.api:
         transportProperties:
           -
@@ -65,6 +73,7 @@ data:
           -
             name: "latency.metrics.enabled"
             value: true
+
         listenerConfigurations:
           -
             id: "default"
@@ -78,155 +87,159 @@ data:
             keyStoreFile: "${carbon.home}/resources/security/wso2carbon.jks"
             keyStorePassword: wso2carbon
             certPass: wso2carbon
+
         # Configuration used for the databridge communication
       databridge.config:
-          # No of worker threads to consume events
-          # THIS IS A MANDATORY FIELD
+        # No of worker threads to consume events
+        # THIS IS A MANDATORY FIELD
         workerThreads: 10
           # Maximum amount of messages that can be queued internally in MB
-          # THIS IS A MANDATORY FIELD
+        # THIS IS A MANDATORY FIELD
         maxEventBufferCapacity: 10000000
           # Queue size; the maximum number of events that can be stored in the queue
-          # THIS IS A MANDATORY FIELD
+        # THIS IS A MANDATORY FIELD
         eventBufferSize: 2000
           # Keystore file path
-          # THIS IS A MANDATORY FIELD
+        # THIS IS A MANDATORY FIELD
         keyStoreLocation : ${sys:carbon.home}/resources/security/wso2carbon.jks
           # Keystore password
-          # THIS IS A MANDATORY FIELD
+        # THIS IS A MANDATORY FIELD
         keyStorePassword : wso2carbon
           # Session Timeout value in mins
-          # THIS IS A MANDATORY FIELD
+        # THIS IS A MANDATORY FIELD
         clientTimeoutMin: 30
           # Data receiver configurations
-          # THIS IS A MANDATORY FIELD
+        # THIS IS A MANDATORY FIELD
         dataReceivers:
-        -
+          -
             # Data receiver configuration
-          dataReceiver:
+            dataReceiver:
               # Data receiver type
               # THIS IS A MANDATORY FIELD
-            type: Thrift
+              type: Thrift
               # Data receiver properties
-            properties:
-              tcpPort: '7611'
-              sslPort: '7711'
-        -
+              properties:
+                tcpPort: '7611'
+                sslPort: '7711'
+
+          -
             # Data receiver configuration
-          dataReceiver:
+            dataReceiver:
               # Data receiver type
               # THIS IS A MANDATORY FIELD
-            type: Binary
+              type: Binary
               # Data receiver properties
-            properties:
-              tcpPort: '9611'
-              sslPort: '9711'
-              tcpReceiverThreadPoolSize: '100'
-              sslReceiverThreadPoolSize: '100'
-              hostName: 0.0.0.0
+              properties:
+                tcpPort: '9611'
+                sslPort: '9711'
+                tcpReceiverThreadPoolSize: '100'
+                sslReceiverThreadPoolSize: '100'
+                hostName: 0.0.0.0
+
         # Configuration of the Data Agents - to publish events through databridge
       data.agent.config:
-          # Data agent configurations
-          # THIS IS A MANDATORY FIELD
+        # Data agent configurations
+        # THIS IS A MANDATORY FIELD
         agents:
-        -
+          -
             # Data agent configuration
-          agentConfiguration:
+            agentConfiguration:
               # Data agent name
               # THIS IS A MANDATORY FIELD
-            name: Thrift
-              # Data endpoint class
+              name: Thrift
+                # Data endpoint class
               # THIS IS A MANDATORY FIELD
-            dataEndpointClass: org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint
+              dataEndpointClass: org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint
               # Data publisher strategy
-            publishingStrategy: async
+              publishingStrategy: async
               # Trust store path
-            trustStorePath: '${sys:carbon.home}/resources/security/client-truststore.jks'
+              trustStorePath: '${sys:carbon.home}/resources/security/client-truststore.jks'
               # Trust store password
-            trustStorePassword: 'wso2carbon'
+              trustStorePassword: 'wso2carbon'
               # Queue Size
-            queueSize: 32768
+              queueSize: 32768
               # Batch Size
-            batchSize: 200
+              batchSize: 200
               # Core pool size
-            corePoolSize: 1
+              corePoolSize: 1
               # Socket timeout in milliseconds
-            socketTimeoutMS: 30000
+              socketTimeoutMS: 30000
               # Maximum pool size
-            maxPoolSize: 1
+              maxPoolSize: 1
               # Keep alive time in pool
-            keepAliveTimeInPool: 20
+              keepAliveTimeInPool: 20
               # Reconnection interval
-            reconnectionInterval: 30
+              reconnectionInterval: 30
               # Max transport pool size
-            maxTransportPoolSize: 250
+              maxTransportPoolSize: 250
               # Max idle connections
-            maxIdleConnections: 250
+              maxIdleConnections: 250
               # Eviction time interval
-            evictionTimePeriod: 5500
+              evictionTimePeriod: 5500
               # Min idle time in pool
-            minIdleTimeInPool: 5000
+              minIdleTimeInPool: 5000
               # Secure max transport pool size
-            secureMaxTransportPoolSize: 250
+              secureMaxTransportPoolSize: 250
               # Secure max idle connections
-            secureMaxIdleConnections: 250
+              secureMaxIdleConnections: 250
               # secure eviction time period
-            secureEvictionTimePeriod: 5500
+              secureEvictionTimePeriod: 5500
               # Secure min idle time in pool
-            secureMinIdleTimeInPool: 5000
+              secureMinIdleTimeInPool: 5000
               # SSL enabled protocols
-            sslEnabledProtocols: TLSv1.1,TLSv1.2
+              sslEnabledProtocols: TLSv1.1,TLSv1.2
               # Ciphers
-            ciphers: TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
-        -
+              ciphers: TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+          -
             # Data agent configuration
-          agentConfiguration:
+            agentConfiguration:
               # Data agent name
               # THIS IS A MANDATORY FIELD
-            name: Binary
-              # Data endpoint class
+              name: Binary
+                # Data endpoint class
               # THIS IS A MANDATORY FIELD
-            dataEndpointClass: org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint
+              dataEndpointClass: org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint
               # Data publisher strategy
-            publishingStrategy: async
+              publishingStrategy: async
               # Trust store path
-            trustStorePath: '${sys:carbon.home}/resources/security/client-truststore.jks'
+              trustStorePath: '${sys:carbon.home}/resources/security/client-truststore.jks'
               # Trust store password
-            trustStorePassword: 'wso2carbon'
+              trustStorePassword: 'wso2carbon'
               # Queue Size
-            queueSize: 32768
+              queueSize: 32768
               # Batch Size
-            batchSize: 200
+              batchSize: 200
               # Core pool size
-            corePoolSize: 1
+              corePoolSize: 1
               # Socket timeout in milliseconds
-            socketTimeoutMS: 30000
+              socketTimeoutMS: 30000
               # Maximum pool size
-            maxPoolSize: 1
+              maxPoolSize: 1
               # Keep alive time in pool
-            keepAliveTimeInPool: 20
+              keepAliveTimeInPool: 20
               # Reconnection interval
-            reconnectionInterval: 30
+              reconnectionInterval: 30
               # Max transport pool size
-            maxTransportPoolSize: 250
+              maxTransportPoolSize: 250
               # Max idle connections
-            maxIdleConnections: 250
+              maxIdleConnections: 250
               # Eviction time interval
-            evictionTimePeriod: 5500
+              evictionTimePeriod: 5500
               # Min idle time in pool
-            minIdleTimeInPool: 5000
+              minIdleTimeInPool: 5000
               # Secure max transport pool size
-            secureMaxTransportPoolSize: 250
+              secureMaxTransportPoolSize: 250
               # Secure max idle connections
-            secureMaxIdleConnections: 250
+              secureMaxIdleConnections: 250
               # secure eviction time period
-            secureEvictionTimePeriod: 5500
+              secureEvictionTimePeriod: 5500
               # Secure min idle time in pool
-            secureMinIdleTimeInPool: 5000
+              secureMinIdleTimeInPool: 5000
               # SSL enabled protocols
-            sslEnabledProtocols: TLSv1.1,TLSv1.2
+              sslEnabledProtocols: TLSv1.1,TLSv1.2
               # Ciphers
-            ciphers: TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+              ciphers: TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+
       # This is the main configuration for metrics
       wso2.metrics:
         # Enable Metrics
@@ -235,11 +248,14 @@ data:
           console:
             - # The name for the Console Reporter
               name: Console
+
               # Enable Console Reporter
               enabled: false
+
               # Polling Period in seconds.
               # This is the period for polling metrics from the metric registry and printing in the console
               pollingPeriod: 5
+
       wso2.metrics.jdbc:
         # Data Source Configurations for JDBC Reporters
         dataSource:
@@ -254,39 +270,49 @@ data:
             scheduledCleanup:
               # Enable scheduled cleanup to delete Metrics data in the database.
               enabled: true
+
               # The scheduled job will cleanup all data older than the specified days
               daysToKeep: 3
+
               # This is the period for each cleanup operation in seconds.
               scheduledCleanupPeriod: 86400
+
         # The JDBC Reporter is in the Metrics JDBC Core feature
         reporting:
           # The JDBC Reporter configurations will be ignored if the Metrics JDBC Core feature is not available in runtime
           jdbc:
             - # The name for the JDBC Reporter
               name: JDBC
+
               # Enable JDBC Reporter
               enabled: true
+
               # Source of Metrics, which will be used to identify each metric in database -->
               # Commented to use the hostname by default
               # source: Carbon
+
               # Alias referring to the Data Source configuration
               dataSource: *JDBC01
+
               # Polling Period in seconds.
               # This is the period for polling metrics from the metric registry and updating the database with the values
               pollingPeriod: 60
+
         # Deployment configuration parameters
       wso2.artifact.deployment:
-          # Scheduler update interval
+        # Scheduler update interval
         updateInterval: 5
+
         # Periodic Persistence Configuration
       state.persistence:
-        enabled: false
+        enabled: true
         intervalInMin: 1
         revisionsToKeep: 2
         persistenceStore: org.wso2.carbon.streaming.integrator.core.persistence.DBPersistenceStore
         config:
           datasource: PERSISTENCE_DB   # A datasource with this name should be defined in wso2.datasources namespace
           table: PERSISTENCE_TABLE
+
         # Secure Vault Configuration
       wso2.securevault:
         secretRepository:
@@ -299,6 +325,7 @@ data:
           type: org.wso2.carbon.secvault.reader.DefaultMasterKeyReader
           parameters:
             masterKeyReaderFile: ${sys:carbon.home}/conf/${sys:wso2.runtime}/master-keys.yaml
+
         # Datasource Configurations
       wso2.datasources:
         dataSources:
@@ -319,6 +346,7 @@ data:
                 connectionTestQuery: SELECT 1
                 validationTimeout: 30000
                 isAutoCommit: false
+
           - name: WSO2_PERMISSIONS_DB
             description: The datasource used for permission feature
             jndiConfig:
@@ -330,12 +358,13 @@ data:
                 jdbcUrl: 'jdbc:mysql://mysql-svc:3306/PERMISSION_DB?useSSL=false'
                 username: wso2carbon
                 password: wso2carbon
-                driverClassName: com.mysql.jdbc.Driver
+                driverClassName: com.mysql.cj.jdbc.Driver
                 maxPoolSize: 10
                 idleTimeout: 60000
                 connectionTestQuery: SELECT 1
                 validationTimeout: 30000
                 isAutoCommit: false
+
           - name: GEO_LOCATION_DATA
             description: "The data source used for geo location database"
             jndiConfig:
@@ -351,6 +380,7 @@ data:
                 idleTimeout: 60000
                 validationTimeout: 30000
                 isAutoCommit: false
+
           - name: APIM_ANALYTICS_DB
             description: "The datasource used for APIM statistics aggregated data."
             jndiConfig:
@@ -361,13 +391,15 @@ data:
                 jdbcUrl: 'jdbc:mysql://mysql-svc:3306/APIM_ANALYTICS_DB?useSSL=false'
                 username: wso2carbon
                 password: wso2carbon
-                driverClassName: com.mysql.jdbc.Driver
+                driverClassName: com.mysql.cj.jdbc.Driver
                 maxPoolSize: 50
                 idleTimeout: 60000
                 connectionTestQuery: SELECT 1
                 validationTimeout: 30000
                 isAutoCommit: false
-          - name: WSO2_CLUSTER_DB
+
+          -
+            name: WSO2_CLUSTER_DB
             description: "The datasource used by cluster coordinators in HA deployment"
             jndiConfig:
               name: jdbc/WSO2_CLUSTER_DB
@@ -375,31 +407,33 @@ data:
               type: RDBMS
               configuration:
                 connectionTestQuery: "SELECT 1"
-                driverClassName: org.h2.Driver
+                driverClassName: com.mysql.cj.jdbc.Driver
                 idleTimeout: 60000
                 isAutoCommit: false
-                jdbcUrl: "jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/WSO2_CLUSTER_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=TRUE"
+                jdbcUrl: "jdbc:mysql://mysql-svc:3306/WSO2_CLUSTER_DB?useSSL=false"
                 maxPoolSize: 10
                 password: wso2carbon
                 username: wso2carbon
                 validationTimeout: 30000
-      #    -
-      #      name: PERSISTENCE_DB
-      #      description: "Datasource used for persistence"
-      #      jndiConfig:
-      #        name: jdbc/PERSISTENCE_DB
-      #      definition:
-      #        type: RDBMS
-      #        configuration:
-      #          connectionTestQuery: "SELECT 1"
-      #          driverClassName: com.mysql.jdbc.Driver
-      #          idleTimeout: 60000
-      #          isAutoCommit: false
-      #          jdbcUrl: "jdbc:h2:${sys:carbon.home}/wso2/${sys:wso2.runtime}/database/PERSISTENCE_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=TRUE"
-      #          maxPoolSize: 10
-      #          password: pass
-      #          username: root
-      #          validationTimeout: 30000
+
+          -
+            name: PERSISTENCE_DB
+            description: "Datasource used for persistence"
+            jndiConfig:
+              name: jdbc/PERSISTENCE_DB
+            definition:
+              type: RDBMS
+              configuration:
+                connectionTestQuery: "SELECT 1"
+                driverClassName: com.mysql.cj.jdbc.Driver
+                idleTimeout: 60000
+                isAutoCommit: false
+                jdbcUrl: "jdbc:mysql://mysql-svc:3306/PERSISTENCE_DB?useSSL=false"
+                maxPoolSize: 10
+                password: wso2carbon
+                username: wso2carbon
+                validationTimeout: 30000
+
       siddhi:
         # properties:
         #  partitionById: true
@@ -431,7 +465,7 @@ data:
                 cacheSize: 10000
                 isPersistInDatabase: true
                 datasource: GEO_LOCATION_DATA
-         #Enabling GRPC Service with an Extension
+          #Enabling GRPC Service with an Extension
           -
             extension:
               name: 'grpc'
@@ -443,16 +477,18 @@ data:
                 trustStoreFile : ${sys:carbon.home}/resources/security/client-truststore.jks
                 trustStorePassword : wso2carbon
                 trustStoreAlgorithm : SunX509
+
         # Cluster Configuration
       cluster.config:
-        enabled: false
+        enabled: true
         groupId:  sp
         coordinationStrategyClass: org.wso2.carbon.cluster.coordinator.rdbms.RDBMSCoordinationStrategy
         strategyConfig:
           datasource: WSO2_CLUSTER_DB
           heartbeatInterval: 5000
-          heartbeatMaxRetry: 3
-          eventPollingInterval: 1000
+          heartbeatMaxRetry: 5
+          eventPollingInterval: 5000
+
       # Authentication configuration
       auth.configs:
         type: 'local'        # Type of the IdP client used
@@ -460,35 +496,59 @@ data:
           adminRole: admin   # Admin role which is granted all permissions
           userStore:         # User store
             users:
-             -
-               user:
-                 username: admin
-                 password: YWRtaW4=
-                 roles: 1
+              -
+                user:
+                  username: admin
+                  password: YWRtaW4=
+                  roles: 1
             roles:
-             -
-               role:
-                 id: 1
-                 displayName: admin
+              -
+                role:
+                  id: 1
+                  displayName: admin
+
+      deployment.config:
+        type: ha
+        passiveNodeDetailsWaitTimeOutMillis: 300000
+        passiveNodeDetailsRetrySleepTimeMillis: 500
+        eventByteBufferQueueCapacity: 20000
+        byteBufferExtractorThreadPoolSize: 5
+        eventSyncServer:
+          host: 0.0.0.0
+          port: 9893
+          advertisedHost: wso2-am-analytics-worker-svc
+          advertisedPort: 9893
+          bossThreads: 10
+          workerThreads: 10
+        eventSyncClientPool:
+          maxActive: 10
+          maxTotal: 10
+          maxIdle: 10
+          maxWait: 60000
+          minEvictableIdleTimeMillis: 120000
+
         # Configuration to enable apim alerts
-      #analytics.solutions:
-      #  APIM-alerts.enabled: true
+        #analytics.solutions:
+        #  APIM-alerts.enabled: true
+
+
         # Sample of deployment.config for Two node HA
-      #deployment.config:
-      #  type: ha
-      #  eventSyncServer:
-      #    host: localhost
-      #    port: 9893
-      #    advertisedHost: localhost
-      #    advertisedPort: 9893
-      #    bossThreads: 10
-      #    workerThreads: 10
-      #  eventSyncClientPool:
-      #    maxActive: 10
-      #    maxTotal: 10
-      #    maxIdle: 10
-      #    maxWait: 60000
-      #    minEvictableIdleTimeMillis: 120000
+        # deployment.config:
+        #  type: ha
+        #  eventSyncServer:
+        #    host: localhost
+        #    port: 9893
+        #    advertisedHost: localhost
+        #    advertisedPort: 9893
+        #    bossThreads: 10
+        #    workerThreads: 10
+        #  eventSyncClientPool:
+        #    maxActive: 10
+        #    maxTotal: 10
+        #    maxIdle: 10
+        #    maxWait: 60000
+        #    minEvictableIdleTimeMillis: 120000
+
         # Sample of deployment.config for Distributed deployment
       #deployment.config:
       #  type: distributed
@@ -507,11 +567,3 @@ data:
       #      port: 9543
       #      username: admin
       #      password: admin
-kind: ConfigMap
-metadata:
-  creationTimestamp: "2020-01-24T12:07:05Z"
-  name: wso2am-p1-analytics-worker-conf
-  namespace: wso2-system
-  resourceVersion: "774168"
-  selfLink: /api/v1/namespaces/default/configmaps/wso2am-p1-analytics-worker-conf-cluster-1
-  uid: 09575950-3ea2-11ea-be52-42010aa000c5
