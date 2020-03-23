@@ -66,7 +66,33 @@ func getApimCommonSvcPorts() []corev1.ServicePort {
 		Port:       9443,
 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
 	})
-	return apimsvs1ports
 
+	return apimsvs1ports
 }
 
+func getDashBoardNPPorts() []corev1.ServicePort {
+	var dashports []corev1.ServicePort
+
+	dashports = append(dashports, corev1.ServicePort{
+		Name:       "analytics-dashboard",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9643,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
+		NodePort:   32201,
+	})
+
+	return dashports
+}
+
+func getDashBoardPorts() []corev1.ServicePort {
+
+	var dashports []corev1.ServicePort
+	dashports = append(dashports, corev1.ServicePort{
+		Name:       "servlet-https",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9643,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
+	})
+
+	return dashports
+}

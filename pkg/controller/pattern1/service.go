@@ -97,16 +97,16 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	servType :=""
 	dashports := []corev1.ServicePort{}
 	if apimanager.Spec.Service.Type == "NodePort"{
-		dashports = getDashNPPorts()
+		dashports = getDashBoardNPPorts()
 		servType = "NodePort"
 	} else if apimanager.Spec.Service.Type == "LoadBalancer"{
-		dashports = getDashLBPorts()
+		dashports = getDashBoardPorts()
 		servType = "LoadBalancer"
 	} else if apimanager.Spec.Service.Type == "ClusterIP" {
-		dashports = getDashCIPorts()
+		dashports = getDashBoardPorts()
 		servType = "ClusterIP"
 	} else {
-		dashports = getDashLBPorts()
+		dashports = getDashBoardPorts()
 		servType = "LoadBalancer"
 	}
 
@@ -132,7 +132,7 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-worker",
 	}
-	servType :="ClusterIP"
+	servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -151,42 +151,36 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7612,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7612},
-					//NodePort:   32020,
 				},
 				{
 					Name:       "thrift-ssl",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7712,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7712},
-					//NodePort:   32011,
 				},
 				{
 					Name:       "rest-api-port-1",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9444,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9444},
-					//NodePort:   32012,
 				},
 				{
 					Name:       "rest-api-port-2",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       9091,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9091},
-					//NodePort:   32013,
 				},
 				{
 					Name:       "rest-api-port-3",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7071,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7071},
-					//NodePort:   32014,
 				},
 				{
 					Name:       "rest-api-port-4",
 					Protocol:   corev1.ProtocolTCP,
 					Port:       7444,
 					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7444},
-					//NodePort:   32015,
 				},
 			},
 		},

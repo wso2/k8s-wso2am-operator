@@ -71,27 +71,34 @@ func DashboardXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 		"deployment": r.Name,
 	}
 
+	dashBoardPorts := []corev1.ServicePort{}
+	servType :=""
+	if apimanager.Spec.Service.Type == "NodePort"{
+		dashBoardPorts = getDashBoardNPPorts()
+		servType = "NodePort"
+	} else if apimanager.Spec.Service.Type == "LoadBalancer"{
+		dashBoardPorts = getDashBoardPorts()
+		servType = "LoadBalancer"
+	} else if apimanager.Spec.Service.Type == "ClusterIP" {
+		dashBoardPorts = getDashBoardPorts()
+		servType = "ClusterIP"
+	} else {
+		dashBoardPorts = getDashBoardPorts()
+		servType = "LoadBalancer"
+	}
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      r.Service.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:   "LoadBalancer",
-			Ports: 	[]corev1.ServicePort{
-				{
-					Name:       "analytics-dashboard",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       9643,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
-
-				},
-			},
+			Type:    corev1.ServiceType(servType),
+			Ports: dashBoardPorts,
 		},
 	}
 }
@@ -101,6 +108,7 @@ func WorkerXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile)
 		"deployment": r.Name,
 	}
 
+	servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -112,7 +120,7 @@ func WorkerXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile)
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     "LoadBalancer",
+			Type:     corev1.ServiceType(servType),
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "thrift",

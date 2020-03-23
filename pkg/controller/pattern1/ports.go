@@ -71,8 +71,9 @@ func getApimCommonSvcPorts() []corev1.ServicePort {
 }
 
 
-func getDashNPPorts() []corev1.ServicePort {
+func getDashBoardNPPorts() []corev1.ServicePort {
 	var dashports []corev1.ServicePort
+
 	dashports = append(dashports, corev1.ServicePort{
 		Name:       "analytics-dashboard",
 		Protocol:   corev1.ProtocolTCP,
@@ -82,31 +83,19 @@ func getDashNPPorts() []corev1.ServicePort {
 	})
 
 	return dashports
-
 }
-func getDashLBPorts() []corev1.ServicePort {
+
+func getDashBoardPorts() []corev1.ServicePort {
+
 	var dashports []corev1.ServicePort
-	dashports = append(dashports, corev1.ServicePort{
-		Name:       "pass-through-http",
+		dashports = append(dashports, corev1.ServicePort{
+		Name:       "servlet-https",
 		Protocol:   corev1.ProtocolTCP,
 		Port:       9643,
 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
 	})
 
 	return dashports
-
-}
-func getDashCIPorts() []corev1.ServicePort {
-		var dashports []corev1.ServicePort
-		dashports = append(dashports, corev1.ServicePort{
-		Name:       "pass-through-http",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9643,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
-	})
-
-return dashports
-
 }
 
 
