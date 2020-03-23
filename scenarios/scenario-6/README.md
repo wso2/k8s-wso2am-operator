@@ -36,3 +36,44 @@ Finally, apply the given wso2-apim.yaml file.
   kubectl apply -f scenarios/scenario-6/wso2-apim.yaml
 ```
 
+Available Options can be found here.
+
+```
+apiVersion: apim.wso2.com/v1alpha1
+kind: APIManager
+metadata:
+  name: cluster-1
+spec:
+  pattern: Pattern-X
+  service:
+    type: NodePort
+  profiles:
+    - name: <NEW_PROFILE_NAME>
+      type: api-manager
+      service:
+        name: <NEW_PROFILE_SERVICE_NAME>
+      deployment:
+        replicas: 1
+        minReadySeconds: 100
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 2000m
+          limits:
+            memory: 3Gi
+            cpu: 3000m
+        livenessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        configMaps:
+          deploymentConfigMap: <NEW_PROFILE_DEPLOYMENT_CONFIGMAP>
+        persistentVolumeClaim:
+          synapseConfigs: <NEW_PROFILE_SYNAPSE_CONFIGS>
+          executionPlans: <NEW_PROFILE_EXECUTION_PLANS>
+```

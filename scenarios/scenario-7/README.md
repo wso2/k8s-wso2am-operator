@@ -1,42 +1,38 @@
-<h3>Running External-nfs</h3>
+## Scenario-6 : Custom Pattern
 
-**Prerequisites**
- * A pre-configured Network File System (NFS) to be used as the persistent volume for artifact sharing and persistence. In the NFS server instance, create a Linux system user account named wso2carbon with user id 802 and a system group named wso2 with group id 802. Add the wso2carbon user to the group wso2.
+You can introduce a new custom pattern with any no.of profiles.
 
-```
-    groupadd --system -g 802 wso2
-    useradd --system -g 802 -u 802 wso2carbon 
-```
-    
-1.Setup a Network File System (NFS) to be used for persistent storage.
-Create and export unique directories within the NFS server instance for each Kubernetes Persistent Volume resource     defined in the <KUBERNETES_HOME>/scenarios/scenario-7/pv.yaml file.
+There are several types a profile can be of, they are:
 
-2.Grant ownership to wso2carbon user and wso2 group, for each of the previously created directories. 
+* api-manager
+* analytics-dashboard
+* analytics-worker
 
-```
-    sudo chown -R wso2carbon:wso2 <directory_name>
-```
+You can create any no.of profiles with given types.
+You can provide desired configuration values if you wish, if not provided it will take upon the default type specific configuration values.
+Under a profile, everything except name, type, service, and configMaps are optional fields.
 
-3.Grant read-write-execute permissions to the wso2carbon user, for each of the previously created directories.
+There are two main types of patterns you can implement. Create the necessary profiles for the pattern you want to try out.
+* api-portal
+  * api-manager
+  * mysql
+* api-portal-with-analytics
+  * api-manager
+  * analytics-dashboard
+  * analytics-worker
+  * mysql
 
-```
-    chmod -R 700 <directory_name>
-```
+You need to create relavant configmaps and persistent volume claims and add them under deploymentConfigmap, synapseConfigs and executionPlans. If you do not specify any persistent volume claims, default ones will not be created unlike in Pattern 1. You would not need a nfs deployment in this case.
 
-4.Update the StorageClassName in the <KUBERNETES_HOME>/scenarios/scenario-7/storage-class.yaml file as you want.
-
-Then, apply the following command to create a new Storage Class,
-
-```
-    kubectl create -f <KUBERNETES_HOME>/scenarios/scenario-7/storage-class.yaml 
-```
-
-5.Update each Kubernetes Persistent Volume resource with the corresponding Namespace (NAME_SPACE), NFS server IP (NFS_SERVER_IP) and exported, NFS server directory path (NFS_LOCATION_PATH) in the <KUBERNETES_HOME>/scenarios/scenario-7/pv.yaml file.
-      
-Then, deploy the persistent volume resource as follows,
+If you choose not to specify any persistent volume claims, apply the given `.yaml` files to deploy a seperate MySQL service.
 
 ```
-    kubectl create -f <KUBERNETES_HOME>/scenarios/scenario-7/pv.yaml -n <USER-NAMESPACE>
+  kubectl apply -f artifacts/install/api-manager-artifacts/pattern-x/mysql
 ```
 
-6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/install/operator-configs/pvc-config.yaml file.
+Finally, apply the given wso2-apim.yaml file.
+
+```
+  kubectl apply -f scenarios/scenario-6/wso2-apim.yaml
+```
+

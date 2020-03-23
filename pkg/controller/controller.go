@@ -509,7 +509,7 @@ func (c *Controller) syncHandler(key string) error {
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			x := pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
+			x := pattern1.AssignApimConfigMapValues(apimanager,configmap,am1num)
 			//mysqdeploy, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 			if mysqldeployment.Status.AvailableReplicas >0 {
 				//deployment.Status.AvailableReplicas > 0
@@ -525,7 +525,7 @@ func (c *Controller) syncHandler(key string) error {
 		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			z := pattern1.AssignApim2ConfigMapValues(apimanager,configmap,am2num)
+			z := pattern1.AssignApimConfigMapValues(apimanager,configmap,am2num)
 			if mysqldeployment.Status.AvailableReplicas >0 {
 				deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z, am2num))
 				if err != nil {
@@ -775,14 +775,14 @@ func (c *Controller) syncHandler(key string) error {
 		// If this number of the replicas on the Apimanager resource is specified, and the number does not equal the
 		// current desired replicas on the Deployment, we should update the Deployment resource.
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-			x:= pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
+			x := pattern1.AssignApimConfigMapValues(apimanager,configmap,am1num)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim1Deployment(apimanager, x,am1num))
 		}
 
 		//for apim instance 2 also
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
-			z := pattern1.AssignApim2ConfigMapValues(apimanager,configmap,am2num)
+			z := pattern1.AssignApimConfigMapValues(apimanager,configmap,am2num)
 			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
 			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, z,am2num))
 		}
@@ -878,7 +878,7 @@ func (c *Controller) syncHandler(key string) error {
 			// If the resource doesn't exist, we'll create it
 			x := patternX.AssignApimXConfigMapValues(apimanager,configmap,r)
 			if errors.IsNotFound(err) {
-				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.ApimXDeployment(apimanager, &r,x))
+				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.ApimXDeployment(apimanager, &r, x))
 				if err != nil {
 					return err
 				}
@@ -944,7 +944,7 @@ func (c *Controller) syncHandler(key string) error {
 
 				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashdeploymentName)
 				// If the resource doesn't exist, we'll create it
-				x := patternX.AssignApimAnalyticsXDashboardConfigMapValues(apimanager,configmap,r)
+				x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
 
 				if errors.IsNotFound(err) {
 					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.DashboardXDeployment(apimanager, &r,x))
@@ -986,7 +986,7 @@ func (c *Controller) syncHandler(key string) error {
 
 
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-					x := patternX.AssignApimAnalyticsXDashboardConfigMapValues(apimanager,configmap,r)
+					x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
 					klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r,x))
 				}
@@ -1008,7 +1008,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 
 			if r.Type == "analytics-worker" {
-				x := patternX.AssignApimAnalyticsXDashboardConfigMapValues(apimanager,configmap,r)
+				x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
 
 
 				workerdeploymentName := r.Name
@@ -1058,8 +1058,8 @@ func (c *Controller) syncHandler(key string) error {
 
 
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-					//x:= pattern1.AssignApim1ConfigMapValues(apimanager,configmap,am1num)
-					x := patternX.AssignApimAnalyticsXDashboardConfigMapValues(apimanager,configmap,r)
+
+					x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
 
 					klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.WorkerXDeployment(apimanager, &r,x))

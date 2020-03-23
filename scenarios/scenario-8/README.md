@@ -1,51 +1,42 @@
-## Scenario 8 : Exposing using Ingresses
+<h3>Running External-nfs</h3>
 
-1. Go inside root folder _wso2am-k8s-operator_
+**Prerequisites**
+ * A pre-configured Network File System (NFS) to be used as the persistent volume for artifact sharing and persistence. In the NFS server instance, create a Linux system user account named wso2carbon with user id 802 and a system group named wso2 with group id 802. Add the wso2carbon user to the group wso2.
 
-2. Create a new configmap **<AM-1-DEPLOYMENT-CONFIGMAP>** for API Manager instance 1 using the command,
-
 ```
-kubectl create configmap <AM-1-DEPLOYMENT-CONFIGMAP> --from-file=wso2am-k8s-operator/scenarios/scenario-2/am-1/deployment.toml
+    groupadd --system -g 802 wso2
+    useradd --system -g 802 -u 802 wso2carbon 
 ```
-3. Similarly, create a new configmap **<AM-2-DEPLOYMENT-CONFIGMAP>** for API Manager instance 1 using the command,
-  
-```
-kubectl create configmap <AM-2-DEPLOYMENT-CONFIGMAP> --from-file=wso2am-k8s-operator/scenarios/scenario-2/am-2/deployment.toml
-```
-4. Follow steps 3,4,5 in the Home page
-
-5. Then apply the given yaml using the command
-```
-kubectl apply -f scenarios/scenario-8/wso2-apim.yaml
-```
-
-Get the external address of the ingresses using the command,
-```
-kubectl get ingress
-
-Output:
-NAME                                     HOSTS                          ADDRESS         PORTS     AGE
-wso2-am-analytics-dashboard-p1-ingress   wso2apim-analytics-dashboard   34.93.244.141   80, 443   24m
-wso2-am-gateway-p1-ingress               wso2apim-gateway               34.93.244.141   80, 443   24m
-wso2-am-p1-ingress                       wso2apim                       34.93.244.141   80, 443   24m
-```
-        
-Then add add those ingresses with the Host Names and Addresses obtained in **/etc/hosts/**,
     
+1.Setup a Network File System (NFS) to be used for persistent storage.
+Create and export unique directories within the NFS server instance for each Kubernetes Persistent Volume resource     defined in the <KUBERNETES_HOME>/scenarios/scenario-7/pv.yaml file.
+
+2.Grant ownership to wso2carbon user and wso2 group, for each of the previously created directories. 
+
 ```
-/etc/hosts
-----------
-<EXTERNAL-ADDRESS>       wso2apim-analytics-dashboard              
-<EXTERNAL-ADDRESS>       wso2apim-gateway
-<EXTERNAL-ADDRESS>       wso2apim 
+    sudo chown -R wso2carbon:wso2 <directory_name>
 ```
-        
 
-Now WSO2 API Manager will be exposed via Ingresses and ClusterIP Service Type successfully.
+3.Grant read-write-execute permissions to the wso2carbon user, for each of the previously created directories.
 
-Access the portals using below urls.
+```
+    chmod -R 700 <directory_name>
+```
 
-   _APIM Publisher_ - https://wso2apim:443/publisher
+4.Update the StorageClassName in the <KUBERNETES_HOME>/scenarios/scenario-7/storage-class.yaml file as you want.
 
-   _APIM Devportal_ - https://wso2apim:443/devportal
+Then, apply the following command to create a new Storage Class,
 
+```
+    kubectl create -f <KUBERNETES_HOME>/scenarios/scenario-7/storage-class.yaml 
+```
+
+5.Update each Kubernetes Persistent Volume resource with the corresponding Namespace (NAME_SPACE), NFS server IP (NFS_SERVER_IP) and exported, NFS server directory path (NFS_LOCATION_PATH) in the <KUBERNETES_HOME>/scenarios/scenario-7/pv.yaml file.
+      
+Then, deploy the persistent volume resource as follows,
+
+```
+    kubectl create -f <KUBERNETES_HOME>/scenarios/scenario-7/pv.yaml -n <USER-NAMESPACE>
+```
+
+6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/install/operator-configs/pvc-config.yaml file.

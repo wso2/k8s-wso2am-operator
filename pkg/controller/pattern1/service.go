@@ -39,7 +39,7 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 
 
-	apimsvs1ports := getApimSvcCIPorts()
+	apimsvs1ports := getApimCommonSvcPorts()
 	servType :="ClusterIP"
 
 
@@ -67,7 +67,7 @@ func Apim2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2am-pattern-1-am",
 		"node": "wso2am-pattern-1-am-2",
 	}
-	apimsvs2ports := getApimSvcCIPorts()
+	apimsvs2ports := getApimCommonSvcPorts()
 	servType :="ClusterIP"
 
 
@@ -96,13 +96,13 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 	servType :=""
 	dashports := []corev1.ServicePort{}
-	if apimanager.Spec.Service.Type=="NodePort"{
+	if apimanager.Spec.Service.Type == "NodePort"{
 		dashports = getDashNPPorts()
 		servType = "NodePort"
-	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
+	} else if apimanager.Spec.Service.Type == "LoadBalancer"{
 		dashports = getDashLBPorts()
 		servType = "LoadBalancer"
-	} else if apimanager.Spec.Service.Type=="ClusterIP" {
+	} else if apimanager.Spec.Service.Type == "ClusterIP" {
 		dashports = getDashCIPorts()
 		servType = "ClusterIP"
 	} else {
@@ -199,19 +199,19 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2am-pattern-1-am",
 	}
 
-	apimcommonsvsports:= []corev1.ServicePort{}
-	servType :=""
-	if apimanager.Spec.Service.Type=="NodePort"{
+	apimcommonsvsports := []corev1.ServicePort{}
+	servType := ""
+	if apimanager.Spec.Service.Type == "NodePort"{
 		apimcommonsvsports = getApimCommonSvcNPPorts()
 		servType = "NodePort"
-	}else if apimanager.Spec.Service.Type=="LoadBalancer"{
-		apimcommonsvsports = getApimCommonSvcLBPorts()
+	}else if apimanager.Spec.Service.Type == "LoadBalancer"{
+		apimcommonsvsports = getApimCommonSvcPorts()
 		servType = "LoadBalancer"
-	}else if apimanager.Spec.Service.Type=="ClusterIP"{
-		apimcommonsvsports = getApimCommonSvcCIPorts()
+	}else if apimanager.Spec.Service.Type =="ClusterIP"{
+		apimcommonsvsports = getApimCommonSvcPorts()
 		servType = "ClusterIP"
 	} else{
-		apimcommonsvsports = getApimCommonSvcLBPorts()
+		apimcommonsvsports = getApimCommonSvcPorts()
 		servType = "LoadBalancer"
 	}
 
