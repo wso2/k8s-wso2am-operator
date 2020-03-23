@@ -3,7 +3,7 @@
 * The project was initiated by following the structure of [Sample Controller](https://github.com/kubernetes/sample-controller) provided by Kubernetes.
   
 * The workflow of the sample controller is shown below.
-  ![sample controller workflow](https://github.com/kubernetes/sample-controller/blob/master/docs/images/client-go-controller-interaction.jpeg "Kubernetes controller diagram(source: https://github.com/kubernetes/sample-controller/blob/master/docs/images/client-go-controller-interaction.jpeg)")
+  ![sample controller workflow](../images/controller-workflow.jpeg)
 
 * More information regarding this can be found [here](https://medium.com/speechmatics/how-to-write-kubernetes-custom-controllers-in-go-8014c4a04235).
 

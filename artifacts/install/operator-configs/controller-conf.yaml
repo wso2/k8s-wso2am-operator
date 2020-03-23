@@ -48,14 +48,14 @@ data:
   apim-analytics-deployment-readinessProbe-failureThreshold: "3"
 
   # pattern specific configs for apim-instances
-  p1-apim-deployment-image: "pubudu/wso2am:3.1.0-rc1"
+  p1-apim-deployment-image: "pubudu/wso2am:3.1.0-rc3"
   p1-apim-deployment-resources-requests-cpu: "2000m"
   p1-apim-deployment-resources-requests-memory: "2Gi"
   p1-apim-deployment-resources-limits-cpu: "2000m"
   p1-apim-deployment-resources-limits-memory: "2Gi"
 
   # custom pattern specific configs for apim-instances
-  pX-apim-deployment-image: "pubudu/wso2am:3.1.0-rc1"
+  pX-apim-deployment-image: "pubudu/wso2am:3.1.0-rc3"
   pX-apim-deployment-resources-requests-cpu: "2000m"
   pX-apim-deployment-resources-requests-memory: "2Gi"
   pX-apim-deployment-resources-limits-cpu: "2000m"

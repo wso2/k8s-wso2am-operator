@@ -1,13 +1,13 @@
-## WSO2 APIM Operator for Kubernetes
+## WSO2 API Manager Operator for Kubernetes
 
-Deploying WSO2 APIM Patterns in kubernetes through a simple command. Introducing a new Custom Resource Definition called APIManager to efficiently and easily deploy all 4 patterns, and the custom pattern in Kubernetes.
+With WSO2 API Manager Operator, it makes easy to deploy WSO2 API Manager Patterns in Kubernetes through a simple command. Introducing a new Custom Resource Definition called APIManager to efficiently and easily deploy patterns, and the custom pattern in Kubernetes.
 
-![K8S CRD workflow](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/docs/images/crd-overview.png "K8S CRD workflow")
+![K8S CRD workflow](docs/images/wso2am-operator.png "K8S CRD workflow")
 
 ## Quick Start Guide
 
 In this document, we will walk through the following.
-* Setup strorage 
+* Setup storage 
 * Deploy pattern-1 in Kubernetes
 * Access publisher and devportal
 
@@ -22,6 +22,11 @@ In this document, we will walk through the following.
 1. Download [wso2am-k8s-operator-1.0.0.zip](https://github.com/wso2-incubator/wso2am-k8s-operator/releases/download/1.0.0/wso2am-k8s-operator-1.0.0.zip) and extract it.
 
 2. Setup the required Storage
+
+
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
+helm repo list
+
 ```
     helm install stable/nfs-server-provisioner --generate-name
 ```

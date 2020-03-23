@@ -132,16 +132,7 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-worker",
 	}
-	servType :=""
-	if apimanager.Spec.Service.Type=="NodePort"{
-		servType = "NodePort"
-	} else if apimanager.Spec.Service.Type=="LoadBalancer"{
-		servType = "LoadBalancer"
-	}  else if apimanager.Spec.Service.Type=="ClusterIP"{
-		servType = "ClusterIP"
-	} else {
-		servType = "LoadBalancer"
-	}
+	servType :="ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{

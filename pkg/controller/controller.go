@@ -493,8 +493,6 @@ func (c *Controller) syncHandler(key string) error {
 			pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
 		}
 
-		fmt.Println(synapseConfigsPVCName)
-
 		// Get mysql deployment name using hardcoded value
 		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 		// If the resource doesn't exist, we'll create it

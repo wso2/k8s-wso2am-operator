@@ -2,7 +2,8 @@
 
 Deploying WSO2 APIM Patterns in kubernetes through a simple command. Introducing a new Custom Resource Definition called APIManager to efficiently and easily deploy all 4 patterns, and the custom pattern in Kubernetes.
 
-![K8S CRD workflow](https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/docs/images/crd-overview.png "K8S CRD workflow")
+![K8S CRD workflow](../images/wso2am-operator.png "K8S CRD workflow")
+
 
 ## Quick Start Guide
 

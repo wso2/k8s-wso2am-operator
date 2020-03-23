@@ -150,16 +150,16 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 									},
 								},
 							},
-							//Resources:corev1.ResourceRequirements{
-							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:x.Reqcpu,
-							//		corev1.ResourceMemory:x.Reqmem,
-							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:x.Limitcpu,
-							//		corev1.ResourceMemory:x.Limitmem,
-							//	},
-							//},
+							Resources:corev1.ResourceRequirements{
+								Requests:corev1.ResourceList{
+									corev1.ResourceCPU:x.Reqcpu,
+									corev1.ResourceMemory:x.Reqmem,
+								},
+								Limits:corev1.ResourceList{
+									corev1.ResourceCPU:x.Limitcpu,
+									corev1.ResourceMemory:x.Limitmem,
+								},
+							},
 
 							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
 
@@ -312,16 +312,16 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 								},
 							},
 
-							//Resources:corev1.ResourceRequirements{
-							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:z.Reqcpu,
-							//		corev1.ResourceMemory:z.Reqmem,
-							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:z.Limitcpu,
-							//		corev1.ResourceMemory:z.Limitmem,
-							//	},
-							//},
+							Resources:corev1.ResourceRequirements{
+								Requests:corev1.ResourceList{
+									corev1.ResourceCPU:z.Reqcpu,
+									corev1.ResourceMemory:z.Reqmem,
+								},
+								Limits:corev1.ResourceList{
+									corev1.ResourceCPU:z.Limitcpu,
+									corev1.ResourceMemory:z.Limitmem,
+								},
+							},
 
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 
@@ -433,8 +433,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-dashboard",
-							// Image: "wso2/wso2am-analytics-dashboard:3.0.0",
-							Image: "pubudu/wso2am-analytics-dashboard:3.1.0-rc1",
+							Image: y.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -471,16 +470,16 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 								},
 							},
 
-							//Resources:corev1.ResourceRequirements{
-							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:y.Reqcpu,
-							//		corev1.ResourceMemory:y.Reqmem,
-							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:y.Limitcpu,
-							//		corev1.ResourceMemory:y.Limitmem,
-							//	},
-							//},
+							Resources:corev1.ResourceRequirements{
+								Requests:corev1.ResourceList{
+									corev1.ResourceCPU:y.Reqcpu,
+									corev1.ResourceMemory:y.Reqmem,
+								},
+								Limits:corev1.ResourceList{
+									corev1.ResourceCPU:y.Limitcpu,
+									corev1.ResourceMemory:y.Limitmem,
+								},
+							},
 
 							ImagePullPolicy:corev1.PullPolicy(y.Imagepull),
 
@@ -556,8 +555,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-worker",
-							// Image: "wso2/wso2am-analytics-worker:3.0.0",
-							Image: "pubudu/wso2am-analytics-worker:3.1.0-rc1",
+							Image: y.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -601,16 +599,16 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 								},
 							},
 
-							//Resources:corev1.ResourceRequirements{
-							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:y.Reqcpu,
-							//		corev1.ResourceMemory:y.Reqmem,
-							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:y.Limitcpu,
-							//		corev1.ResourceMemory:y.Limitmem,
-							//	},
-							//},
+							Resources:corev1.ResourceRequirements{
+								Requests:corev1.ResourceList{
+									corev1.ResourceCPU:y.Reqcpu,
+									corev1.ResourceMemory:y.Reqmem,
+								},
+								Limits:corev1.ResourceList{
+									corev1.ResourceCPU:y.Limitcpu,
+									corev1.ResourceMemory:y.Limitmem,
+								},
+							},
 
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
 
@@ -647,18 +645,6 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 									ContainerPort: 7444,
 									Protocol:      "TCP",
 								},
-								//{
-								//	ContainerPort: 7575,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7576,
-								//	Protocol:      "TCP",
-								//},
-								//{
-								//	ContainerPort: 7577,
-								//	Protocol:      "TCP",
-								//},
 							},
 
 							VolumeMounts: workervolumemounts,
