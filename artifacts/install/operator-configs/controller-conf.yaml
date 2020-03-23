@@ -21,6 +21,9 @@ metadata:
   namespace: wso2-system
 data:
 
+  api-manager-version: "3.1.0"
+  image-pull-secret-name: ""
+
   # common configs for apim-instances
   apim-deployment-replicas: "1"
   apim-deployment-minReadySeconds: "240"

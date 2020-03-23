@@ -23,13 +23,7 @@ package patternX
 import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	//"k8s.io/apimachinery/pkg/util/intstr"
-
-	//v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	//"strconv"
-	//"k8s.io/apimachinery/pkg/api/resource"
 	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 )
 
@@ -42,7 +36,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 		"deployment": r.Name,
 
 	}
-	apimXVolumeMount, apimXVolume := getApimXVolumes(apimanager,*r)
+	apimXVolumeMount, apimXVolume := getApimXVolumes(apimanager, *r, x)
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -64,19 +58,9 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
-					HostAliases: []corev1.HostAlias{
-						{
-							IP: "127.0.0.1",
-							Hostnames: []string{
-								"wso2-am",
-								"wso2-gateway",
-							},
-						},
-					},
-
 					Containers: []corev1.Container{
 						{
-							Name:  r.Name+"container",
+							Name:  r.Name + "-container",
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -109,16 +93,16 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 
 							},
 
-							//Resources:corev1.ResourceRequirements{
-							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:x.Reqcpu,
-							//		corev1.ResourceMemory:x.Reqmem,
-							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:x.Limitcpu,
-							//		corev1.ResourceMemory:x.Limitmem,
-							//	},
-							//},
+							Resources:corev1.ResourceRequirements{
+								Requests:corev1.ResourceList{
+									corev1.ResourceCPU:x.Reqcpu,
+									corev1.ResourceMemory:x.Reqmem,
+								},
+								Limits:corev1.ResourceList{
+									corev1.ResourceCPU:x.Limitcpu,
+									corev1.ResourceMemory:x.Limitmem,
+								},
+							},
 
 							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
 
@@ -140,24 +124,14 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 									Protocol:      "TCP",
 								},
 							},
-							Env: []corev1.EnvVar{
-								// {
-								// 	Name:  "HOST_NAME",
-								// 	Value: "wso2-am",
-								// },
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-							},
 							VolumeMounts: apimXVolumeMount,
 						},
 					},
-
+					ImagePullSecrets:[]corev1.LocalObjectReference{
+						{
+							Name: x.ImagePullSecret,
+						},
+					},
 					Volumes: apimXVolume,
 
 				},
@@ -188,7 +162,8 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
 	runasuser := int64(802)
-	//defaultMode := int32(0407)
+
+
 
 	dashVolumeMount, dashVolume := getDashboardXVolumes(apimanager,*r)
 
@@ -215,8 +190,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-dashboard",
-							// Image: "wso2/wso2am-analytics-dashboard:3.0.0",
-							Image: "pubudu/wso2am-analytics-dashboard:3.1.0-rc1",
+							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -253,16 +227,16 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 								},
 							},
 
-							//Resources:corev1.ResourceRequirements{
-							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:x.Reqcpu,
-							//		corev1.ResourceMemory:x.Reqmem,
-							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:x.Limitcpu,
-							//		corev1.ResourceMemory:x.Limitmem,
-							//	},
-							//},
+							Resources:corev1.ResourceRequirements{
+								Requests:corev1.ResourceList{
+									corev1.ResourceCPU:x.Reqcpu,
+									corev1.ResourceMemory:x.Reqmem,
+								},
+								Limits:corev1.ResourceList{
+									corev1.ResourceCPU:x.Limitcpu,
+									corev1.ResourceMemory:x.Limitmem,
+								},
+							},
 
 							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
 
@@ -352,8 +326,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-worker",
-							// Image: "wso2/wso2am-analytics-worker:3.0.0",
-							Image: "pubudu/wso2am-analytics-worker:3.1.0-rc1",
+							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec:&corev1.ExecAction{
@@ -399,16 +372,16 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 								},
 							},
 
-							//Resources:corev1.ResourceRequirements{
-							//	Requests:corev1.ResourceList{
-							//		corev1.ResourceCPU:x.Reqcpu,
-							//		corev1.ResourceMemory:x.Reqmem,
-							//	},
-							//	Limits:corev1.ResourceList{
-							//		corev1.ResourceCPU:x.Limitcpu,
-							//		corev1.ResourceMemory:x.Limitmem,
-							//	},
-							//},
+							Resources:corev1.ResourceRequirements{
+								Requests:corev1.ResourceList{
+									corev1.ResourceCPU:x.Reqcpu,
+									corev1.ResourceMemory:x.Reqmem,
+								},
+								Limits:corev1.ResourceList{
+									corev1.ResourceCPU:x.Limitcpu,
+									corev1.ResourceMemory:x.Limitmem,
+								},
+							},
 
 							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 

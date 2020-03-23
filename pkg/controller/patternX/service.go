@@ -21,12 +21,10 @@
 package patternX
 
 import (
-	//appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	//"k8s.io/apimachinery/pkg/api/resource"
 	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 )
 
@@ -36,6 +34,23 @@ func ApimXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *
 	labels := map[string]string{
 		"deployment": r.Name,
 	}
+
+	apimcommonsvsports := []corev1.ServicePort{}
+	servType := ""
+	if apimanager.Spec.Service.Type == "NodePort"{
+		apimcommonsvsports = getApimCommonSvcNPPorts()
+		servType = "NodePort"
+	}else if apimanager.Spec.Service.Type == "LoadBalancer"{
+		apimcommonsvsports = getApimCommonSvcPorts()
+		servType = "LoadBalancer"
+	}else if apimanager.Spec.Service.Type == "ClusterIP"{
+		apimcommonsvsports = getApimCommonSvcPorts()
+		servType = "ClusterIP"
+	} else{
+		apimcommonsvsports = getApimCommonSvcPorts()
+		servType = "LoadBalancer"
+	}
+
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      r.Service.Name,
@@ -46,45 +61,67 @@ func ApimXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     "LoadBalancer",
-
-			Ports: []corev1.ServicePort{
-				{
-					Name:       "pass-through-http",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       8280,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
-
-				},
-				{
-					Name:       "pass-through-https",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       8243,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
-
-
-				},
-				{
-					Name:       "servlet-http",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       9763,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
-
-
-				},
-				{
-					Name:       "servlet-https",
-					Protocol:   corev1.ProtocolTCP,
-					Port:       9443,
-					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-
-
-				},
-
-			},
+			Type:    corev1.ServiceType(servType),
+			Ports: apimcommonsvsports,
 		},
 	}
 }
+
+
+
+//func ApimXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *corev1.Service {
+//	labels := map[string]string{
+//		"deployment": r.Name,
+//	}
+//	return &corev1.Service{
+//		ObjectMeta: metav1.ObjectMeta{
+//			Name:      r.Service.Name,
+//			Namespace: apimanager.Namespace,
+//			OwnerReferences: []metav1.OwnerReference{
+//				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
+//			},
+//		},
+//		Spec: corev1.ServiceSpec{
+//			Selector: labels,
+//			Type:     "LoadBalancer",
+//
+//			Ports: []corev1.ServicePort{
+//				{
+//					Name:       "pass-through-http",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       8280,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
+//
+//				},
+//				{
+//					Name:       "pass-through-https",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       8243,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+//
+//
+//				},
+//				{
+//					Name:       "servlet-http",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       9763,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
+//
+//
+//				},
+//				{
+//					Name:       "servlet-https",
+//					Protocol:   corev1.ProtocolTCP,
+//					Port:       9443,
+//					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+//
+//
+//				},
+//
+//			},
+//		},
+//	}
+//}
 
 
 func DashboardXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *corev1.Service {

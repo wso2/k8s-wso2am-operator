@@ -206,14 +206,15 @@ wso2-am-svc                              LoadBalancer   10.0.13.20    34.93.86.8
    
 ## Sample Scenarios
 
-1. [Scenario-1 : Applying Simple and shortest Custom Resource YAML](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-1)
-2. [Scenario-2 : Exposing via NodePort Service Type](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-2)
-3. [Scenario-3 : Override Deployment Configuration values](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-3)
-4. [Scenario-4 : Override ConfigMaps and PersistentVolumeClaims](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-4)
-5. [Scenario-5 : Add New Configmaps and Persistent Volume Claims](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-5)
-6. [Scenario-6 : Deploying Custom Pattern](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-6)
-7. [Scenario-7 : Running External-NFS](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-7)
-8. [Scenario-8 : Exposing using Ingresses](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-8)
+1. [Scenario-1 : Applying Simple and shortest Custom Resource YAML](scenarios/scenario-1)
+2. [Scenario-2 : Exposing via NodePort Service Type](scenarios/scenario-2)
+3. [Scenario-3 : Override Deployment Configuration values](scenarios/scenario-3)
+4. [Scenario-4 : Override ConfigMaps and PersistentVolumeClaims](scenarios/scenario-4)
+5. [Scenario-5 : Add New Configmaps and Persistent Volume Claims](scenarios/scenario-5)
+6. [Scenario-6 : Deploying Custom Pattern - Basic](scenarios/scenario-6)
+7. [Scenario-7 : Deploying Custom Pattern - Advanced](scenarios/scenario-7)
+8. [Scenario-8 : Running External-NFS](scenarios/scenario-8)
+8. [Scenario-9 : Exposing using Ingresses](scenarios/scenario-9)
 
 ### Clean up
 

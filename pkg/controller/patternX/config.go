@@ -21,17 +21,21 @@ type configvalues struct {
 	Maxunavail  int32
 	Replicas 	int32
 	Imagepull   string
-	Image     string
+	Image       string
 	Reqcpu      resource.Quantity
 	Reqmem      resource.Quantity
 	Limitcpu    resource.Quantity
 	Limitmem    resource.Quantity
+	APIMVersion string
+	ImagePullSecret string
 }
 
 func AssignApimXConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap,  r apimv1alpha1.Profile) *configvalues{
 
 	ControlConfigData := configMap.Data
 
+	apimVersion := ControlConfigData["api-manager-version"]
+	imagePullSecret := ControlConfigData["image-pull-secret-name"]
 	replicas,_ := strconv.ParseInt(ControlConfigData["apim-deployment-replicas"], 10, 32)
 	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
 	maxSurges,_ := strconv.ParseInt(ControlConfigData["apim-deployment-maxSurge"], 10, 32)
@@ -113,13 +117,15 @@ func AssignApimXConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v
 		Limitcpu:    limitCPU,
 		Limitmem:    limitMem,
 		Replicas: int32(replicas),
+		APIMVersion: apimVersion,
+		ImagePullSecret: imagePullSecret,
 	}
 
 	return cmvalues
 
 }
 
-func AssignApimAnalyticsXDashboardConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap,r apimv1alpha1.Profile) *configvalues{
+func AssignApimAnalyticsConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap,r apimv1alpha1.Profile) *configvalues{
 
 	ControlConfigData := configMap.Data
 
@@ -135,7 +141,7 @@ func AssignApimAnalyticsXDashboardConfigMapValues(apimanager *apimv1alpha1.APIMa
 		amImages=ControlConfigData["pX-apim-analytics-deployment-image"]
 	}
 
-
+	imagePullSecret := ControlConfigData["image-pull-secret-name"]
 	imagePull,_ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["pX-apim-analytics-deployment-resources-requests-cpu"])
 	reqMem := resource.MustParse(ControlConfigData["pX-apim-analytics-deployment-resources-requests-memory"])
@@ -213,6 +219,7 @@ func AssignApimAnalyticsXDashboardConfigMapValues(apimanager *apimv1alpha1.APIMa
 		Limitcpu:    limitCPU,
 		Limitmem:    limitMem,
 		Replicas: int32(replicas),
+		ImagePullSecret: imagePullSecret,
 	}
 	return cmvalues
 
