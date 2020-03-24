@@ -504,11 +504,11 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		time.Sleep(30 * time.Second)
-
-		if mysqldeployment.Status.AvailableReplicas == 0 {
+		for mysqldeployment.Status.AvailableReplicas == 0 {
+			time.Sleep(5 * time.Second)
 			mysqldeployment, err = c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 		}
+
 
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 		// If the resource doesn't exist, we'll create it
