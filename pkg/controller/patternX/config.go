@@ -135,10 +135,10 @@ func AssignApimAnalyticsConfigMapValues(apimanager *apimv1alpha1.APIManager,conf
 	maxUnavail,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxUnavailable"], 10, 32)
 	amImages :=""
 	if r.Type == "analytics-dashboard"{
-		amImages=ControlConfigData["pX-apim-analytics-deployment-image"]
+		amImages = ControlConfigData["pX-apim-analytics-deployment-dashboard-image"]
 	}
 	if r.Type == "analytics-worker"{
-		amImages=ControlConfigData["pX-apim-analytics-deployment-image"]
+		amImages = ControlConfigData["pX-apim-analytics-deployment-worker-image"]
 	}
 
 	imagePullSecret := ControlConfigData["image-pull-secret-name"]

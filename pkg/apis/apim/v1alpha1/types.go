@@ -41,13 +41,6 @@ type PVCServer struct {
 	ExecutionPlans string `json:"executionPlans"`
 }
 
-//type ApiManagerInstance struct {
-//	//ApimDeployment   ApimDeployment   `json:"apim-deployment"`
-//	//Deployment     Deployment         `json:"deployment"`
-//	//DeploymentConfigmap string `json:"deployment-configmap"`
-//	//PersistentVolumeClaimServer PVCServer `json:"persistent-volume-claim-server"`
-//}
-
 type Storage struct {
 	Memory string `json:"memory"`
 	CPU string `json:"cpu"`
@@ -58,24 +51,11 @@ type Resources struct {
 	Limits Storage `json:"limits"`
 }
 
-//type ApimDeployment struct {
-//
-//}
-
 type Probe struct {
 	InitialDelaySeconds int32 		`json:"initialDelaySeconds"`
 	FailureThreshold    int32		`json:"failureThreshold"`
 	PeriodSeconds		int32		`json:"periodSeconds"`
 }
-
-//type RollUpdate struct {
-//	MaxSurge int32 `json:"maxSurge"`
-//	MaxUnavailable int32 `json:"maxUnavailable"`
-//}
-//
-//type Strategy struct {
-//	RollingUpdate RollUpdate `json:"rollingUpdate"`
-//}
 
 type NewVolume struct {
 	Name string `json:"name"`
@@ -125,33 +105,10 @@ type Profile struct {
 
 }
 
-//type Custom struct {
-//	Name  string `json:"name"`
-//	Deployment Deployment `json:"deployment"`
-//	Type string `json:"type"`
-//
-//}
-
 type Artifacts struct {
 	Deployment Deployment `json:"deployment"`
 }
 
-//type Profile struct {
-//	Apimanager1 Artifacts `json:"api-manager-1"`
-//	Apimanager2 Artifacts `json:"api-manager-2"`
-//	AnalyticsDashboard Artifacts `json:"analytics-dashboard"`
-//	AnalyticsWorker Artifacts `json:"analytics-worker"`
-//	Custom []Custom `json:"custom"`
-//}
-
-//// APIManagerSpec is the spec for a APIManager resource old
-//type APIManagerSpec struct {
-//	Pattern        string             `json:"pattern"`
-//	Replicas       *int32             `json:"replicas"`
-//	Profiles 	Profile  				`json:"profiles"`
-//	Service Service `json:"service"`
-//
-//}
 // APIManagerSpec is the spec for a APIManager resource
 type APIManagerSpec struct {
 	Pattern        string             `json:"pattern"`

@@ -23,7 +23,7 @@ spec:
   service:
     type: NodePort
   profiles:
-    - name: all-in-one
+    - name: all-in-one-api-manager
       type: api-manager
       service:
         name: wso2apim

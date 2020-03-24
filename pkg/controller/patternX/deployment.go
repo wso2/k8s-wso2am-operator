@@ -143,27 +143,18 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 // for handling analytics-dashboard deployment
 func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
 
-	cmdstring := []string{}
-	if apimanager.Spec.Service.Type=="NodePort"{
-		cmdstring = []string{
-			"/bin/sh",
-			"-c",
-			"nc -z localhost 32201",
-		}
-	} else {
-		cmdstring = []string{
-			"/bin/sh",
-			"-c",
-			"nc -z localhost 9643",
-		}
+
+	cmdstring := []string{
+		"/bin/sh",
+		"-c",
+		"nc -z localhost 9643",
 	}
+
 
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-1-analytics-dashboard",
+		"deployment": r.Name,
 	}
 	runasuser := int64(802)
-
-
 
 	dashVolumeMount, dashVolume := getDashboardXVolumes(apimanager,*r)
 
@@ -189,7 +180,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2am-pattern-1-analytics-dashboard",
+							Name:  r.Name + "-container",
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -281,7 +272,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 
 					ImagePullSecrets:[]corev1.LocalObjectReference{
 						{
-							Name:"wso2am-pattern-1-creds",
+							Name: x.ImagePullSecret,
 						},
 					},
 
@@ -325,7 +316,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2am-pattern-1-analytics-worker",
+							Name:  r.Name + "-container",
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -437,7 +428,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 					},
 					ImagePullSecrets:[]corev1.LocalObjectReference{
 						{
-							Name:"wso2am-pattern-1-creds",
+							Name: x.ImagePullSecret,
 						},
 					},
 
