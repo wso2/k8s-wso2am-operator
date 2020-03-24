@@ -336,7 +336,7 @@ func (c *Controller) syncHandler(key string) error {
         
         synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
 		executionPlanPVCName := "wso2am-p1-am-execution-plans"
-		mysqlPVCName := "wso2am-p1-mysql"
+		mysqlPVCName := "wso2am-mysql"
 
 
 		/////////checking whether resourecs already exits, else create one
@@ -504,7 +504,11 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		time.Sleep(15 * time.Second)
+		time.Sleep(30 * time.Second)
+
+		if mysqldeployment.Status.AvailableReplicas == 0 {
+			mysqldeployment, err = c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
+		}
 
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 		// If the resource doesn't exist, we'll create it
