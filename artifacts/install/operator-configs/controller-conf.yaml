@@ -23,6 +23,7 @@ data:
 
   api-manager-version: "3.1.0"
   image-pull-secret-name: ""
+  use-mysql-pod: "true"
 
   # common configs for apim-instances
   apim-deployment-replicas: "1"

@@ -27,6 +27,7 @@ type configvalues struct {
 	Limitcpu    resource.Quantity
 	Limitmem    resource.Quantity
 	APIMVersion string
+	UseMysqlPod bool
 }
 
 func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1.ConfigMap,num int) *configvalues{
@@ -35,6 +36,7 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1
 	totalProfiles := len(apimanager.Spec.Profiles)
 
 	apimVersion := ControlConfigData["api-manager-version"]
+	useMysqlPod,_ := strconv.ParseBool(ControlConfigData["use-mysql-pod"]);
 	replicas,_ := strconv.ParseInt(ControlConfigData["apim-deployment-replicas"], 10, 32)
 	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
 	maxSurges,_ := strconv.ParseInt(ControlConfigData["apim-deployment-maxSurge"], 10, 32)
@@ -139,6 +141,7 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v1
 		Limitmem:    limitMem,
 		Replicas: int32(replicas),
 		APIMVersion:  apimVersion,
+		UseMysqlPod: useMysqlPod,
 	}
 
 	return cmvalues
@@ -150,6 +153,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 
 	ControlConfigData := configMap.Data
 
+	useMysqlPod,_ := strconv.ParseBool(ControlConfigData["use-mysql-pod"]);
 	replicas,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-replicas"], 10, 32)
 	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	maxSurges,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
@@ -257,6 +261,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 		Limitcpu:    limitCPU,
 		Limitmem:    limitMem,
 		Replicas: int32(replicas),
+		UseMysqlPod: useMysqlPod,
 	}
 	return cmvalues
 
@@ -266,6 +271,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 
 	ControlConfigData := configMap.Data
 
+	useMysqlPod,_ := strconv.ParseBool(ControlConfigData["use-mysql-pod"]);
 	replicas,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-replicas"], 10, 32)
 	minReadySec,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	maxSurges,_ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
@@ -372,6 +378,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 		Limitcpu:    limitCPU,
 		Limitmem:    limitMem,
 		Replicas: int32(replicas),
+		UseMysqlPod: useMysqlPod,
 	}
 	return cmvalues
 
