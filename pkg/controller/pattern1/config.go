@@ -381,11 +381,11 @@ func AssignMysqlConfigMapValues(apimanager *apimv1alpha1.APIManager,configMap *v
 
 	ControlConfigData := configMap.Data
 
-	replicas,_ := strconv.ParseInt(ControlConfigData["p1-mysql-replicas"], 10, 32)
+	replicas,_ := strconv.ParseInt(ControlConfigData["mysql-replicas"], 10, 32)
 
-	amImages:=ControlConfigData["p1-mysql-image"]
+	amImages:=ControlConfigData["mysql-image"]
 
-	imagePull,_ := ControlConfigData["p1-mysql-imagePullPolicy"]
+	imagePull,_ := ControlConfigData["mysql-imagePullPolicy"]
 
 	cmvalues := &configvalues{
 

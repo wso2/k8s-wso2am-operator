@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: wso2am-controller
-          image: pubudu/k8s-wso2am-operator:0.9.0
+          image: rakhitharr/wso2am-controller:v17
           imagePullPolicy: Always
       serviceAccountName: wso2am-pattern-1-svc-account
