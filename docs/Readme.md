@@ -8,8 +8,10 @@ You can find the content you need to be working with the WSO2AM K8S Operator in 
     - [Overview](GettingStarted/overview.md)
     - [Quick Start Guide](GettingStarted/quick-start-guide.md)  
 2. [How To Guide](HowToGuide)
-    - [how to one](HowToGuide/configurations-overview.md)
-    - [how to two](HowToGuide/apply-security-to-api.md)
+    - [Configure Database Manually](HowToGuide/configure-database-manually.md)
+    - [Configure Custom Pattern](HowToGuide/configure-own-custom-pattern.md)
+    - [Use Different Service Types](HowToGuide/using-different-service-types.md)
+    - [Use Different Volume Types](HowToGuide/using-different-volume-types.md)
     
 3. [Troubleshooting Guide](Troubleshooting/troubleshooting.md)
 
