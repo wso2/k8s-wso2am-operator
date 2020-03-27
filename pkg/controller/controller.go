@@ -21,32 +21,12 @@
 package controller
 
 import (
-	//"github.com/sirupsen/logrus"
-	//"sigs.k8s.io/controller-runtime/pkg/log"
-
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
-	//"github.com/wso2-incubator/wso2am-k8s-operator/artifacts/resources"
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/patternX"
-
 	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/mysql"
-	//"k8s.io/apimachinery/pkg/api/resource"
-	//"strconv"
-	//v1 "k8s.io/api/core/v1"
-
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/dashboard"
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/worker"
-	//"k8s.io/apimachinery/pkg/types"
-	//"sigs.k8s.io/controller-runtime/pkg/client"
-
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim2"
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/mysql"
-
 	"fmt"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	//v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -324,7 +304,7 @@ func (c *Controller) syncHandler(key string) error {
 	configMapName := "controller-config"
 	configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
 	useMysqlPod,_ := strconv.ParseBool(configmap.Data["use-mysql-pod"])
-	
+
 	if apimanager.Spec.Pattern == "Pattern-1" {
 
 		apim1deploymentName := "wso2-am-1-"+apimanager.Name
@@ -342,9 +322,6 @@ func (c *Controller) syncHandler(key string) error {
         synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
 		executionPlanPVCName := "wso2am-p1-am-execution-plans"
 		mysqlPVCName := "wso2am-mysql"
-
-
-		/////////checking whether resourecs already exits, else create one
 
 		dashConfName := "wso2am-p1-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
@@ -525,7 +502,6 @@ func (c *Controller) syncHandler(key string) error {
 				if mysqldeployment.Status.AvailableReplicas >0 {
 					//deployment.Status.AvailableReplicas > 0
 					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x, am1num))
-					//fmt.Println("aaaaaaaaaa metadata name is ", apimanager.Name)
 					if err != nil {
 						return err
 					}
@@ -685,7 +661,7 @@ func (c *Controller) syncHandler(key string) error {
 		if errors.IsNotFound(err) {
 			commonservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.ApimCommonService(apimanager))
 		}
-      
+
 		// If an error occurs during Get/Create, we'll requeue the item so we can
 		// attempt processing again later. This could have been caused by a
 		// temporary network failure, or any other transient reason.
@@ -1180,7 +1156,7 @@ func (c *Controller) syncHandler(key string) error {
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
-			
+
 			if useMysqlPod {
 				// Get mysql-pvc name using hardcoded value
 				pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)

@@ -1,39 +1,57 @@
-## Scenario-3 : Override default configuration values
+## Scenario 3 : Deploy API Manager Pattern-1 (NodePort Service Type)
 
-You can override the default configuration values of relavant artifacts.
+1. Go inside root folder _wso2am-k8s-operator_
 
-There are different set of profiles based on each patterns. Some of them are:
-
-In pattern-1 we have,
-
-* api-manager-1
-* api-manager-2
-* analytics-dashboard
-* analytics-worker
-
-For the above profiles, you can override the fields such as,
-
-* Replicas
-* MinReadySeconds
-* Resources 
-  * Requests 
-    * Memory 
-    * CPU
-  * Limits 
-    * Memory 
-    * CPU
-* LivenessProbe
-  - InitialDelaySeconds
-  - PeriodSeconds
-  - FailureTHreshold
-* ReadinessProbe
-  - InitialDelaySeconds
-  - PeriodSeconds
-  - FailureTHreshold
-* imagePullPolicy
-
-You can specify to any or all of the profiles using the given wso2-apim.yaml file. A sample configuration values for 1 of the profile is given, you can include required profiles as an array. Then apply the command,
+2. Create a new configmap **wso2am-pattern-1-am-1-conf** for API Manager instance 1 using the command,
 
 ```
-  kubectl apply -f scenarios/scenario-3/wso2-apim.yaml
+kubectl create configmap wso2am-pattern-1-am-1-conf --from-file=wso2am-k8s-operator/scenarios/scenario-2/am-1/deployment.toml
 ```
+3. Similarly, create a new configmap **wso2am-pattern-1-am-2-conf** for API Manager instance 1 using the command,
+```
+kubectl create configmap wso2am-pattern-1-am-2-conf --from-file=wso2am-k8s-operator/scenarios/scenario-2/am-2/deployment.toml
+```
+4. Follow steps 3,4,5 in the Home page
+
+5. Then apply the given yaml using the command
+```
+kubectl apply -f scenarios/scenario-2/wso2-apim.yaml
+```
+
+- GCP:
+    Get the external-ip of one of the nodes in the cluster using the command,
+    
+    ```
+        kubectl get nodes -o wide
+        
+    ```
+    Then add that ip to the **/etc/hosts** file,
+    ```
+    /etc/hosts
+    ----------
+    <EXTERNAL-IP-OF-ONE-OF-THE-NODES>                       wso2apim
+    <EXTERNAL-IP-OF-ONE-OF-THE-NODES>    wso2apim-analytics-dashboard 
+        
+    ```
+ - Minikube:
+      Get the ip address of the Minikube, using the command,
+      ```
+          minikube ip
+      ```
+      Then add that ip address to the **/etc/hosts** file,
+      ```
+      /etc/hosts
+      ----------
+      <MINIKUBE-IP>      wso2apim
+      ```
+    
+    
+    
+  Finally, WSO2 API Manager will be exposed via NodePort Service Type successfully.
+  
+  Access the portals using below urls.
+      
+   _APIM Publisher_ - https://wso2apim:32001/publisher
+   
+   _APIM Devportal_ - https://wso2apim:32001/devportal
+

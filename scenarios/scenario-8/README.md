@@ -39,4 +39,4 @@ Then, deploy the persistent volume resource as follows,
     kubectl create -f <KUBERNETES_HOME>/scenarios/scenario-7/pv.yaml -n <USER-NAMESPACE>
 ```
 
-6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/install/operator-configs/pvc-config.yaml file.
+6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/operator-configs/pvc-config.yaml file.

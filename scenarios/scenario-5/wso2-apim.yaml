@@ -7,11 +7,21 @@ spec:
   profiles:
     - name: api-manager-1
       deployment:
-        configMaps:
-          newConfigMap:
-            - name: <NEW_CONFIGMAP_1>
-              mountPath: <NEW_MOUNTPATH_FOR_CONFIGMAP_1>
-        persistentVolumeClaim:
-          newClaim:
-            - name: <NEW_CLAIM_1>
-              mountPath: <NEW_MOUNTPATH_FOR_CLAIM_1>
+        replicas: 1
+        minReadySeconds: 100
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 1000m
+          limits:
+            memory: 1Gi
+            cpu: 1000m
+        livenessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10

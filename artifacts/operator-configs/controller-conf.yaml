@@ -1,0 +1,89 @@
+#Copyright (c)  WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#
+# WSO2 Inc. licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: controller-config
+  namespace: wso2-system
+data:
+
+  api-manager-version: "3.1.0"
+  image-pull-secret-name: ""
+  # Set this flag to false if you want to manually configure a database rather than using the default mysql deployment in a pod. 
+  use-mysql-pod: "true"
+
+  # common configs for apim-instances
+  apim-deployment-replicas: "1"
+  apim-deployment-minReadySeconds: "240"
+  apim-deployment-maxSurge: "1"
+  apim-deployment-maxUnavailable: "0"
+  apim-deployment-imagePullPolicy: "Always"
+  apim-deployment-livenessProbe-initialDelaySeconds: "300"
+  apim-deployment-livenessProbe-periodSeconds: "10"
+  apim-deployment-livenessProbe-failureThreshold: "3"
+  apim-deployment-readinessProbe-initialDelaySeconds: "300"
+  apim-deployment-readinessProbe-periodSeconds: "10"
+  apim-deployment-readinessProbe-failureThreshold: "3"
+
+  # common configs for apim-analytics
+  apim-analytics-deployment-replicas: "1"
+  apim-analytics-deployment-minReadySeconds: "30"
+  apim-analytics-deployment-maxSurge: "1"
+  apim-analytics-deployment-maxUnavailable: "0"
+  apim-analytics-deployment-imagePullPolicy: "Always"
+  apim-analytics-deployment-livenessProbe-initialDelaySeconds: "20"
+  apim-analytics-deployment-livenessProbe-periodSeconds: "10"
+  apim-analytics-deployment-livenessProbe-failureThreshold: "3"
+  apim-analytics-deployment-readinessProbe-initialDelaySeconds: "20"
+  apim-analytics-deployment-readinessProbe-periodSeconds: "10"
+  apim-analytics-deployment-readinessProbe-failureThreshold: "3"
+
+  # pattern specific configs for apim-instances
+  p1-apim-deployment-image: "wso2/wso2am:3.1.0"
+  p1-apim-deployment-resources-requests-cpu: "2000m"
+  p1-apim-deployment-resources-requests-memory: "2Gi"
+  p1-apim-deployment-resources-limits-cpu: "2000m"
+  p1-apim-deployment-resources-limits-memory: "2Gi"
+
+  # custom pattern specific configs for apim-instances
+  pX-apim-deployment-image: "wso2/wso2am:3.1.0"
+  pX-apim-deployment-resources-requests-cpu: "2000m"
+  pX-apim-deployment-resources-requests-memory: "2Gi"
+  pX-apim-deployment-resources-limits-cpu: "2000m"
+  pX-apim-deployment-resources-limits-memory: "2Gi"
+
+  # pattern specific configs for apim-analytics
+  p1-apim-analytics-deployment-dashboard-image: "wso2/wso2am-analytics-dashboard:3.1.0"
+  p1-apim-analytics-deployment-worker-image: "wso2/wso2am-analytics-worker:3.1.0"
+  p1-apim-analytics-deployment-resources-requests-cpu: "2000m"
+  p1-apim-analytics-deployment-resources-requests-memory: "4Gi"
+  p1-apim-analytics-deployment-resources-limits-cpu: "2000m"
+  p1-apim-analytics-deployment-resources-limits-memory: "4Gi"
+
+  # custom pattern specific configs for apim-analytics
+  pX-apim-analytics-deployment-dashboard-image: "wso2/wso2am-analytics-dashboard:3.1.0"
+  pX-apim-analytics-deployment-worker-image: "wso2/wso2am-analytics-worker:3.1.0"
+  pX-apim-analytics-deployment-resources-requests-cpu: "2000m"
+  pX-apim-analytics-deployment-resources-requests-memory: "4Gi"
+  pX-apim-analytics-deployment-resources-limits-cpu: "2000m"
+  pX-apim-analytics-deployment-resources-limits-memory: "4Gi"
+
+  mysql-replicas: "1"
+  mysql-image: "mysql:5.7"
+  mysql-imagePullPolicy: "IfNotPresent"
+
+

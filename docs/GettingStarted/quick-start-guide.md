@@ -39,7 +39,7 @@ In this document, we will walk through the following.
 ```
     
 1.Setup a Network File System (NFS) to be used for persistent storage.
-Create and export unique directories within the NFS server instance for each Kubernetes Persistent Volume resource     defined in the <KUBERNETES_HOME>/artifacts/install/persistent-volumes/persistent-volume-for-external-nfs.yaml file.
+Create and export unique directories within the NFS server instance for each Kubernetes Persistent Volume resource     defined in the <KUBERNETES_HOME>/artifacts/persistent-volumes/persistent-volume-for-external-nfs.yaml file.
 
 2.Grant ownership to wso2carbon user and wso2 group, for each of the previously created directories. 
 
@@ -53,23 +53,23 @@ Create and export unique directories within the NFS server instance for each Kub
     chmod -R 700 <directory_name>
 ```
 
-4.Update the StorageClassName in the <KUBERNETES_HOME>/artifacts/install/persistent-volumes/storage-class.yaml file as you want.
+4.Update the StorageClassName in the <KUBERNETES_HOME>/artifacts/persistent-volumes/storage-class.yaml file as you want.
 
 Then, apply the following command to create a new Storage Class,
 
 ```
-    kubectl create -f <KUBERNETES_HOME>/artifacts/install/persistent-volumes/storage-class.yaml 
+    kubectl create -f <KUBERNETES_HOME>/artifacts/persistent-volumes/storage-class.yaml 
 ```
 
-5.Update each Kubernetes Persistent Volume resource with the corresponding Namespace (NAME_SPACE), NFS server IP (NFS_SERVER_IP) and exported, NFS server directory path (NFS_LOCATION_PATH) in the <KUBERNETES_HOME>/artifacts/install/persistent-volumes/persistent-volume-for-external-nfs.yaml file.
+5.Update each Kubernetes Persistent Volume resource with the corresponding Namespace (NAME_SPACE), NFS server IP (NFS_SERVER_IP) and exported, NFS server directory path (NFS_LOCATION_PATH) in the <KUBERNETES_HOME>/artifacts/persistent-volumes/persistent-volume-for-external-nfs.yaml file.
       
 Then, deploy the persistent volume resource as follows,
 
 ```
-    kubectl create -f <KUBERNETES_HOME>/artifacts/install/persistent-volumes/persistent-volume-for-external-nfs.yaml -n <USER-NAMESPACE>
+    kubectl create -f <KUBERNETES_HOME>/artifacts/persistent-volumes/persistent-volume-for-external-nfs.yaml -n <USER-NAMESPACE>
 ```
 
-6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/install/operator-configs/pvc-config.yaml file.
+6.Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/operator-configs/pvc-config.yaml file.
 
 <h3>Using Minikube Hostpath</h3>
 
@@ -81,7 +81,7 @@ Minikube runs a single-node Kubernetes cluster inside a Virtual Machine. Therefo
     minikube ssh
 ```
 
-2. Create unique directories within the Minikube filesystem for each Kubernetes Persistent Volume resource defined in the <KUBERNETES_HOME>/artifacts/install/persistent-volumes/pv-hostpath.yaml file.
+2. Create unique directories within the Minikube filesystem for each Kubernetes Persistent Volume resource defined in the <KUBERNETES_HOME>/artifacts/persistent-volumes/pv-hostpath.yaml file.
 
 3. Grant permission to mysql directory using the command,
 ```
@@ -89,7 +89,7 @@ Minikube runs a single-node Kubernetes cluster inside a Virtual Machine. Therefo
 ```
 4. Then, deploy the persistent volumes as follows,
 ```
-    kubectl create -f <KUBERNETES_HOME>/artifacts/install/persistent-volumes/pv-hostpath.yaml -n <USER-NAMESPACE>
+    kubectl create -f <KUBERNETES_HOME>/artifacts/persistent-volumes/pv-hostpath.yaml -n <USER-NAMESPACE>
 ```
 That is all, Now run the flow in order from start.
 
@@ -101,7 +101,7 @@ That is all, Now run the flow in order from start.
 3. Apply the command to create the operator-artifacts (in wso2-system namespace)
 
 ``` 
-    kubectl apply -f artifacts/install/operator-artifacts/ 
+    kubectl apply -f artifacts/operator-artifacts/ 
 
     Output: 
 
@@ -115,7 +115,7 @@ That is all, Now run the flow in order from start.
 ```
 4. Apply the command below to create operator-configs (in wso2-system namespace)
 ```
-    kubectl apply -f artifacts/install/operator-configs/
+    kubectl apply -f artifacts/operator-configs/
     
     Output:
     
@@ -125,7 +125,7 @@ That is all, Now run the flow in order from start.
 
 5. Apply the command below to create pattern-spceific api manager artifacts
 ```
-    kubectl apply -f artifacts/install/api-manager-artifacts/pattern-1/
+    kubectl apply -f artifacts/api-manager-artifacts/pattern-1/
     
     Output:
     
@@ -203,6 +203,6 @@ mysql-svc                               ClusterIP      10.43.242.130   <none>   
 Execute the following commands if you wish to clean up the Kubernetes cluster by removing all the applied artifacts and configurations related to wso2am-k8s-operator.
 
 ```
-    kubectl delete -f artifacts/install/operator-artifacts/
+    kubectl delete -f artifacts/operator-artifacts/
 ```
   
