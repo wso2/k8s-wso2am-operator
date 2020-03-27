@@ -23,6 +23,8 @@ data:
 
   api-manager-version: "3.1.0"
   image-pull-secret-name: ""
+  # Set this flag to false if you want to manually configure a database rather than using the default mysql deployment in a pod. 
+  use-mysql-pod: "true"
 
   # common configs for apim-instances
   apim-deployment-replicas: "1"

@@ -66,6 +66,7 @@ import (
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
 	"time"
+	"strconv"
 
 	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 	clientset "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned"
@@ -320,6 +321,10 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
+	configMapName := "controller-config"
+	configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
+	useMysqlPod,_ := strconv.ParseBool(configmap.Data["use-mysql-pod"])
+	
 	if apimanager.Spec.Pattern == "Pattern-1" {
 
 		apim1deploymentName := "wso2-am-1-"+apimanager.Name
@@ -340,8 +345,6 @@ func (c *Controller) syncHandler(key string) error {
 
 
 		/////////checking whether resourecs already exits, else create one
-		configMapName := "controller-config"
-		configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
 
 		dashConfName := "wso2am-p1-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
@@ -417,7 +420,7 @@ func (c *Controller) syncHandler(key string) error {
 		// Get mysql-pvc name using hardcoded value
 		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
 		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
+		if errors.IsNotFound(err) && useMysqlPod {
 			sqlconf := mysql.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
 			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(mysql.MakeMysqlPvc(apimanager, sqlconf))
 		}
@@ -495,18 +498,21 @@ func (c *Controller) syncHandler(key string) error {
 
 		// Get mysql deployment name using hardcoded value
 		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
-			if err != nil {
-				return err
-			}
-		}
 
-		for mysqldeployment.Status.AvailableReplicas == 0 {
-			time.Sleep(5 * time.Second)
-			mysqldeployment, err = c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
+		if useMysqlPod {
+			// If the resource doesn't exist, we'll create it
+			if errors.IsNotFound(err) {
+				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
+				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
+				if err != nil {
+					return err
+				}
+			}
+
+			for mysqldeployment.Status.AvailableReplicas == 0 {
+				time.Sleep(5 * time.Second)
+				mysqldeployment, err = c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
+			}
 		}
 
 
@@ -515,10 +521,17 @@ func (c *Controller) syncHandler(key string) error {
 		if errors.IsNotFound(err) {
 			x := pattern1.AssignApimConfigMapValues(apimanager,configmap,am1num)
 			//mysqdeploy, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
-			if mysqldeployment.Status.AvailableReplicas >0 {
-				//deployment.Status.AvailableReplicas > 0
+			if x.UseMysqlPod {
+				if mysqldeployment.Status.AvailableReplicas >0 {
+					//deployment.Status.AvailableReplicas > 0
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x, am1num))
+					//fmt.Println("aaaaaaaaaa metadata name is ", apimanager.Name)
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x, am1num))
-				//fmt.Println("aaaaaaaaaa metadata name is ", apimanager.Name)
 				if err != nil {
 					return err
 				}
@@ -530,7 +543,14 @@ func (c *Controller) syncHandler(key string) error {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			z := pattern1.AssignApimConfigMapValues(apimanager,configmap,am2num)
-			if mysqldeployment.Status.AvailableReplicas >0 {
+			if z.UseMysqlPod {
+				if mysqldeployment.Status.AvailableReplicas >0 {
+					deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z, am2num))
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z, am2num))
 				if err != nil {
 					return err
@@ -543,7 +563,14 @@ func (c *Controller) syncHandler(key string) error {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
-			if mysqldeployment.Status.AvailableReplicas >0 {
+			if y.UseMysqlPod {
+				if mysqldeployment.Status.AvailableReplicas >0 || !y.UseMysqlPod {
+					dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y, dashnum))
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y, dashnum))
 				if err != nil {
 					return err
@@ -556,7 +583,14 @@ func (c *Controller) syncHandler(key string) error {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
-			if mysqldeployment.Status.AvailableReplicas >0 {
+			if y.UseMysqlPod {
+				if mysqldeployment.Status.AvailableReplicas >0 || !y.UseMysqlPod {
+					workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
+					if err != nil {
+						return err
+					}
+				}
+			} else {
 				workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
 				if err != nil {
 					return err
@@ -651,17 +685,7 @@ func (c *Controller) syncHandler(key string) error {
 		if errors.IsNotFound(err) {
 			commonservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.ApimCommonService(apimanager))
 		}
-
-		// Get mysql service name using hardcoded value
-		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
-        }
-        
-        	
-
-
+      
 		// If an error occurs during Get/Create, we'll requeue the item so we can
 		// attempt processing again later. This could have been caused by a
 		// temporary network failure, or any other transient reason.
@@ -699,11 +723,13 @@ func (c *Controller) syncHandler(key string) error {
 			return fmt.Errorf(msg)
 		}
 
-		//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-		if !metav1.IsControlledBy(mysqldeployment, apimanager) {
-			msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
-			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-			return fmt.Errorf(msg)
+		if useMysqlPod {
+			//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+			if !metav1.IsControlledBy(mysqldeployment, apimanager) {
+				msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
+				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+				return fmt.Errorf(msg)
+			}
 		}
 
 
@@ -743,12 +769,21 @@ func (c *Controller) syncHandler(key string) error {
 		}
 
 
-		// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-		if !metav1.IsControlledBy(mysqlservice, apimanager) {
-			msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
-			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-			return fmt.Errorf(msg)
-        }
+		if useMysqlPod {
+			// Get mysql service name using hardcoded value
+			mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
+			// If the resource doesn't exist, we'll create it
+			if errors.IsNotFound(err) {
+				mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
+			}
+
+			// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+			if !metav1.IsControlledBy(mysqlservice, apimanager) {
+				msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
+				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+				return fmt.Errorf(msg)
+			}
+		}
         
 
 		// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
@@ -763,11 +798,13 @@ func (c *Controller) syncHandler(key string) error {
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
-		// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-		if !metav1.IsControlledBy(pvc3, apimanager) {
-			msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by Apimanager", pvc3.Name)
-			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-			return fmt.Errorf(msg)
+		if useMysqlPod {
+			// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+			if !metav1.IsControlledBy(pvc3, apimanager) {
+				msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by Apimanager", pvc3.Name)
+				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+				return fmt.Errorf(msg)
+			}
 		}
 
 
@@ -805,11 +842,13 @@ func (c *Controller) syncHandler(key string) error {
 			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, y,worknum))
 		}
 
-		//for instance mysql deployment
-		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
-			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
+		if useMysqlPod {
+			//for instance mysql deployment
+			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
+				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
+				klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
+				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
+			}
 		}
 
 		// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
@@ -844,10 +883,12 @@ func (c *Controller) syncHandler(key string) error {
 			return err
 		}
 
-		//for mysql deployment
-		err = c.updateApimanagerStatus(apimanager, mysqldeployment)
-		if err != nil {
-			return err
+		if useMysqlPod {
+			//for mysql deployment
+			err = c.updateApimanagerStatus(apimanager, mysqldeployment)
+			if err != nil {
+				return err
+			}
 		}
 
 		c.recorder.Event(apimanager, corev1.EventTypeNormal, "synced", "Apimanager synced successfully")
@@ -1126,49 +1167,7 @@ func (c *Controller) syncHandler(key string) error {
 				epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
 				pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
 			}
-			// Get mysql-pvc name using hardcoded value
-			pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
-			// If the resource doesn't exist, we'll create it
-			if errors.IsNotFound(err) {
-				sqlconf := mysql.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
-				pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(mysql.MakeMysqlPvc(apimanager, sqlconf))
-			}
-			//
-			// Get mysql deployment name using hardcoded value
-			mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
-			// If the resource doesn't exist, we'll create it
-			if errors.IsNotFound(err) {
-				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
-				if err != nil {
-					return err
-				}
-			}
-			//
-			// Get mysql service name using hardcoded value
-			mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
-			// If the resource doesn't exist, we'll create it
-			if errors.IsNotFound(err) {
-				mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
-			}
-			if err != nil {
-				return err
-			}
-			//
-			//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-			if !metav1.IsControlledBy(mysqldeployment, apimanager) {
-				msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
-				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-				return fmt.Errorf(msg)
-			}
 
-			// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-			if !metav1.IsControlledBy(mysqlservice, apimanager) {
-				msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
-				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-				return fmt.Errorf(msg)
-			}
-			
 			// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(pvc1, apimanager) {
 				msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by Apimanager", pvc1.Name)
@@ -1181,27 +1180,72 @@ func (c *Controller) syncHandler(key string) error {
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
-			// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-			if !metav1.IsControlledBy(pvc3, apimanager) {
-				msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by Apimanager", pvc3.Name)
-				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-				return fmt.Errorf(msg)
-			}
-			//for instance mysql deployment
-			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-				klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
-				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
+			
+			if useMysqlPod {
+				// Get mysql-pvc name using hardcoded value
+				pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
+				// If the resource doesn't exist, we'll create it
+				if errors.IsNotFound(err) {
+					sqlconf := mysql.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
+					pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(mysql.MakeMysqlPvc(apimanager, sqlconf))
+				}
+				//
+				// Get mysql deployment name using hardcoded value
+				mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
+				// If the resource doesn't exist, we'll create it
+				if errors.IsNotFound(err) {
+					//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
+					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
+					if err != nil {
+						return err
+					}
+				}
+				//
+				// Get mysql service name using hardcoded value
+				mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
+				// If the resource doesn't exist, we'll create it
+				if errors.IsNotFound(err) {
+					mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
+					if err != nil {
+						return err
+					}
+				}
+
+				//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(mysqldeployment, apimanager) {
+					msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+
+				// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(mysqlservice, apimanager) {
+					msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+
+				// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(pvc3, apimanager) {
+					msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by Apimanager", pvc3.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+				//for instance mysql deployment
+				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
+					//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
+					klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
+					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
+				}
+
+				//for mysql deployment
+				err = c.updateApimanagerStatus(apimanager, mysqldeployment)
+				if err != nil {
+					return err
+				}
 			}
 
-			//for mysql deployment
-			err = c.updateApimanagerStatus(apimanager, mysqldeployment)
-			if err != nil {
-				return err
-			}
 		}
-
-
 
 		//////////finally update the deployment resources after done checking
 
