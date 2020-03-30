@@ -16,7 +16,7 @@ In this document, we will walk through the following.
     * Minimum CPU : **4 vCPU** 
     * Minimum Memory : **6 GB** 
 
-* Download [k8s-wso2am-operator-0.8.zip](https://github.com/wso2-incubator/wso2am-k8s-operator/releases/download/0.8/k8s-wso2am-operator-0.8.zip) and extract it. 
+* Download [k8s-wso2am-operator-0.8.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/0.8/k8s-wso2am-operator-0.8.zip) and extract it. 
 
     This zip contains the artifacts that required to deploy in Kubernetes.
 

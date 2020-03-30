@@ -24,9 +24,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned"
-	apim "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/informers/externalversions/apim"
-	internalinterfaces "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/informers/externalversions/internalinterfaces"
+	versioned "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
+	apim "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/apim"
+	internalinterfaces "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

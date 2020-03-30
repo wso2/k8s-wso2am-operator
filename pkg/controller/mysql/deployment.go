@@ -1,15 +1,30 @@
+/*
+ *
+ *  * Copyright (c) 2020 WSO2 Inc. (http:www.wso2.org) All Rights Reserved.
+ *  *
+ *  * WSO2 Inc. licenses this file to you under the Apache License,
+ *  * Version 2.0 (the "License"); you may not use this file except
+ *  * in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  * http:www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing,
+ *  * software distributed under the License is distributed on an
+ *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  * KIND, either express or implied. See the License for the
+ *  * specific language governing permissions and limitations
+ *  * under the License.
+ *
+ */
 package mysql
 
 import (
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
-
-	//"strconv"
-	//v1 "k8s.io/api/core/v1"
-
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
 )
 
 //  for handling mysql deployment
@@ -45,28 +60,33 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 						{
 							Name:  "wso2apim-with-analytics-mysql",
 							Image: "mysql:5.7",
-							//ReadinessProbe: &corev1.Probe{
-							//	Handler: corev1.Handler{
-							//		Exec:&corev1.ExecAction{
-							//			Command:[]string{
-							//				 "sh",
-							//				 "-c",
-							//				 "mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD}",
-							//				//"mysql",
-							//				//"-h",
-							//				//"127.0.0.1",
-							//				//"-p$MYSQL_ROOT_PASSWORD",
-							//				//"-e",
-							//				//"SELECT 1",
-							//			},
-							//		},
-							//	},
-							//
-							//	InitialDelaySeconds:5,
-							//	PeriodSeconds:2,
-							//	FailureThreshold:1,
-							//
-							//},
+							LivenessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{
+											"mysqladmin",
+											"ping",
+										},
+									},
+								},
+								InitialDelaySeconds: 30,
+								PeriodSeconds:     10,
+								FailureThreshold: 5,
+							},
+							ReadinessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec:&corev1.ExecAction{
+										Command:[]string{
+											 "sh",
+											 "-c",
+											 "mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD}",
+										},
+									},
+								},
+								InitialDelaySeconds: 15,
+								PeriodSeconds:5,
+								FailureThreshold:1,
+							},
 							ImagePullPolicy: "Always",
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser: &runasuser,

@@ -23,6 +23,7 @@ data:
 
   api-manager-version: "3.1.0"
   image-pull-secret-name: ""
+  service-account-name: ""
   # Set this flag to false if you want to manually configure a database rather than using the default mysql deployment in a pod. 
   use-mysql-pod: "true"
 
@@ -32,10 +33,10 @@ data:
   apim-deployment-maxSurge: "1"
   apim-deployment-maxUnavailable: "0"
   apim-deployment-imagePullPolicy: "Always"
-  apim-deployment-livenessProbe-initialDelaySeconds: "300"
+  apim-deployment-livenessProbe-initialDelaySeconds: "120"
   apim-deployment-livenessProbe-periodSeconds: "10"
   apim-deployment-livenessProbe-failureThreshold: "3"
-  apim-deployment-readinessProbe-initialDelaySeconds: "300"
+  apim-deployment-readinessProbe-initialDelaySeconds: "120"
   apim-deployment-readinessProbe-periodSeconds: "10"
   apim-deployment-readinessProbe-failureThreshold: "3"
 

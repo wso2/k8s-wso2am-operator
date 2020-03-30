@@ -19,7 +19,7 @@ In this document, we will walk through the following.
 * Minimum Memory : **12GB** 
 
 ## Steps:
-1. Download [wso2am-k8s-operator-1.0.0.zip](https://github.com/wso2-incubator/wso2am-k8s-operator/releases/download/1.0.0/wso2am-k8s-operator-1.0.0.zip) and extract it.
+1. Download [wso2am-k8s-operator-1.0.0.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/1.0.0/wso2am-k8s-operator-1.0.0.zip) and extract it.
 
 2. Setup the required Storage
 

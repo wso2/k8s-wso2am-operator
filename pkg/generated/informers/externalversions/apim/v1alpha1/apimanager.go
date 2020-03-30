@@ -22,10 +22,10 @@ package v1alpha1
 import (
 	time "time"
 
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
-	versioned "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned"
-	internalinterfaces "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/listers/apim/v1alpha1"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
+	versioned "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
+	internalinterfaces "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/generated/listers/apim/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"

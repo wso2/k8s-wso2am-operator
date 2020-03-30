@@ -7,17 +7,17 @@
 
 * More information regarding this can be found [here](https://medium.com/speechmatics/how-to-write-kubernetes-custom-controllers-in-go-8014c4a04235).
 
-* Introduced a new type called APIManager in [`types.go`](https://github.com/wso2/K8s-wso2am-operator/blob/master/pkg/apis/apim/v1alpha1/types.go).
+* Introduced a new type called APIManager in [`types.go`](https://github.com/wso2/k8s-wso2am-operator/blob/master/pkg/apis/apim/v1alpha1/types.go).
 
-* Modified the [`hack/update-codegen.sh`](https://github.com/wso2/K8s-wso2am-operator/blob/master/hack/update-codegen.sh) file to generate the **generated** directory with clientset, informers and listers.
+* Modified the [`hack/update-codegen.sh`](https://github.com/wso2/k8s-wso2am-operator/blob/master/hack/update-codegen.sh) file to generate the **generated** directory with clientset, informers and listers.
 
 * Then developed the go code to create deployments, services and ingresses for wso2 apim pattern-1 artifacts.
 
-* [`main.go`](https://github.com/wso2/K8s-wso2am-operator/blob/master/cmd/controller/main.go) has the command to run the controller. It will create the binary image of the controller.
+* [`main.go`](https://github.com/wso2/k8s-wso2am-operator/blob/master/cmd/controller/main.go) has the command to run the controller. It will create the binary image of the controller.
 
-* [`controller.go`](https://github.com/wso2/K8s-wso2am-operator/blob/master/pkg/controller/controller.go) has the actual logic to run once the custom resource triggers it. The components are separated into their own go files for easy access and invoking in the relevant places inside the controller.go file.
+* [`controller.go`](https://github.com/wso2/k8s-wso2am-operator/blob/master/pkg/controller/controller.go) has the actual logic to run once the custom resource triggers it. The components are separated into their own go files for easy access and invoking in the relevant places inside the controller.go file.
 
-* [`Makefile`](https://github.com/wso2/K8s-wso2am-operator/blob/master/Makefile) has the commands to build and run the controller. 
+* [`Makefile`](https://github.com/wso2/k8s-wso2am-operator/blob/master/Makefile) has the commands to build and run the controller. 
 
 * The `make all` command make all will run the controller even if we don’t pull the controller from Docker Hub.
 

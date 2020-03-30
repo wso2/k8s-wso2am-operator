@@ -21,24 +21,27 @@
 package patternX
 
 import (
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 )
 
 // apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it.
-func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
+func ApimXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
 
 	labels := map[string]string{
 		"deployment": r.Name,
-
 	}
 	apimXVolumeMount, apimXVolume := getApimXVolumes(apimanager, *r, x)
 
 	return &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: depApiVersion,
+			Kind:       deploymentKind,
+		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
@@ -47,8 +50,8 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: r.Deployment.Replicas,
-			MinReadySeconds:x.Minreadysec,
+			Replicas:        r.Deployment.Replicas,
+			MinReadySeconds: x.Minreadysec,
 
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
@@ -64,8 +67,8 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"/bin/sh",
 											"-c",
 											"nc -z localhost 9443",
@@ -73,13 +76,13 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 									},
 								},
 								InitialDelaySeconds: x.Livedelay,
-								PeriodSeconds:     x.Liveperiod,
-								FailureThreshold: x.Livethres,
+								PeriodSeconds:       x.Liveperiod,
+								FailureThreshold:    x.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"/bin/sh",
 											"-c",
 											"nc -z localhost 9443",
@@ -88,23 +91,22 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 								},
 
 								InitialDelaySeconds: x.Readydelay,
-								PeriodSeconds:  x.Readyperiod,
-								FailureThreshold: x.Readythres,
-
+								PeriodSeconds:       x.Readyperiod,
+								FailureThreshold:    x.Readythres,
 							},
 
-							Resources:corev1.ResourceRequirements{
-								Requests:corev1.ResourceList{
-									corev1.ResourceCPU:x.Reqcpu,
-									corev1.ResourceMemory:x.Reqmem,
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    x.Reqcpu,
+									corev1.ResourceMemory: x.Reqmem,
 								},
-								Limits:corev1.ResourceList{
-									corev1.ResourceCPU:x.Limitcpu,
-									corev1.ResourceMemory:x.Limitmem,
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    x.Limitcpu,
+									corev1.ResourceMemory: x.Limitmem,
 								},
 							},
 
-							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
+							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 
 							Ports: []corev1.ContainerPort{
 								{
@@ -127,13 +129,13 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 							VolumeMounts: apimXVolumeMount,
 						},
 					},
-					ImagePullSecrets:[]corev1.LocalObjectReference{
+					ServiceAccountName: x.ServiceAccountName,
+					ImagePullSecrets: []corev1.LocalObjectReference{
 						{
 							Name: x.ImagePullSecret,
 						},
 					},
 					Volumes: apimXVolume,
-
 				},
 			},
 		},
@@ -141,8 +143,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile
 }
 
 // for handling analytics-dashboard deployment
-func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
-
+func DashboardXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
 
 	cmdstring := []string{
 		"/bin/sh",
@@ -150,15 +151,18 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 		"nc -z localhost 9643",
 	}
 
-
 	labels := map[string]string{
 		"deployment": r.Name,
 	}
 	runasuser := int64(802)
 
-	dashVolumeMount, dashVolume := getDashboardXVolumes(apimanager,*r)
+	dashVolumeMount, dashVolume := getDashboardXVolumes(apimanager, *r)
 
 	return &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: depApiVersion,
+			Kind:       deploymentKind,
+		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
@@ -167,8 +171,8 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:x.Minreadysec,
+			Replicas:        apimanager.Spec.Replicas,
+			MinReadySeconds: x.Minreadysec,
 
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
@@ -184,32 +188,30 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:cmdstring,
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
 									},
 								},
 								InitialDelaySeconds: x.Livedelay,
-								PeriodSeconds:   x.Liveperiod,
-								FailureThreshold: x.Livethres,
-
+								PeriodSeconds:       x.Liveperiod,
+								FailureThreshold:    x.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:cmdstring,
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
 									},
 								},
 
 								InitialDelaySeconds: x.Readydelay,
-								PeriodSeconds:  x.Readyperiod,
-								FailureThreshold: x.Readythres,
-
+								PeriodSeconds:       x.Readyperiod,
+								FailureThreshold:    x.Readythres,
 							},
 
 							Lifecycle: &corev1.Lifecycle{
-								PreStop:&corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+								PreStop: &corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"sh",
 											"-c",
 											"${WSO2_SERVER_HOME}/bin/dashboard.sh stop",
@@ -218,21 +220,21 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 								},
 							},
 
-							Resources:corev1.ResourceRequirements{
-								Requests:corev1.ResourceList{
-									corev1.ResourceCPU:x.Reqcpu,
-									corev1.ResourceMemory:x.Reqmem,
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    x.Reqcpu,
+									corev1.ResourceMemory: x.Reqmem,
 								},
-								Limits:corev1.ResourceList{
-									corev1.ResourceCPU:x.Limitcpu,
-									corev1.ResourceMemory:x.Limitmem,
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    x.Limitcpu,
+									corev1.ResourceMemory: x.Limitmem,
 								},
 							},
 
-							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
+							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 
 							SecurityContext: &corev1.SecurityContext{
-								RunAsUser:&runasuser,
+								RunAsUser: &runasuser,
 							},
 
 							Ports: []corev1.ContainerPort{
@@ -261,23 +263,19 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 									ContainerPort: 7613,
 									Protocol:      "TCP",
 								},
-
-
 							},
 
 							VolumeMounts: dashVolumeMount,
-
 						},
 					},
-
-					ImagePullSecrets:[]corev1.LocalObjectReference{
+					ServiceAccountName: x.ServiceAccountName,
+					ImagePullSecrets: []corev1.LocalObjectReference{
 						{
 							Name: x.ImagePullSecret,
 						},
 					},
 
 					Volumes: dashVolume,
-
 				},
 			},
 		},
@@ -285,15 +283,18 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Pr
 }
 
 // for handling analytics-worker deployment
-func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
+func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
 	workervolumemounts, workervolume := getWorkerXVolumes(apimanager, *r)
-
 
 	labels := map[string]string{
 		"deployment": r.Name,
 	}
 	runasuser := int64(802)
 	return &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: depApiVersion,
+			Kind:       deploymentKind,
+		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
@@ -302,9 +303,8 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Replicas,
+			Replicas:        apimanager.Spec.Replicas,
 			MinReadySeconds: x.Minreadysec,
-
 
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
@@ -320,8 +320,8 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"/bin/sh",
 											"-c",
 											"nc -z localhost 7712",
@@ -329,14 +329,13 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 									},
 								},
 								InitialDelaySeconds: x.Livedelay,
-								PeriodSeconds:   x.Liveperiod,
-								FailureThreshold: x.Livethres,
-
+								PeriodSeconds:       x.Liveperiod,
+								FailureThreshold:    x.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"/bin/sh",
 											"-c",
 											"nc -z localhost 7712",
@@ -345,16 +344,14 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 								},
 
 								InitialDelaySeconds: x.Readydelay,
-								PeriodSeconds:  x.Readyperiod,
-								FailureThreshold: x.Readythres,
-
-
+								PeriodSeconds:       x.Readyperiod,
+								FailureThreshold:    x.Readythres,
 							},
 
 							Lifecycle: &corev1.Lifecycle{
-								PreStop:&corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+								PreStop: &corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"sh",
 											"-c",
 											"${WSO2_SERVER_HOME}/bin/worker.sh stop",
@@ -363,21 +360,21 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 								},
 							},
 
-							Resources:corev1.ResourceRequirements{
-								Requests:corev1.ResourceList{
-									corev1.ResourceCPU:x.Reqcpu,
-									corev1.ResourceMemory:x.Reqmem,
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    x.Reqcpu,
+									corev1.ResourceMemory: x.Reqmem,
 								},
-								Limits:corev1.ResourceList{
-									corev1.ResourceCPU:x.Limitcpu,
-									corev1.ResourceMemory:x.Limitmem,
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    x.Limitcpu,
+									corev1.ResourceMemory: x.Limitmem,
 								},
 							},
 
 							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 
 							SecurityContext: &corev1.SecurityContext{
-								RunAsUser:&runasuser,
+								RunAsUser: &runasuser,
 							},
 
 							Ports: []corev1.ContainerPort{
@@ -426,7 +423,8 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 							VolumeMounts: workervolumemounts,
 						},
 					},
-					ImagePullSecrets:[]corev1.LocalObjectReference{
+					ServiceAccountName: x.ServiceAccountName,
+					ImagePullSecrets: []corev1.LocalObjectReference{
 						{
 							Name: x.ImagePullSecret,
 						},
@@ -438,6 +436,3 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 		},
 	}
 }
-
-
-

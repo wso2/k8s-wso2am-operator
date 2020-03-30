@@ -21,17 +21,12 @@
 package pattern1
 
 import (
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-
-	//"strconv"
-	//v1 "k8s.io/api/core/v1"
-
 )
-
 
 // apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
@@ -40,22 +35,21 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
-		"node": "wso2am-pattern-1-am-1",
+		"node":       "wso2am-pattern-1-am-1",
 	}
 
-	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager,num)
-
+	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager, num)
 
 	apim1deployports := []corev1.ContainerPort{}
-	if apimanager.Spec.Service.Type =="LoadBalancer"{
+	if apimanager.Spec.Service.Type == "LoadBalancer" {
 		apim1deployports = getApimDeployLBPorts()
 	}
-	if apimanager.Spec.Service.Type =="NodePort"{
+	if apimanager.Spec.Service.Type == "NodePort" {
 		apim1deployports = getApimDeployNPPorts()
 	}
 
 	cmdstring := []string{}
-	if apimanager.Spec.Service.Type=="NodePort"{
+	if apimanager.Spec.Service.Type == "NodePort" {
 		cmdstring = []string{
 			"/bin/sh",
 			"-c",
@@ -69,17 +63,32 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		}
 	}
 
+	initContainers := []corev1.Container{}
+
+	if x.UseMysqlPod {
+		mysqlContainer := corev1.Container{}
+		mysqlContainer.Name = "init-mysql"
+		mysqlContainer.Image = "busybox:1.31"
+		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
+		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
+		initContainers = append(initContainers, mysqlContainer)
+	}
+
 	return &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: depApiVersion,
+			Kind:       deploymentKind,
+		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-1-"+apimanager.Name,
+			Name:      "wso2-am-1-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:x.Minreadysec,
+			Replicas:        apimanager.Spec.Replicas,
+			MinReadySeconds: x.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
@@ -101,48 +110,38 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: labels,
 				},
-				Spec:corev1.PodSpec{
-					HostAliases: []corev1.HostAlias{
-						{
-							IP: "127.0.0.1",
-							Hostnames: []string{
-								"wso2apim",
-								"wso2apim-gateway",
-							},
-						},
-					},
-
+				Spec: corev1.PodSpec{
+					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2-pattern-1-am",
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:cmdstring,
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
 									},
 								},
 								InitialDelaySeconds: x.Livedelay,
-								PeriodSeconds:     x.Liveperiod,
-								FailureThreshold: x.Livethres,
+								PeriodSeconds:       x.Liveperiod,
+								FailureThreshold:    x.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:cmdstring,
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
 									},
 								},
 
 								InitialDelaySeconds: x.Readydelay,
-								PeriodSeconds:  x.Readyperiod,
-								FailureThreshold: x.Readythres,
-
+								PeriodSeconds:       x.Readyperiod,
+								FailureThreshold:    x.Readythres,
 							},
 
 							Lifecycle: &corev1.Lifecycle{
-								PreStop:&corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+								PreStop: &corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"sh",
 											"-c",
 											"${WSO2_SERVER_HOME}/bin/wso2server.sh stop",
@@ -150,25 +149,19 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 									},
 								},
 							},
-							Resources:corev1.ResourceRequirements{
-								Requests:corev1.ResourceList{
-									corev1.ResourceCPU:x.Reqcpu,
-									corev1.ResourceMemory:x.Reqmem,
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    x.Reqcpu,
+									corev1.ResourceMemory: x.Reqmem,
 								},
-								Limits:corev1.ResourceList{
-									corev1.ResourceCPU:x.Limitcpu,
-									corev1.ResourceMemory:x.Limitmem,
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    x.Limitcpu,
+									corev1.ResourceMemory: x.Limitmem,
 								},
 							},
-
-							ImagePullPolicy:corev1.PullPolicy(x.Imagepull),
-
-							Ports: apim1deployports,
+							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
+							Ports:           apim1deployports,
 							Env: []corev1.EnvVar{
-								// {
-								// 	Name:  "HOST_NAME",
-								// 	Value: "wso2-am",
-								// },
 								{
 									Name: "NODE_IP",
 									ValueFrom: &corev1.EnvVarSource{
@@ -178,16 +171,13 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 									},
 								},
 							},
-
-							VolumeMounts:apim1VolumeMount,
-
+							VolumeMounts: apim1VolumeMount,
 						},
 					},
-
-					// ServiceAccountName: "wso2am-pattern-1-svc-account",
-					ImagePullSecrets:[]corev1.LocalObjectReference{
+					ServiceAccountName: x.ServiceAccountName,
+					ImagePullSecrets: []corev1.LocalObjectReference{
 						{
-							Name:"wso2am-pattern-1-creds",
+							Name: x.ImagePullSecret,
 						},
 					},
 
@@ -198,26 +188,24 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 	}
 }
 
-
-func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num int) *appsv1.Deployment {
+func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.Deployment {
 
 	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager, num)
 	apim2deployports := []corev1.ContainerPort{}
-	if apimanager.Spec.Service.Type =="LoadBalancer"{
+	if apimanager.Spec.Service.Type == "LoadBalancer" {
 		apim2deployports = getApimDeployLBPorts()
 	}
-	if apimanager.Spec.Service.Type =="NodePort"{
+	if apimanager.Spec.Service.Type == "NodePort" {
 		apim2deployports = getApimDeployNPPorts()
 	}
 
-
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
-		"node": "wso2am-pattern-1-am-2",
+		"node":       "wso2am-pattern-1-am-2",
 	}
 
 	cmdstring := []string{}
-	if apimanager.Spec.Service.Type=="NodePort"{
+	if apimanager.Spec.Service.Type == "NodePort" {
 		cmdstring = []string{
 			"/bin/sh",
 			"-c",
@@ -230,9 +218,25 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 			"nc -z localhost 9443",
 		}
 	}
+
+	initContainers := []corev1.Container{}
+
+	if z.UseMysqlPod {
+		mysqlContainer := corev1.Container{}
+		mysqlContainer.Name = "init-mysql"
+		mysqlContainer.Image = "busybox:1.31"
+		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
+		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
+		initContainers = append(initContainers, mysqlContainer)
+	}
+
 	return &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: depApiVersion,
+			Kind:       deploymentKind,
+		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-2-"+apimanager.Name,
+			Name:      "wso2-am-2-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
@@ -240,8 +244,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 		},
 
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:z.Minreadysec,
+			Replicas:        apimanager.Spec.Replicas,
+			MinReadySeconds: z.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
@@ -264,46 +268,36 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
-					HostAliases: []corev1.HostAlias{
-						{
-							IP: "127.0.0.1",
-							Hostnames: []string{
-								"wso2apim",
-								"wso2apim-gateway",
-							},
-						},
-					},
-
+					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2-pattern-1-am",
 							Image: z.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:cmdstring,
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
 									},
 								},
 								InitialDelaySeconds: z.Livedelay,
-                                PeriodSeconds:       z.Liveperiod,
-                                FailureThreshold:    z.Livethres,
+								PeriodSeconds:       z.Liveperiod,
+								FailureThreshold:    z.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:cmdstring,
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
 									},
 								},
-
 								InitialDelaySeconds: z.Readydelay,
-                                PeriodSeconds:       z.Readyperiod,
-                                FailureThreshold:    z.Readythres,
+								PeriodSeconds:       z.Readyperiod,
+								FailureThreshold:    z.Readythres,
 							},
 
 							Lifecycle: &corev1.Lifecycle{
-								PreStop:&corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+								PreStop: &corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"sh",
 											"-c",
 											"${WSO2_SERVER_HOME}/bin/wso2server.sh stop",
@@ -312,26 +306,19 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 								},
 							},
 
-							Resources:corev1.ResourceRequirements{
-								Requests:corev1.ResourceList{
-									corev1.ResourceCPU:z.Reqcpu,
-									corev1.ResourceMemory:z.Reqmem,
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    z.Reqcpu,
+									corev1.ResourceMemory: z.Reqmem,
 								},
-								Limits:corev1.ResourceList{
-									corev1.ResourceCPU:z.Limitcpu,
-									corev1.ResourceMemory:z.Limitmem,
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    z.Limitcpu,
+									corev1.ResourceMemory: z.Limitmem,
 								},
 							},
-
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
-
-							Ports:apim2deployports,
-
+							Ports:           apim2deployports,
 							Env: []corev1.EnvVar{
-								// {
-								// 	Name:  "HOST_NAME",
-								// 	Value: "wso2-am",
-								// },
 								{
 									Name: "NODE_IP",
 									ValueFrom: &corev1.EnvVarSource{
@@ -342,19 +329,15 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 								},
 							},
 							VolumeMounts: apim2VolumeMount,
-
 						},
 					},
-
-					// ServiceAccountName: "wso2am-pattern-1-svc-account",
-					ImagePullSecrets:[]corev1.LocalObjectReference{
+					ServiceAccountName: z.ServiceAccountName,
+					ImagePullSecrets: []corev1.LocalObjectReference{
 						{
-							Name:"wso2am-pattern-1-creds",
+							Name: z.ImagePullSecret,
 						},
 					},
-
 					Volumes: apim2Volume,
-
 				},
 			},
 		},
@@ -362,20 +345,20 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager,z *configvalues, num in
 }
 
 // for handling analytics-dashboard deployment
-func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num int) *appsv1.Deployment {
+func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
 
 	dashdeployports := []corev1.ContainerPort{}
-	if apimanager.Spec.Service.Type =="LoadBalancer"{
+	if apimanager.Spec.Service.Type == "LoadBalancer" {
 		dashdeployports = getDashDeployLBPorts()
-	}else if apimanager.Spec.Service.Type =="NodePort"{
+	} else if apimanager.Spec.Service.Type == "NodePort" {
 		dashdeployports = getDashDeployNPPorts()
-	}else if  apimanager.Spec.Service.Type =="ClusterIP" {
+	} else if apimanager.Spec.Service.Type == "ClusterIP" {
 		dashdeployports = getDashDeployLBPorts()
 	} else {
 		dashdeployports = getDashDeployLBPorts()
 	}
 	cmdstring := []string{}
-	if apimanager.Spec.Service.Type=="NodePort"{
+	if apimanager.Spec.Service.Type == "NodePort" {
 		cmdstring = []string{
 			"/bin/sh",
 			"-c",
@@ -397,17 +380,32 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
+	initContainers := []corev1.Container{}
+
+	if y.UseMysqlPod {
+		mysqlContainer := corev1.Container{}
+		mysqlContainer.Name = "init-mysql"
+		mysqlContainer.Image = "busybox:1.31"
+		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
+		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
+		initContainers = append(initContainers, mysqlContainer)
+	}
+
 	return &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: depApiVersion,
+			Kind:       deploymentKind,
+		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-analytics-dashboard-"+apimanager.Name,
+			Name:      "wso2-am-analytics-dashboard-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:y.Minreadysec,
+			Replicas:        apimanager.Spec.Replicas,
+			MinReadySeconds: y.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
@@ -430,38 +428,37 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
+					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-dashboard",
 							Image: y.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:cmdstring,
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
 									},
 								},
 								InitialDelaySeconds: y.Livedelay,
-								PeriodSeconds:     y.Liveperiod,
-								FailureThreshold: y.Livethres,
-
+								PeriodSeconds:       y.Liveperiod,
+								FailureThreshold:    y.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:cmdstring,
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
 									},
 								},
 
 								InitialDelaySeconds: y.Readydelay,
-								PeriodSeconds:  y.Readyperiod,
-								FailureThreshold: y.Readythres,
-
+								PeriodSeconds:       y.Readyperiod,
+								FailureThreshold:    y.Readythres,
 							},
 
 							Lifecycle: &corev1.Lifecycle{
-								PreStop:&corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+								PreStop: &corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"sh",
 											"-c",
 											"${WSO2_SERVER_HOME}/bin/dashboard.sh stop",
@@ -470,39 +467,31 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 								},
 							},
 
-							Resources:corev1.ResourceRequirements{
-								Requests:corev1.ResourceList{
-									corev1.ResourceCPU:y.Reqcpu,
-									corev1.ResourceMemory:y.Reqmem,
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    y.Reqcpu,
+									corev1.ResourceMemory: y.Reqmem,
 								},
-								Limits:corev1.ResourceList{
-									corev1.ResourceCPU:y.Limitcpu,
-									corev1.ResourceMemory:y.Limitmem,
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    y.Limitcpu,
+									corev1.ResourceMemory: y.Limitmem,
 								},
 							},
-
-							ImagePullPolicy:corev1.PullPolicy(y.Imagepull),
-
+							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
 							SecurityContext: &corev1.SecurityContext{
-								RunAsUser:&runasuser,
+								RunAsUser: &runasuser,
 							},
-
-							Ports:dashdeployports,
-
+							Ports:        dashdeployports,
 							VolumeMounts: dashVolumeMount,
-
 						},
 					},
-
-					// ServiceAccountName: "wso2am-pattern-1-svc-account",
-					ImagePullSecrets:[]corev1.LocalObjectReference{
+					ServiceAccountName: y.ServiceAccountName,
+					ImagePullSecrets: []corev1.LocalObjectReference{
 						{
-							Name:"wso2am-pattern-1-creds",
+							Name: y.ImagePullSecret,
 						},
 					},
-
 					Volumes: dashVolume,
-
 				},
 			},
 		},
@@ -510,7 +499,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, nu
 }
 
 // for handling analytics-worker deployment
-func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num int) *appsv1.Deployment {
+func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
 
 	workervolumemounts, workervolume := getAnalyticsWorkerVolumes(apimanager, num)
 
@@ -518,18 +507,33 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 		"deployment": "wso2am-pattern-1-analytics-worker",
 	}
 	runasuser := int64(802)
+
+	initContainers := []corev1.Container{}
+
+	if y.UseMysqlPod {
+		mysqlContainer := corev1.Container{}
+		mysqlContainer.Name = "init-mysql"
+		mysqlContainer.Image = "busybox:1.31"
+		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
+		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
+		initContainers = append(initContainers, mysqlContainer)
+	}
+
 	return &appsv1.Deployment{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: depApiVersion,
+			Kind:       deploymentKind,
+		},
 		ObjectMeta: metav1.ObjectMeta{
-			// Name: apimanager.Spec.DeploymentName,
-			Name:      "wso2-am-analytics-worker-"+apimanager.Name,
+			Name:      "wso2-am-analytics-worker-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: apimanager.Spec.Replicas,
-			MinReadySeconds:y.Minreadysec,
+			Replicas:        apimanager.Spec.Replicas,
+			MinReadySeconds: y.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
 				RollingUpdate: &appsv1.RollingUpdateDeployment{
@@ -552,14 +556,15 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
+					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2am-pattern-1-analytics-worker",
 							Image: y.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"/bin/sh",
 											"-c",
 											"nc -z localhost 9444",
@@ -567,13 +572,13 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 									},
 								},
 								InitialDelaySeconds: y.Livedelay,
-								PeriodSeconds:     y.Liveperiod,
-								FailureThreshold: y.Livethres,
+								PeriodSeconds:       y.Liveperiod,
+								FailureThreshold:    y.Livethres,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"/bin/sh",
 											"-c",
 											"nc -z localhost 9444",
@@ -582,15 +587,14 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 								},
 
 								InitialDelaySeconds: y.Readydelay,
-								PeriodSeconds:  y.Readyperiod,
-								FailureThreshold: y.Readythres,
-
+								PeriodSeconds:       y.Readyperiod,
+								FailureThreshold:    y.Readythres,
 							},
 
 							Lifecycle: &corev1.Lifecycle{
-								PreStop:&corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
+								PreStop: &corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{
 											"sh",
 											"-c",
 											"${WSO2_SERVER_HOME}/bin/worker.sh stop",
@@ -599,21 +603,21 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 								},
 							},
 
-							Resources:corev1.ResourceRequirements{
-								Requests:corev1.ResourceList{
-									corev1.ResourceCPU:y.Reqcpu,
-									corev1.ResourceMemory:y.Reqmem,
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    y.Reqcpu,
+									corev1.ResourceMemory: y.Reqmem,
 								},
-								Limits:corev1.ResourceList{
-									corev1.ResourceCPU:y.Limitcpu,
-									corev1.ResourceMemory:y.Limitmem,
+								Limits: corev1.ResourceList{
+									corev1.ResourceCPU:    y.Limitcpu,
+									corev1.ResourceMemory: y.Limitmem,
 								},
 							},
 
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
 
 							SecurityContext: &corev1.SecurityContext{
-								RunAsUser:&runasuser,
+								RunAsUser: &runasuser,
 							},
 
 							Ports: []corev1.ContainerPort{
@@ -646,24 +650,18 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager,y *configvalues, num i
 									Protocol:      "TCP",
 								},
 							},
-
 							VolumeMounts: workervolumemounts,
 						},
 					},
-					// ServiceAccountName: "wso2am-pattern-1-svc-account",
-					ImagePullSecrets:[]corev1.LocalObjectReference{
+					ServiceAccountName: y.ServiceAccountName,
+					ImagePullSecrets: []corev1.LocalObjectReference{
 						{
-							Name:"wso2am-pattern-1-creds",
+							Name: y.ImagePullSecret,
 						},
 					},
-
 					Volumes: workervolume,
 				},
 			},
 		},
 	}
 }
-
-
-
-

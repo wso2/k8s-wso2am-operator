@@ -73,6 +73,16 @@ data:
     [apim.devportal]
     url = "https://wso2apim:9443/devportal"
 
+    [[apim.throttling.url_group]]
+    traffic_manager_urls = ["tcp://localhost:9611"]
+    traffic_manager_auth_urls = ["ssl://localhost:9711"]
+    type = "loadbalance"
+
+    [[apim.throttling.url_group]]
+    traffic_manager_urls = ["tcp://wso2-am-2-svc:9611"]
+    traffic_manager_auth_urls = ["ssl://wso2-am-2-svc:9711"]
+    type = "loadbalance"
+
     [apim.cors]
     allow_origins = "*"
     allow_methods = ["GET","PUT","POST","DELETE","PATCH","OPTIONS"]

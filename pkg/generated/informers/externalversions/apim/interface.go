@@ -20,8 +20,8 @@
 package apim
 
 import (
-	v1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/informers/externalversions/apim/v1alpha1"
-	internalinterfaces "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/apim/v1alpha1"
+	internalinterfaces "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.

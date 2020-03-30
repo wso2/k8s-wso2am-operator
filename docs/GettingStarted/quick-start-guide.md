@@ -18,7 +18,7 @@ In this document, we will walk through the following.
 * Minimum CPU : **8vCPU** & Minimum Memory : **12GB** for the K8S Cluster
 
 ## Steps:
-1. Download [wso2am-k8s-operator-1.0.0.zip](https://github.com/wso2-incubator/wso2am-k8s-operator/releases/download/1.0.0/wso2am-k8s-operator-1.0.0.zip) and extract it.
+1. Download [wso2am-k8s-operator-1.0.0.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/1.0.0/wso2am-k8s-operator-1.0.0.zip) and extract it.
 
 2. Setup the required Storage
 ```
@@ -190,13 +190,13 @@ mysql-svc                               ClusterIP      10.43.242.130   <none>   
 
 ## Sample Scenarios
 
-1. [Scenario-1 : Applying Simple and shortest Custom Resource YAML](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-1)
-2. [Scenario-2 : Exposing via NodePort Service Type](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-2)
-3. [Scenario-3 : Override Deployment Configuration values](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-3)
-4. [Scenario-4 : Override ConfigMaps and PersistentVolumeClaims](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-4)
-5. [Scenario-5 : Add New Configmaps and Persistent Volume Claims](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-5)
-6. [Scenario-6 : Deploying Custom Pattern](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-6)
-7. [Scenario-7 : Running External-NFS](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-7)
+1. [Scenario-1 : Applying Simple and shortest Custom Resource YAML](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-1)
+2. [Scenario-2 : Exposing via NodePort Service Type](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-2)
+3. [Scenario-3 : Override Deployment Configuration values](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-3)
+4. [Scenario-4 : Override ConfigMaps and PersistentVolumeClaims](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-4)
+5. [Scenario-5 : Add New Configmaps and Persistent Volume Claims](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-5)
+6. [Scenario-6 : Deploying Custom Pattern](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-6)
+7. [Scenario-7 : Running External-NFS](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-7)
 
 ### Clean up
 

@@ -14,9 +14,9 @@ As user just need to apply the below command with preinstalled Helm,
 helm install stable/nfs-server-provisioner
 ```  
 
-Secondly, Configuring the External NFS can be done by following the **Advanced** steps in [Quick-Start-Guide](https://github.com/wso2-incubator/wso2am-k8s-operator)
-or by following the [scenario-7](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-7)
+Secondly, Configuring the External NFS can be done by following the **Advanced** steps in [Quick-Start-Guide](https://github.com/wso2/k8s-wso2am-operator)
+or by following the [scenario-7](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-7)
 
 Finally, for Minikube users, it much more appropriate to use HostPaths as a volume type for the required persistent volumes.
-Configuring HostPath also given in the **Advanced** steps in [Quick-Start-Guide](https://github.com/wso2-incubator/wso2am-k8s-operator).
+Configuring HostPath also given in the **Advanced** steps in [Quick-Start-Guide](https://github.com/wso2/k8s-wso2am-operator).
 

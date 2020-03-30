@@ -15,7 +15,7 @@
 
 2. You can preview the csv file created in the 1st step using [this](<https://operatorhub.io/preview>)
 
-3. Add the directory with the new version to the api-manager-operator bundle available [here](<https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/operatorhub-resources/api-manager-operator>) and the bundle should be in the below format.
+3. Add the directory with the new version to the api-manager-operator bundle available [here](<https://github.com/wso2/k8s-wso2am-operator/tree/master/operatorhub-resources/api-manager-operator>) and the bundle should be in the below format.
 
 ```bash
    api-manager-operator

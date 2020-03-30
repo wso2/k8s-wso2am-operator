@@ -94,6 +94,8 @@ That is all, Now run the flow in order from start.
 </p>
 </details>
 
+-----
+
 ##### Deploy pattern 1
 
 ```
@@ -124,10 +126,10 @@ wso2-am-svc                              LoadBalancer   10.0.13.20    34.93.86.8
     
     ```
     <EXTERNAL-IP-OF-WSO2-AM-SVC>                        wso2apim
-    <EXTERNAL-IP-OF-WSO2-AM-ANALYTICS-DASHBOARD-SVC>    wso2apim-analytics-dashboard 
+    <EXTERNAL-IP-OF-WSO2-AM-ANALYTICS-DASHBOARD-SVC>    wso2apim-analytics 
     ```
 
 - **API Publisher**             : https://wso2apim:9443/publisher 
 - **API Devportal**             : https://wso2apim:9443/devportal 
-- **API Analytics Dashboard**   : https://wso2apim-analytics-dashboard:9763/analytics-dashboard 
+- **API Analytics Dashboard**   : https://wso2apim-analytics:9643/analytics-dashboard 
 

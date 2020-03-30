@@ -15,5 +15,5 @@ You can find the content you need to be working with the WSO2AM K8S Operator in 
     
 3. [Troubleshooting Guide](Troubleshooting/troubleshooting.md)
 
-> If you were not able to find the content you were looking for, please let us know by creating a GitHub issue in our [GitHub space](https://github.com/wso2-incubator/wso2am-k8s-operator/issues).
+> If you were not able to find the content you were looking for, please let us know by creating a GitHub issue in our [GitHub space](https://github.com/wso2/k8s-wso2am-operator/issues).
   

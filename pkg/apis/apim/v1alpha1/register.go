@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim"
+	"github.com/wso2/k8s-wso2am-operator/pkg/apis/apim"
 
 )
 
