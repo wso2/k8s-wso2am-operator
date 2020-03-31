@@ -49,5 +49,5 @@ Also, there is an additional functionality to add new configmap and persistent v
 ```
 Finally via applying that custom resource YAML file, it will automatically start to create all the artifacts for the newly created pattern.
 
-The scenario for Customizing the new pattern can be seen in [Scenario-6](https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/scenarios/scenario-6)
+The scenario for Customizing the new pattern can be seen in [Scenario-6](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-6)
 

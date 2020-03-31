@@ -23,7 +23,7 @@
     <groupId>apim.wso2.com</groupId>
     <artifactId>wso2am-k8s-operator</artifactId>
     <version>1.0.0</version>
-    <name>WSO2AM K8S Operator Distribution</name>
+    <name>K8S WSO2AM Operator</name>
     <packaging>pom</packaging>
 
     <modules>

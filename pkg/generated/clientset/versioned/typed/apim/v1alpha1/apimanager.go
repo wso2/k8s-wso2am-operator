@@ -22,8 +22,8 @@ package v1alpha1
 import (
 	"time"
 
-	v1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
-	scheme "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned/scheme"
+	v1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
+	scheme "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

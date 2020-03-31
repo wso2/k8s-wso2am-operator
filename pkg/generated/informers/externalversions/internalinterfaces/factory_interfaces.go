@@ -22,7 +22,7 @@ package internalinterfaces
 import (
 	time "time"
 
-	versioned "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned"
+	versioned "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	cache "k8s.io/client-go/tools/cache"

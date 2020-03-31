@@ -21,13 +21,10 @@
 package pattern1
 
 import (
-	//appsv1 "k8s.io/api/apps/v1"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-
-	//"k8s.io/apimachinery/pkg/api/resource"
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
 )
 
 // newService creates a new Service for a Apimanager resource.
@@ -35,14 +32,11 @@ import (
 func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
-		"node": "wso2am-pattern-1-am-1",
+		"node":       "wso2am-pattern-1-am-1",
 	}
 
-
-	apimsvs1ports := getApimCommonSvcPorts()
-	servType :="ClusterIP"
-
-
+	apimsvs1ports := getApimSpecificSvcPorts()
+	servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -54,9 +48,8 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:    corev1.ServiceType(servType),
-			Ports: apimsvs1ports,
-
+			Type:     corev1.ServiceType(servType),
+			Ports:    apimsvs1ports,
 		},
 	}
 }
@@ -65,12 +58,10 @@ func Apim1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 func Apim2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
-		"node": "wso2am-pattern-1-am-2",
+		"node":       "wso2am-pattern-1-am-2",
 	}
-	apimsvs2ports := getApimCommonSvcPorts()
-	servType :="ClusterIP"
-
-
+	apimsvs2ports := getApimSpecificSvcPorts()
+	servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -83,8 +74,7 @@ func Apim2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
 			Type:     corev1.ServiceType(servType),
-			Ports: apimsvs2ports,
-
+			Ports:    apimsvs2ports,
 		},
 	}
 }
@@ -94,12 +84,12 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
-	servType :=""
+	servType := ""
 	dashports := []corev1.ServicePort{}
-	if apimanager.Spec.Service.Type == "NodePort"{
+	if apimanager.Spec.Service.Type == "NodePort" {
 		dashports = getDashBoardNPPorts()
 		servType = "NodePort"
-	} else if apimanager.Spec.Service.Type == "LoadBalancer"{
+	} else if apimanager.Spec.Service.Type == "LoadBalancer" {
 		dashports = getDashBoardPorts()
 		servType = "LoadBalancer"
 	} else if apimanager.Spec.Service.Type == "ClusterIP" {
@@ -120,9 +110,8 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:    corev1.ServiceType(servType),
-			Ports: 	dashports,
-
+			Type:     corev1.ServiceType(servType),
+			Ports:    dashports,
 		},
 	}
 }
@@ -195,16 +184,16 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 
 	apimcommonsvsports := []corev1.ServicePort{}
 	servType := ""
-	if apimanager.Spec.Service.Type == "NodePort"{
+	if apimanager.Spec.Service.Type == "NodePort" {
 		apimcommonsvsports = getApimCommonSvcNPPorts()
 		servType = "NodePort"
-	}else if apimanager.Spec.Service.Type == "LoadBalancer"{
+	} else if apimanager.Spec.Service.Type == "LoadBalancer" {
 		apimcommonsvsports = getApimCommonSvcPorts()
 		servType = "LoadBalancer"
-	}else if apimanager.Spec.Service.Type =="ClusterIP"{
+	} else if apimanager.Spec.Service.Type == "ClusterIP" {
 		apimcommonsvsports = getApimCommonSvcPorts()
 		servType = "ClusterIP"
-	} else{
+	} else {
 		apimcommonsvsports = getApimCommonSvcPorts()
 		servType = "LoadBalancer"
 	}
@@ -219,11 +208,8 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:    corev1.ServiceType(servType),
-			Ports: apimcommonsvsports,
-
+			Type:     corev1.ServiceType(servType),
+			Ports:    apimcommonsvsports,
 		},
 	}
 }
-
-

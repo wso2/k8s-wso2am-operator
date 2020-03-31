@@ -21,32 +21,12 @@
 package controller
 
 import (
-	//"github.com/sirupsen/logrus"
-	//"sigs.k8s.io/controller-runtime/pkg/log"
-
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
-	//"github.com/wso2-incubator/wso2am-k8s-operator/artifacts/resources"
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources"
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1"
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/patternX"
-
-	"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/mysql"
-	//"k8s.io/apimachinery/pkg/api/resource"
-	//"strconv"
-	//v1 "k8s.io/api/core/v1"
-
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/dashboard"
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/analytics/worker"
-	//"k8s.io/apimachinery/pkg/types"
-	//"sigs.k8s.io/controller-runtime/pkg/client"
-
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/am/apim2"
-	//"github.com/wso2-incubator/wso2am-k8s-operator/pkg/controller/pattern1/resources/mysql"
-
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/patternX"
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/mysql"
 	"fmt"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	//v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -68,11 +48,11 @@ import (
 	"time"
 	"strconv"
 
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
-	clientset "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned"
-	samplescheme "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned/scheme"
-	informers "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/informers/externalversions/apim/v1alpha1"
-	listers "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/listers/apim/v1alpha1"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
+	clientset "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
+	samplescheme "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned/scheme"
+	informers "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/apim/v1alpha1"
+	listers "github.com/wso2/k8s-wso2am-operator/pkg/generated/listers/apim/v1alpha1"
 )
 
 const controllerAgentName = "wso2am-controller"
@@ -323,8 +303,8 @@ func (c *Controller) syncHandler(key string) error {
 
 	configMapName := "controller-config"
 	configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
-	useMysqlPod,_ := strconv.ParseBool(configmap.Data["use-mysql-pod"])
-	
+	useMysqlPod, _ := strconv.ParseBool(configmap.Data["use-mysql-pod"])
+
 	if apimanager.Spec.Pattern == "Pattern-1" {
 
 		apim1deploymentName := "wso2-am-1-"+apimanager.Name
@@ -342,9 +322,6 @@ func (c *Controller) syncHandler(key string) error {
         synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
 		executionPlanPVCName := "wso2am-p1-am-execution-plans"
 		mysqlPVCName := "wso2am-mysql"
-
-
-		/////////checking whether resourecs already exits, else create one
 
 		dashConfName := "wso2am-p1-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
@@ -374,8 +351,9 @@ func (c *Controller) syncHandler(key string) error {
 		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
 		if errors.IsNotFound(err){
 			workerConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,workerConfWso2))
-			if err!= nil{
+			if err!= nil {
 				fmt.Println("Creating worker configmap in user specified ns",workerConfUser)
+
 			}
 		}
 
@@ -426,9 +404,6 @@ func (c *Controller) syncHandler(key string) error {
 		}
 
 
-
-
-
 		// Parse the object and look for it’s deployment
 		// Use a Lister to find the deployment object referred to in the Apimanager resource
 		// Get apim instance 1 deployment name using hardcoded value
@@ -459,7 +434,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		if totalProfiles >0 &&  apimanager.Spec.Profiles[am1num].Name=="api-manager-1"{	 
+		if totalProfiles > 0 &&  apimanager.Spec.Profiles[am1num].Name=="api-manager-1"{
 			synapseConfFromYaml := apimanager.Spec.Profiles[am1num].Deployment.PersistentVolumeClaim.SynapseConfigs
 			if synapseConfFromYaml != "" {
 				synapseConfigsPVCName = synapseConfFromYaml
@@ -470,7 +445,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		if totalProfiles >0 &&  apimanager.Spec.Profiles[am2num].Name=="api-manager-2"{	 
+		if totalProfiles > 0 &&  apimanager.Spec.Profiles[am2num].Name=="api-manager-2"{
 			synapseConfFromYaml := apimanager.Spec.Profiles[am2num].Deployment.PersistentVolumeClaim.SynapseConfigs
 			if synapseConfFromYaml != "" {
 				synapseConfigsPVCName = synapseConfFromYaml
@@ -509,52 +484,19 @@ func (c *Controller) syncHandler(key string) error {
 				}
 			}
 
-			for mysqldeployment.Status.AvailableReplicas == 0 {
+			// Get mysql service name using hardcoded value
+			mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
+
+			// If the resource doesn't exist, we'll create it
+			if errors.IsNotFound(err) {
+				mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
+			} else {
+				fmt.Println("Mysql Service is already available. [Service name] ,", mysqlservice)
+			}
+
+			for mysqldeployment.Status.ReadyReplicas == 0 {
 				time.Sleep(5 * time.Second)
 				mysqldeployment, err = c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
-			}
-		}
-
-
-		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			x := pattern1.AssignApimConfigMapValues(apimanager,configmap,am1num)
-			//mysqdeploy, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
-			if x.UseMysqlPod {
-				if mysqldeployment.Status.AvailableReplicas >0 {
-					//deployment.Status.AvailableReplicas > 0
-					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x, am1num))
-					//fmt.Println("aaaaaaaaaa metadata name is ", apimanager.Name)
-					if err != nil {
-						return err
-					}
-				}
-			} else {
-				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x, am1num))
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		// Get apim instance 2 deployment name using hardcoded value
-		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			z := pattern1.AssignApimConfigMapValues(apimanager,configmap,am2num)
-			if z.UseMysqlPod {
-				if mysqldeployment.Status.AvailableReplicas >0 {
-					deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z, am2num))
-					if err != nil {
-						return err
-					}
-				}
-			} else {
-				deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z, am2num))
-				if err != nil {
-					return err
-				}
 			}
 		}
 
@@ -563,19 +505,18 @@ func (c *Controller) syncHandler(key string) error {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
-			if y.UseMysqlPod {
-				if mysqldeployment.Status.AvailableReplicas >0 || !y.UseMysqlPod {
-					dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y, dashnum))
-					if err != nil {
-						return err
-					}
-				}
-			} else {
-				dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y, dashnum))
-				if err != nil {
-					return err
-				}
+
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y, dashnum))
+			if err != nil {
+				return err
 			}
+		}
+
+		// Get analytics dashboard service name using hardcoded value
+		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.DashboardService(apimanager))
 		}
 
 		// Get analytics worker deployment name using hardcoded value
@@ -583,20 +524,78 @@ func (c *Controller) syncHandler(key string) error {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
-			if y.UseMysqlPod {
-				if mysqldeployment.Status.AvailableReplicas >0 || !y.UseMysqlPod {
-					workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
-					if err != nil {
-						return err
-					}
-				}
-			} else {
-				workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
-				if err != nil {
-					return err
-				}
+
+			workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
+			if err != nil {
+				return err
 			}
 		}
+
+		// Get analytics worker service name using hardcoded value
+		workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerService(apimanager))
+		}
+
+		// Waiting for Analytics worker nodes
+		workerdeploymentupdated, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+		for workerdeploymentupdated.Status.ReadyReplicas == 0 {
+			time.Sleep(5 * time.Second)
+			workerdeploymentupdated, err = c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+		}
+
+		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			x := pattern1.AssignApimConfigMapValues(apimanager,configmap,am1num)
+
+			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x, am1num))
+			if err != nil {
+				return err
+			}
+		}
+
+		// Get apim instance 2 deployment name using hardcoded value
+		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			z := pattern1.AssignApimConfigMapValues(apimanager,configmap,am2num)
+
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z, am2num))
+			if err != nil {
+				return err
+			}
+		}
+
+		// Get apim instance 1 service name using hardcoded value
+		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim1Service(apimanager))
+		}
+
+		// Get apim instance 2 service name using hardcoded value
+		service2, err := c.servicesLister.Services(apimanager.Namespace).Get(apim2serviceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			service2, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim2Service(apimanager))
+		}
+
+		// Get apim common service name using hardcoded value
+		commonservice, err := c.servicesLister.Services(apimanager.Namespace).Get(apimcommonservice)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			commonservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.ApimCommonService(apimanager))
+		}
+
+		// If an error occurs during Get/Create, we'll requeue the item so we can
+		// attempt processing again later. This could have been caused by a
+		// temporary network failure, or any other transient reason.
+		if err != nil {
+			return err
+		}
+
 
 		if apimanager.Spec.Expose == "Ingress" {
 			// Get apim instance 1 service name using hardcoded value
@@ -649,49 +648,7 @@ func (c *Controller) syncHandler(key string) error {
 				return fmt.Errorf(msg)
 			}
 		}
-		
 
-		// Get apim instance 1 service name using hardcoded value
-		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim1Service(apimanager))
-		}
-
-		// Get apim instance 2 service name using hardcoded value
-		service2, err := c.servicesLister.Services(apimanager.Namespace).Get(apim2serviceName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			service2, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim2Service(apimanager))
-		}
-
-		// Get analytics dashboard service name using hardcoded value
-		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.DashboardService(apimanager))
-		}
-
-		// Get analytics worker service name using hardcoded value
-		workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerService(apimanager))
-		}
-
-		// Get apim instance 2 service name using hardcoded value
-		commonservice, err := c.servicesLister.Services(apimanager.Namespace).Get(apimcommonservice)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			commonservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.ApimCommonService(apimanager))
-		}
-      
-		// If an error occurs during Get/Create, we'll requeue the item so we can
-		// attempt processing again later. This could have been caused by a
-		// temporary network failure, or any other transient reason.
-		if err != nil {
-			return err
-		}
 
 		/////////////checking whether resources are controlled by apimanager with same owner reference
 
@@ -770,14 +727,9 @@ func (c *Controller) syncHandler(key string) error {
 
 
 		if useMysqlPod {
-			// Get mysql service name using hardcoded value
-			mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
-			// If the resource doesn't exist, we'll create it
-			if errors.IsNotFound(err) {
-				mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
-			}
-
 			// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+
+			mysqlservice, _ := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 			if !metav1.IsControlledBy(mysqlservice, apimanager) {
 				msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
@@ -806,8 +758,6 @@ func (c *Controller) syncHandler(key string) error {
 				return fmt.Errorf(msg)
 			}
 		}
-
-
 
 
 		///////////check replicas are same as defined for deployments
@@ -1180,7 +1130,7 @@ func (c *Controller) syncHandler(key string) error {
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
-			
+
 			if useMysqlPod {
 				// Get mysql-pvc name using hardcoded value
 				pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)

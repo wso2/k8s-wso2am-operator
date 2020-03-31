@@ -22,7 +22,7 @@ package versioned
 import (
 	"fmt"
 
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/generated/clientset/versioned/typed/apim/v1alpha1"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned/typed/apim/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"

@@ -16,7 +16,7 @@ metadata:
     containerImage: 'thamiliniramakrishna/api-manager-operator:latest'
     support: ''
     capabilities: Basic Install
-    repository: 'https://github.com/wso2-incubator/wso2am-k8s-operator'
+    repository: 'https://github.com/wso2/k8s-wso2am-operator'
 spec:
   displayName: WSO2 API Manager Operator for Kubernetes
   description: >+
@@ -79,10 +79,10 @@ spec:
     matchLabels: {}
   links:
     - name: Documentation
-      url: 'https://github.com/wso2-incubator/wso2am-k8s-operator/tree/master/docs'
+      url: 'https://github.com/wso2/k8s-wso2am-operator/tree/master/docs'
     - name: Quick Start Guide
       url: >-
-        https://github.com/wso2-incubator/wso2am-k8s-operator/blob/master/README.md#quick-start-guide
+        https://github.com/wso2/k8s-wso2am-operator/blob/master/README.md#quick-start-guide
     - name: Web page
       url: 'https://wso2.com/api-management/'
   icon:

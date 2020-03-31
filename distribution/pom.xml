@@ -24,7 +24,7 @@
     <groupId>apim.wso2.com</groupId>
     <artifactId>wso2am-k8s-operator-distribution</artifactId>
     <version>1.0.0</version>
-    <name>WSO2AM K8S Operator Distribution</name>
+    <name>K8S WSO2AM Operator Distribution</name>
 
     <build>
         <plugins>
@@ -42,7 +42,7 @@
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>
-                            <finalName>wso2am-k8s-operator-${project.version}</finalName>
+                            <finalName>k8s-wso2am-operator-${project.version}</finalName>
                         </configuration>
                     </execution>
                 </executions>

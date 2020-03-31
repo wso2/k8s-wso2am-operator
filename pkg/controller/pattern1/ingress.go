@@ -1,7 +1,27 @@
+/*
+ *
+ *  * Copyright (c) 2020 WSO2 Inc. (http:www.wso2.org) All Rights Reserved.
+ *  *
+ *  * WSO2 Inc. licenses this file to you under the Apache License,
+ *  * Version 2.0 (the "License"); you may not use this file except
+ *  * in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  * http:www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing,
+ *  * software distributed under the License is distributed on an
+ *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  * KIND, either express or implied. See the License for the
+ *  * specific language governing permissions and limitations
+ *  * under the License.
+ *
+ */
+
 package pattern1
 
 import (
-	apimv1alpha1 "github.com/wso2-incubator/wso2am-k8s-operator/pkg/apis/apim/v1alpha1"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	"k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	networkv1 "k8s.io/api/extensions/v1beta1"
@@ -118,7 +138,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 		Spec: v1beta1.IngressSpec{
 			Rules: []networkv1.IngressRule{
 				{
-					Host: "wso2apim-analytics-dashboard",
+					Host: "wso2apim-analytics",
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []networkv1.HTTPIngressPath{
@@ -137,7 +157,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts:[]string{
-						"wso2apim-analytics-dashboard",
+						"wso2apim-analytics",
 					},
 				},
 			},
