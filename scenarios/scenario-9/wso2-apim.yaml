@@ -27,12 +27,12 @@ spec:
     - name: api-manager-1
       deployment:
         configMaps:
-          deploymentConfigMap: mydeploy1
+          deploymentConfigMap: apim-conf-ingress-1
     - name: api-manager-2
       deployment:
         configMaps:
-          deploymentConfigMap: mydeploy2
+          deploymentConfigMap: apim-conf-ingress-2
     - name: analytics-dashboard
       deployment:
         configMaps:
-          deploymentConfigMap: mydash
+          deploymentConfigMap: apim-analytics-dash-conf-ingress

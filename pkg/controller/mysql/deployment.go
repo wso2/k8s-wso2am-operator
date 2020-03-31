@@ -79,7 +79,7 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 										Command:[]string{
 											 "sh",
 											 "-c",
-											 "mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD}",
+											 "mysqladmin ping -u wso2carbon -p${MYSQL_PASSWORD}",
 										},
 									},
 								},

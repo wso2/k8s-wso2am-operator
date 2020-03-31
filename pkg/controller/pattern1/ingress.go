@@ -138,7 +138,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 		Spec: v1beta1.IngressSpec{
 			Rules: []networkv1.IngressRule{
 				{
-					Host: "wso2apim-analytics-dashboard",
+					Host: "wso2apim-analytics",
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []networkv1.HTTPIngressPath{
@@ -157,7 +157,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts:[]string{
-						"wso2apim-analytics-dashboard",
+						"wso2apim-analytics",
 					},
 				},
 			},

@@ -17,7 +17,7 @@
 apiVersion: apim.wso2.com/v1alpha1
 kind: APIManager
 metadata:
-  name: custom-pattern
+  name: custom-pattern-2
 spec:
   pattern: Pattern-X
   service:

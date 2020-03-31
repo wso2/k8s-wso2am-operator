@@ -14,13 +14,15 @@ In this document, we will walk through the following.
 
 * [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
     * Minimum CPU : **4 vCPU** 
-    * Minimum Memory : **6 GB** 
+    * Minimum Memory : **6 GB** <br>
+    
+    **Note:** This is for testing scenario-1.
 
-* Download [k8s-wso2am-operator-0.8.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/0.8/k8s-wso2am-operator-0.8.zip) and extract it. 
+* Download [k8s-wso2am-operator-1.0.0.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/1.0.0/k8s-wso2am-operator-1.0.0.zip) and extract it. 
 
     This zip contains the artifacts that required to deploy in Kubernetes.
 
-**Note:** You need to run all commands from within the k8s-wso2am-operator-0.8 directory.
+**Note:** You need to run all commands from within the k8s-wso2am-operator-1.0.0 directory.
 
 #### Step 1: Deploy WSO2 API Manager Operator
 
@@ -73,7 +75,7 @@ To access the API Manager, add a host mapping entry to the /etc/hosts file. As w
 <Any K8s Node IP>  wso2apim
 ```
 
-- For Docker for Mac use "localhost" for the K8s node IP
+- For Docker for Mac use "127.0.0.1" for the K8s node IP
 - For Minikube, use minikube ip command to get the K8s node IP
 - For GKE
     ```
@@ -87,17 +89,17 @@ To access the API Manager, add a host mapping entry to the /etc/hosts file. As w
    
 ## Sample Scenarios
 
-1. [Scenario-1 : Applying Simple and shortest Custom Resource YAML](scenarios/scenario-2)
-2. [Scenario-2 : Exposing via NodePort Service Type](scenarios/scenario-3)
-3. [Scenario-3 : Override Deployment Configuration values](scenarios/scenario-5)
-4. [Scenario-4 : Override ConfigMaps and PersistentVolumeClaims](scenarios/scenario-6)
-5. [Scenario-5 : Add New Configmaps and Persistent Volume Claims](scenarios/scenario-7)
-6. [Scenario-6 : Deploying Custom Pattern - Basic](scenarios/scenario-1)
-7. [Scenario-7 : Deploying Custom Pattern - Advanced](scenarios/scenario-4)
-8. [Scenario-8 : Running External-NFS](scenarios/scenario-8)
-8. [Scenario-9 : Exposing using Ingresses](scenarios/scenario-9)
+1. [Scenario-1 : Deploy A Single API Manager Instance (Custom Pattern)](scenarios/scenario-1)
+2. [Scenario-2 : Deploy API Manager Pattern-1 (LoadBalancer Service Type)](scenarios/scenario-2)
+3. [Scenario-3 : Deploy API Manager Pattern-1 (NodePort Service Type)](scenarios/scenario-3)
+4. [Scenario-4 : Deploy A Single API Manager Instance with Analytics (Custom Pattern)](scenarios/scenario-4)
+5. [Scenario-5 : Override default configuration values](scenarios/scenario-5)
+6. [Scenario-6 : Override ConfigMaps and PersistentVolumeClaims](scenarios/scenario-6)
+7. [Scenario-7 : Add new configmaps and Persistent Volume Claims](scenarios/scenario-7)
+8. [Scenario-8 : Running External NFS](scenarios/scenario-8)
+9. [Scenario-9 : Expose API Manager using Ingress](scenarios/scenario-9)
 
-### Clean up
+## Clean up
 
 Execute the following command if you wish to clean up the Kubernetes cluster by removing all the applied artifacts and configurations related to WSO2AM Operator.
 

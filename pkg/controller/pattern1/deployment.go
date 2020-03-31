@@ -39,28 +39,12 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 	}
 
 	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager, num)
+	apim1deployports := getApimContainerPorts()
 
-	apim1deployports := []corev1.ContainerPort{}
-	if apimanager.Spec.Service.Type == "LoadBalancer" {
-		apim1deployports = getApimDeployLBPorts()
-	}
-	if apimanager.Spec.Service.Type == "NodePort" {
-		apim1deployports = getApimDeployNPPorts()
-	}
-
-	cmdstring := []string{}
-	if apimanager.Spec.Service.Type == "NodePort" {
-		cmdstring = []string{
-			"/bin/sh",
-			"-c",
-			"nc -z localhost 32001",
-		}
-	} else {
-		cmdstring = []string{
-			"/bin/sh",
-			"-c",
-			"nc -z localhost 9443",
-		}
+	cmdstring := []string{
+		"/bin/sh",
+		"-c",
+		"nc -z localhost 9443",
 	}
 
 	initContainers := []corev1.Container{}
@@ -191,32 +175,17 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.Deployment {
 
 	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager, num)
-	apim2deployports := []corev1.ContainerPort{}
-	if apimanager.Spec.Service.Type == "LoadBalancer" {
-		apim2deployports = getApimDeployLBPorts()
-	}
-	if apimanager.Spec.Service.Type == "NodePort" {
-		apim2deployports = getApimDeployNPPorts()
-	}
+	apim2deployports := getApimContainerPorts()
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
 		"node":       "wso2am-pattern-1-am-2",
 	}
 
-	cmdstring := []string{}
-	if apimanager.Spec.Service.Type == "NodePort" {
-		cmdstring = []string{
-			"/bin/sh",
-			"-c",
-			"nc -z localhost 32001",
-		}
-	} else {
-		cmdstring = []string{
-			"/bin/sh",
-			"-c",
-			"nc -z localhost 9443",
-		}
+	cmdstring := []string{
+		"/bin/sh",
+		"-c",
+		"nc -z localhost 9443",
 	}
 
 	initContainers := []corev1.Container{}
@@ -229,6 +198,13 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
 		initContainers = append(initContainers, mysqlContainer)
 	}
+
+	apim1InitContainer := corev1.Container{}
+	apim1InitContainer.Name = "init-apim-1"
+	apim1InitContainer.Image = "busybox:1.31"
+	executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
+	apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
+	initContainers = append(initContainers, apim1InitContainer)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -347,29 +323,12 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 // for handling analytics-dashboard deployment
 func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
 
-	dashdeployports := []corev1.ContainerPort{}
-	if apimanager.Spec.Service.Type == "LoadBalancer" {
-		dashdeployports = getDashDeployLBPorts()
-	} else if apimanager.Spec.Service.Type == "NodePort" {
-		dashdeployports = getDashDeployNPPorts()
-	} else if apimanager.Spec.Service.Type == "ClusterIP" {
-		dashdeployports = getDashDeployLBPorts()
-	} else {
-		dashdeployports = getDashDeployLBPorts()
-	}
-	cmdstring := []string{}
-	if apimanager.Spec.Service.Type == "NodePort" {
-		cmdstring = []string{
-			"/bin/sh",
-			"-c",
-			"nc -z localhost 32201",
-		}
-	} else {
-		cmdstring = []string{
-			"/bin/sh",
-			"-c",
-			"nc -z localhost 9643",
-		}
+	dashdeployports := getDashContainerPorts()
+
+	cmdstring := []string{
+		"/bin/sh",
+		"-c",
+		"nc -z localhost 9643",
 	}
 
 	labels := map[string]string{
@@ -508,6 +467,9 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	}
 	runasuser := int64(802)
 
+	workerContainerPorts := getWorkerContainerPorts()
+
+
 	initContainers := []corev1.Container{}
 
 	if y.UseMysqlPod {
@@ -619,37 +581,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser: &runasuser,
 							},
-
-							Ports: []corev1.ContainerPort{
-								{
-									ContainerPort: 9764,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9444,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7612,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7712,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 9091,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7071,
-									Protocol:      "TCP",
-								},
-								{
-									ContainerPort: 7444,
-									Protocol:      "TCP",
-								},
-							},
+							Ports: workerContainerPorts,
 							VolumeMounts: workervolumemounts,
 						},
 					},

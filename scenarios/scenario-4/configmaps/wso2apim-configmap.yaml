@@ -38,15 +38,15 @@ data:
     [database.apim_db]
     type = "mysql"
     url = "jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_APIMGT_DB?useSSL=false"
-    username = "root"
-    password = "root"
+    username = "wso2carbon"
+    password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
 
     [database.shared_db]
     type = "mysql"
     url = "jdbc:mysql://wso2apim-with-analytics-rdbms-service:3306/WSO2AM_SHARED_DB?autoReconnect=true&amp;useSSL=false"
-    username = "root"
-    password = "root"
+    username = "wso2carbon"
+    password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
 
     [keystore.tls]

@@ -34,6 +34,10 @@ For the above profiles, you can override the fields such as,
 
 You can specify to any or all of the profiles using the given wso2-apim.yaml file. A sample configuration values for 1 of the profile is given, you can include required profiles as an array. Then apply the command,
 
+#### Deploy Pattern-1 by overriding configurations
+
+Please follow the prerequisites section in scenario 2 to deploy Pattern-1 and execute the following command.
+
 ```
-  kubectl apply -f scenarios/scenario-3/wso2-apim.yaml
+  kubectl apply -f wso2-apim.yaml
 ```

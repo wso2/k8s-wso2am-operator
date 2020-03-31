@@ -2,7 +2,7 @@
 
 In this scenario we are deploying a single API Manager instance in Kubernetes.
 
-##### Deploy the configmap and the custom pattern
+#### Deploy the configmap and the custom pattern
 
 The configmap contains the configurations of API Manager node. 
 
@@ -19,7 +19,7 @@ To access the API Manager, add a host mapping entry to the /etc/hosts file. As w
 <Any K8s Node IP>  wso2apim
 ```
 
-- For Docker for Mac use "localhost" for the K8s node IP
+- For Docker for Mac use "127.0.0.1" for the K8s node IP
 - For Minikube, use minikube ip command to get the K8s node IP
 - For GKE
     ```

@@ -126,8 +126,8 @@ func getDashBoardNPPorts() []corev1.ServicePort {
 	dashports = append(dashports, corev1.ServicePort{
 		Name:       "analytics-dashboard",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       32201,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 32201},
+		Port:       9643,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
 		NodePort:   32201,
 	})
 
@@ -149,7 +149,7 @@ func getDashBoardPorts() []corev1.ServicePort {
 
 //container ports
 
-func getApimDeployLBPorts() []corev1.ContainerPort {
+func getApimContainerPorts() []corev1.ContainerPort {
 	var apim1deployports []corev1.ContainerPort
 	apim1deployports = append(apim1deployports, corev1.ContainerPort{
 		ContainerPort: 8280,
@@ -167,32 +167,23 @@ func getApimDeployLBPorts() []corev1.ContainerPort {
 		ContainerPort: 9443,
 		Protocol:      "TCP",
 	})
-	return apim1deployports
-
-}
-func getApimDeployNPPorts() []corev1.ContainerPort {
-	var apim1deployports []corev1.ContainerPort
 	apim1deployports = append(apim1deployports, corev1.ContainerPort{
-		ContainerPort: 30838, //8280,
+		ContainerPort: 9611,
 		Protocol:      "TCP",
 	})
 	apim1deployports = append(apim1deployports, corev1.ContainerPort{
-		ContainerPort: 30801, //8243,
+		ContainerPort: 9711,
 		Protocol:      "TCP",
 	})
 	apim1deployports = append(apim1deployports, corev1.ContainerPort{
-		ContainerPort: 32321, //9763,
-		Protocol:      "TCP",
-	})
-	apim1deployports = append(apim1deployports, corev1.ContainerPort{
-		ContainerPort: 32001, //9443,
+		ContainerPort: 5672,
 		Protocol:      "TCP",
 	})
 	return apim1deployports
 
 }
 
-func getDashDeployLBPorts() []corev1.ContainerPort {
+func getDashContainerPorts() []corev1.ContainerPort {
 	var dashdeployports []corev1.ContainerPort
 	dashdeployports = append(dashdeployports, corev1.ContainerPort{
 		ContainerPort: 9713,
@@ -220,31 +211,38 @@ func getDashDeployLBPorts() []corev1.ContainerPort {
 	})
 	return dashdeployports
 }
-func getDashDeployNPPorts() []corev1.ContainerPort {
-	var dashdeployports []corev1.ContainerPort
-	dashdeployports = append(dashdeployports, corev1.ContainerPort{
-		ContainerPort: 32271,
+
+func getWorkerContainerPorts() []corev1.ContainerPort {
+
+	var workerdeployports []corev1.ContainerPort
+	workerdeployports = append(workerdeployports, corev1.ContainerPort{
+		ContainerPort: 9764,
 		Protocol:      "TCP",
 	})
-	dashdeployports = append(dashdeployports, corev1.ContainerPort{
-		ContainerPort: 32201,
+	workerdeployports = append(workerdeployports, corev1.ContainerPort{
+		ContainerPort: 9444,
 		Protocol:      "TCP",
 	})
-	dashdeployports = append(dashdeployports, corev1.ContainerPort{
-		ContainerPort: 32171,
+	workerdeployports = append(workerdeployports, corev1.ContainerPort{
+		ContainerPort: 7612,
 		Protocol:      "TCP",
 	})
-	dashdeployports = append(dashdeployports, corev1.ContainerPort{
-		ContainerPort: 30271,
+	workerdeployports = append(workerdeployports, corev1.ContainerPort{
+		ContainerPort: 7712,
 		Protocol:      "TCP",
 	})
-	dashdeployports = append(dashdeployports, corev1.ContainerPort{
-		ContainerPort: 32649,
+	workerdeployports = append(workerdeployports, corev1.ContainerPort{
+		ContainerPort: 9091,
 		Protocol:      "TCP",
 	})
-	dashdeployports = append(dashdeployports, corev1.ContainerPort{
-		ContainerPort: 30171,
+	workerdeployports = append(workerdeployports, corev1.ContainerPort{
+		ContainerPort: 7071,
 		Protocol:      "TCP",
 	})
-	return dashdeployports
+	workerdeployports = append(workerdeployports, corev1.ContainerPort{
+		ContainerPort: 7444,
+		Protocol:      "TCP",
+	})
+	return workerdeployports
 }
+

@@ -11,7 +11,7 @@ spec:
   pattern: Pattern-1
 ```
 
-### Installation Prerequisites
+#### Installation Prerequisites
 
 * [Helm](https://helm.sh/docs/intro/install/) v3.1.0 or above
 
@@ -96,7 +96,7 @@ That is all, Now run the flow in order from start.
 
 -----
 
-##### Deploy pattern 1
+#### Deploy pattern 1
 
 ```
 kubectl create -f wso2-apim.yaml

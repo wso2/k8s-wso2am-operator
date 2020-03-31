@@ -1,21 +1,25 @@
 ## Scenario-6 : Override ConfigMaps and PersistentVolumeClaims
 
-You can override the default deployemnt configmap present for each profile.
+You can override the default deployemnt configmaps and persistent volume claims present for each profile.
 
 1. Create a new deployment configmap using the deployment.toml/ deployment.yaml files. And apply the command.
 
-```
-  kubectl create configmap <NEW-PROFILE-CONFIGMAP> --from-file=<PATH_TO_DEPLOYMENT.TOML>
-```
+    ```
+      kubectl create configmap <NEW-PROFILE-CONFIGMAP> --from-file=<PATH_TO_DEPLOYMENT.TOML>
+    ```
 
-2. Then in the given wso2-apim.yaml file replace, the **deploymentConfigmap** name to the above created name.
+2. Update the custom resources with created configmap.
 
-Similarly, you can create the persistent volume claims for synapse configs and execution plans. 
-And add the newly created pvc names in relevant places of **synapseConfigs** and **executionPlans**.
+    Replace, the **deploymentConfigmap** with configmap name.
 
-3. Finally apply the command,
+3. Deploy updated pattern-1.
 
-```
-  kubectl apply -f scenarios/scenario-4/wso2-apim.yaml
-```
+    ```
+      kubectl apply -f wso2-apim.yaml
+    ```
 
+Similarly, you can create the persistent volume claims for synapse configs and execution plans. Add the newly created pvc names in relevant places of **synapseConfigs** and **executionPlans**.
+
+    persistentVolumeClaim:
+      synapseConfigs: <NEW_PROFILE_SYNAPSE_CONFIGS_PVC>
+      executionPlans: <NEW_PROFILE_EXECUTION_PLANS_PVC>
