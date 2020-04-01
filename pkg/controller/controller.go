@@ -301,7 +301,7 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
-	configMapName := "controller-config"
+	configMapName := "wso2am-operator-controller-config"
 	configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
 	useMysqlPod, _ := strconv.ParseBool(configmap.Data["use-mysql-pod"])
 
@@ -848,7 +848,7 @@ func (c *Controller) syncHandler(key string) error {
 
 	if apimanager.Spec.Pattern == "Pattern-X" {
 
-		configMapName := "controller-config"
+		configMapName := "wso2am-operator-controller-config"
 		configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
 
 		if errors.IsNotFound(err) {
