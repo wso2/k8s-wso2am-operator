@@ -17,7 +17,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: controller-config
+  name: wso2am-operator-controller-config
   namespace: wso2-system
 data:
 
