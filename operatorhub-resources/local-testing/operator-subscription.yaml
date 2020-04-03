@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+    name: my-operator-subscription
+    namespace: marketplace
+spec:
+    channel: stable
+    name: api-manager-operator
+    source: rakhitharr-operators
+    sourceNamespace: marketplace
+    
