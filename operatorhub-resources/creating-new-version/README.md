@@ -15,17 +15,17 @@
 
 2. You can preview the csv file created in the 1st step using [this](<https://operatorhub.io/preview>)
 
-3. Add the directory with the new version to the api-manager-operator bundle available [here](<https://github.com/wso2/k8s-wso2am-operator/tree/master/operatorhub-resources/api-manager-operator>) and the bundle should be in the below format.
+3. Add the directory with the new version to the wso2am-operator bundle available [here](<https://github.com/wso2/k8s-wso2am-operator/tree/master/operatorhub-resources/wso2am-operator>) and the bundle should be in the below format.
 
 ```bash
-   api-manager-operator
+   wso2am-operator
    |- 1.0.0
-   |  |- api-manager-operator.v1.0.0.clusterserviceversion.yaml
+   |  |- wso2am-operator.v1.0.0.clusterserviceversion.yaml
    |  |- apimanagers.apim.wso2.com.crd.yaml
    |- 1.0.1
-   |  |- api-manager-operator.v1.0.1.clusterserviceversion.yaml
+   |  |- wso2am-operator.v1.0.1.clusterserviceversion.yaml
    |  |- apimanagers.apim.wso2.com.crd.yaml
-   |- api-manager-operator.package.yaml
+   |- wso2am-operator.package.yaml
 ```
    
 Note:
@@ -35,9 +35,9 @@ packageName: api-operator
 ```
 channels:
   - name: stable
-    currentCSV: api-manager-operator.v1.0.0
+    currentCSV: wso2am-operator.v1.0.0
   - name: alpha
-    currentCSV: api-manager-operator.v1.0.1
+    currentCSV: wso2am-operator.v1.0.1
 defaultChannel: stable
 ```
 
@@ -62,18 +62,18 @@ pip3 install operator-courier
 ```
 6.Verify your bundle
 ```
-thamilini:operatorhub-resources thamilini$ operator-courier --verbose verify  api-manager-operator
+thamilini:operatorhub-resources thamilini$ operator-courier --verbose verify  wso2am-operator
 INFO:operatorcourier.verified_manifest:The source directory is in nested structure.
 INFO:operatorcourier.verified_manifest:Parsing version: 1.0.1
 INFO: Validating bundle. []
 INFO: Validating custom resource definitions. []
 INFO: Evaluating crd apimanagers.apim.wso2.com [1.0.1/apimanagers.apim.wso2.com.crd.yaml]
 INFO: Validating cluster service versions. [1.0.1/apimanagers.apim.wso2.com.crd.yaml]
-INFO: Evaluating csv api-manager-operator.v1.0.1 [1.0.1/api-manager-operator.v1.0.1.clusterserviceversion.yaml]
-INFO: Validating packages. [1.0.1/api-manager-operator.v1.0.1.clusterserviceversion.yaml]
-INFO: Evaluating package api-manager-operator [api-manager-operator/api-manager-operator.package.yaml]
-INFO: Validating cluster service versions for operatorhub.io UI. [api-manager-operator/api-manager-operator.package.yaml]
-INFO: Evaluating csv api-manager-operator.v1.0.1 [api-manager-operator/api-manager-operator.package.yaml]
+INFO: Evaluating csv wso2am-operator.v1.0.1 [1.0.1/wso2am-operator.v1.0.1.clusterserviceversion.yaml]
+INFO: Validating packages. [1.0.1/wso2am-operator.v1.0.1.clusterserviceversion.yaml]
+INFO: Evaluating package wso2am-operator [wso2am-operator/wso2am-operator.package.yaml]
+INFO: Validating cluster service versions for operatorhub.io UI. [wso2am-operator/wso2am-operator.package.yaml]
+INFO: Evaluating csv wso2am-operator.v1.0.1 [wso2am-operator/wso2am-operator.package.yaml]
 ```
 
 7. Login to quay.io account
@@ -88,9 +88,9 @@ export QUAY_TOKEN="basic abvefjijkl=="
 
 8. Push the bundle to quay.io
 ```
-export OPERATOR_DIR=api-manager-operator/
+export OPERATOR_DIR=wso2am-operator/
 export QUAY_NAMESPACE=thamiliniram
-export PACKAGE_NAME=api-manager-operator
+export PACKAGE_NAME=wso2am-operator
 export PACKAGE_VERSION=1.0.1
 export TOKEN=$QUAY_TOKEN
 operator-courier --verbose push "$OPERATOR_DIR" "$QUAY_NAMESPACE" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$TOKEN"
