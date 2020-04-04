@@ -51,6 +51,13 @@ rules:
       - patch
       - watch
   - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - servicemonitors
+    verbs:
+      - get
+      - create
+  - apiGroups:
       - extensions
     resources:
       - ingresses

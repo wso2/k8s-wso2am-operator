@@ -1,7 +1,7 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: api-manager-operator.v1.0.1
+  name: wso2am-operator.v1.0.0
   namespace: placeholder
   annotations:
     alm-examples: >-
@@ -81,7 +81,7 @@ spec:
 
 
   maturity: 'stable'
-  version: 1.0.1
+  version: 1.0.0
   # replaces: 'apim-manager-operator.v1.0.0'
   minikubeVersion: 1.12.0
   keywords:
@@ -171,6 +171,13 @@ spec:
                 - patch
                 - watch
             - apiGroups:
+                - monitoring.coreos.com
+              resources:
+                - servicemonitors
+              verbs:
+                - get
+                - create
+            - apiGroups:
                 - extensions
               resources:
                 - ingresses
@@ -207,7 +214,7 @@ spec:
                 - patch
                 - watch
       deployments:
-        - name: api-manager-operator
+        - name: wso2am-operator
           spec:
             replicas: 1
             selector:
@@ -230,7 +237,7 @@ spec:
                           fieldRef:
                             fieldPath: metadata.name
                       - name: OPERATOR_NAME
-                        value: api-manager-operator
+                        value: wso2am-operator
                 serviceAccountName: wso2am-pattern-1-svc-account
   installModes:
     - type: OwnNamespace

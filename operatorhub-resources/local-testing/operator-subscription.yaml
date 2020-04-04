@@ -5,7 +5,7 @@ metadata:
     namespace: marketplace
 spec:
     channel: stable
-    name: api-manager-operator
-    source: rakhitharr-operators
+    name: wso2am-operator
+    source: wso2am-operators
     sourceNamespace: marketplace
     
