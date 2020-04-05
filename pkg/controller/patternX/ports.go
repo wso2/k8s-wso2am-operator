@@ -57,6 +57,13 @@ func getApimCommonSvcNPPorts() []corev1.ServicePort {
 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
 		NodePort:   32001,
 	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "jms-port",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       5672,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
+		NodePort:   32005,
+	})
 	return apimsvs1ports
 }
 
@@ -85,6 +92,12 @@ func getApimCommonSvcPorts() []corev1.ServicePort {
 		Protocol:   corev1.ProtocolTCP,
 		Port:       9443,
 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "jms-port",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       5672,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
 	})
 
 	return apimsvs1ports
