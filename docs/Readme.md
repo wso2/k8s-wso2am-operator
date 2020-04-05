@@ -1,4 +1,4 @@
-### WSO2AM K8S Operator Docs
+### WSO2AM K8s Operator Docs
 
 ###### Welcome to WSO2AM K8S Operator doc space.
 
@@ -11,7 +11,7 @@ You can find the content you need to be working with the WSO2AM K8S Operator in 
     - [Configure Database Manually](HowToGuide/configure-database-manually.md)
     - [Configure Custom Pattern](HowToGuide/configure-own-custom-pattern.md)
     - [Use Different Service Types](HowToGuide/using-different-service-types.md)
-    - [Use Different Volume Types](HowToGuide/using-different-volume-types.md)
+    - [Use Different Persistent Volumes](HowToGuide/using-different-persistent-volumes.md)
     
 3. [Troubleshooting Guide](Troubleshooting/troubleshooting.md)
 

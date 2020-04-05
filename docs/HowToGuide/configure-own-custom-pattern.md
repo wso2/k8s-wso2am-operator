@@ -1,53 +1,56 @@
 ### Configure Own Custom Pattern
 
-The user has the flexibility to create a completely new Pattern they wish.
+You can introduce a new custom pattern with any number of profiles.
 
-They must provide the type for each of the profiles. And then based on the types, a template for that type of profile will be created.
-But the user can specify whatever the fields they want to override without taking the default configuratiosn specific to that type.
+There are several types of profiles:
 
-For the above profiles, user can override the fields such as,
+    * api-manager
+    * analytics-dashboard
+    * analytics-worker
 
-* Replicas
-* MinReadySeconds
-* Resources 
-  * Requests 
-    * Memory 
-    * CPU
-  * Limits 
-    * Memory 
-    * CPU
-* LivenessProbe
-  - InitialDelaySeconds
-  - PeriodSeconds
-  - FailureTHreshold
-* ReadinessProbe
-  - InitialDelaySeconds
-  - PeriodSeconds
-  - FailureTHreshold
-* imagePullPolicy
+- You can create any no.of profiles with given types.
+- You can provide desired configuration values if you wish, if not provided it will take upon the default type specific configuration values.
+- Under a profile, everything except name, type, service, and configMaps are optional fields.
+- You need to create relevant configmaps and persistent volume claims and add them under deploymentConfigmap, synapseConfigs and executionPlans. If you do not specify any persistent volume claims, default ones will not be created unlike in Pattern 1. You would not need a NFS deployment in this case.
 
-
-Also they can add the Newly created configmaps and persistent volume claims to override the default ones.
+#### Available options in a custom pattern can be found here.
 
 ```
-  configMaps:
+apiVersion: apim.wso2.com/v1alpha1
+kind: APIManager
+metadata:
+  name: cluster-1
+spec:
+  pattern: Pattern-X
+  service:
+    type: NodePort
+  profiles:
+    - name: <NEW_PROFILE_NAME>
+      type: api-manager
+      service:
+        name: <NEW_PROFILE_SERVICE_NAME>
+      deployment:
+        replicas: 1
+        minReadySeconds: 100
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 2000m
+          limits:
+            memory: 3Gi
+            cpu: 3000m
+        livenessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        configMaps:
           deploymentConfigMap: <NEW_PROFILE_DEPLOYMENT_CONFIGMAP>
-  persistentVolumeClaim:
-          synapseConfigs: <NEW_PROFILE_SYNAPSE_CONFIGS_PVC>
-          executionPlans: <NEW_PROFILE_EXECUTION_PLANS_PVC>
+        persistentVolumeClaim:
+          synapseConfigs: <NEW_PROFILE_SYNAPSE_CONFIGS>
+          executionPlans: <NEW_PROFILE_EXECUTION_PLANS>
 ```
-Also, there is an additional functionality to add new configmap and persistent volumes with new MountPaths as well.
-```
-  configMaps:
-          newConfigMap:
-              - name: <NEW_CONFIGMAP_1>
-                mountapth: <NEW_MOUNTPATH_FOR_CONFIGMAP_1>
-  persistentVolumeClaim:
-          newClaim:
-              - name: <NEW_CLAIM_1>
-                mountpath: <NEW_MOUNTPATH_FOR_CLAIM_1>
-```
-Finally via applying that custom resource YAML file, it will automatically start to create all the artifacts for the newly created pattern.
-
-The scenario for Customizing the new pattern can be seen in [Scenario-6](https://github.com/wso2/k8s-wso2am-operator/tree/master/scenarios/scenario-6)
-

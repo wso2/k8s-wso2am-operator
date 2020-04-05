@@ -1,11 +1,11 @@
-## Trouble Shooting Guide - WSO2AM-K8S-OPERATOR
+## Troubleshooting Guide
 
 #### Check logs of wso2am-controller
 
 The controller will be running in "wso2-system" namespace
    
 ```
-kubectl get pods -n wso2-system
+>> kubectl get pods -n wso2-system
 
 Output:
 NAME                               READY   STATUS    RESTARTS   AGE
@@ -13,7 +13,7 @@ wso2am-controller-75c5b84c-vsp4x   1/1     Running   0          76m
 
 ---
 
-kubectl logs wso2am-controller-75c5b84c-vsp4x -n wso2-system
+>> kubectl logs wso2am-controller-75c5b84c-vsp4x -n wso2-system
 
 Output:
 W0113 09:00:45.694404       1 client_config.go:543] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work.
@@ -33,7 +33,7 @@ I0113 09:02:23.739969       1 controller.go:265] Successfully synced 'default/cl
 #### If your pods keep on restarting, and if you see the following output,
 
 ```
-kubectl get pods 
+>> kubectl get pods 
 
 Output:
 NAME                                                      READY   STATUS    RESTARTS   AGE
@@ -44,15 +44,14 @@ wso2-am-analytics-dashboard-cluster-1-577fbd446d-7tpm2    1/1     Running   0   
 wso2-am-analytics-worker-cluster-1-5fb86bf777-dwgkw       1/1     Running   0          6m
 ```
 Then,
-- Check your Internet Connection
 - Check whether the cluster is created with enough resources specified
 - Try to delete the pod using the following command
    ```
-      kubectl delete pod <POD_NAME>
+   >> kubectl delete pod <POD_NAME>
    ```
  
 - See the logs of the pods, if they throw any errors, using the command,
    ```
-      kubectl logs <POD_NAME>
+   >> kubectl logs <POD_NAME>
    ```
 
