@@ -18,7 +18,7 @@ In this document, we will walk through the following.
     
     **Note:** This is for running scenario-1.
 
-* Download [k8s-wso2am-operator-1.0.0.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/1.0.0/k8s-wso2am-operator-1.0.0.zip) and extract it. 
+* Download [k8s-wso2am-operator-1.0.0.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/v1.0.0/k8s-wso2am-operator-1.0.0.zip) and extract it. 
 
     This zip contains the artifacts that required to deploy in Kubernetes.
 
@@ -28,7 +28,7 @@ In this document, we will walk through the following.
 
 #### Step 1: Deploy WSO2 API Manager Operator
 
-- Creates a namespace called wso2-system and deploys the controller artifacts.
+- Creates a namespace called wso2-system and deploy the controller artifacts.
 
     ``` 
     >> kubectl apply -f artifacts/operator-artifacts/ -f artifacts/operator-configs/ -f artifacts/api-manager-artifacts/pattern-1/
@@ -50,7 +50,6 @@ In this document, we will walk through the following.
     >> kubectl apply -f scenarios/scenario-1/
     
     Output:
-    
     configmap/apim-conf created
     apimanager.apim.wso2.com/custom-pattern-1 created
     ```
@@ -61,12 +60,12 @@ In this document, we will walk through the following.
     >> kubectl get pods
     
     Output:
-    
     NAME                                     READY   STATUS    RESTARTS   AGE
     all-in-one-api-manager-d66d6c574-bnwps   0/1     Running   0          2m43s
     
     >> kubectl get svc
     
+    Output:
     NAME         TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)                                                       AGE
     kubernetes   ClusterIP   10.0.32.1     <none>        443/TCP                                                       6h28m
     wso2apim     NodePort    10.0.36.136   <none>        8280:32004/TCP,8243:32003/TCP,9763:32002/TCP,9443:32001/TCP   4m32s

@@ -51,6 +51,21 @@
             <outputDirectory>/docs</outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
         </fileSet>
+        <fileSet>
+            <directory>../artifacts/api-manager-artifacts</directory>
+            <outputDirectory>/artifacts/operatorhub-controller-configs/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../artifacts/operator-artifacts/</directory>
+            <outputDirectory>/artifacts/operatorhub-controller-configs/</outputDirectory>
+            <includes>
+                <include>1-namespace.yaml</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../artifacts/operator-configs/</directory>
+            <outputDirectory>/artifacts/operatorhub-controller-configs/</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
 
