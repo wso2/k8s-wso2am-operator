@@ -254,13 +254,23 @@ func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.Config
 		"deployment": "wso2am-pattern-1-am",
 		"node":       "wso2am-pattern-1-am-1",
 	}
+	blockOwnerDeletion := true
+	isController := true
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      configMap.Name + "-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			Labels:    labels,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				metav1.OwnerReference{
+					APIVersion:			apimanager.APIVersion,
+					Kind:				apimanager.Kind,
+					Name:				apimanager.Name,
+					UID:				apimanager.UID,
+					BlockOwnerDeletion:	&blockOwnerDeletion,
+					Controller:			&isController,
+
+				},
 			},
 		},
 		Data: configMap.Data,
