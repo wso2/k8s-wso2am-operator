@@ -112,7 +112,7 @@ func MakeSynapseConfigsPvc(apimanager *apimv1alpha1.APIManager, sconf *PvcConfig
 			Name:      sconf.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: v1.PersistentVolumeClaimSpec{
@@ -142,7 +142,7 @@ func MakeExecutionPlansPvc(apimanager *apimv1alpha1.APIManager, epconf *PvcConfi
 			Name:      epconf.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: v1.PersistentVolumeClaimSpec{

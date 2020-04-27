@@ -43,7 +43,7 @@ func ApimIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 				"nginx.ingress.kubernetes.io/session-cookie-hash": "sha1",
 			},
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: v1beta1.IngressSpec{
@@ -87,7 +87,7 @@ func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
 			},
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: v1beta1.IngressSpec{
@@ -132,7 +132,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress  {
 			},
 
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: v1beta1.IngressSpec{

@@ -50,22 +50,12 @@ func ApimXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile) *
 		servType = "LoadBalancer"
 	}
 
-	blockOwnerDeletion := true
-	isController := true
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      r.Service.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				metav1.OwnerReference{
-					APIVersion:			apimanager.APIVersion,
-					Kind:				apimanager.Kind,
-					Name:				apimanager.Name,
-					UID:				apimanager.UID,
-					BlockOwnerDeletion:	&blockOwnerDeletion,
-					Controller:			&isController,
-
-				},
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: corev1.ServiceSpec{
@@ -97,22 +87,12 @@ func DashboardXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profi
 		servType = "LoadBalancer"
 	}
 
-	blockOwnerDeletion := true
-	isController := true
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      r.Service.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				metav1.OwnerReference{
-					APIVersion:			apimanager.APIVersion,
-					Kind:				apimanager.Kind,
-					Name:				apimanager.Name,
-					UID:				apimanager.UID,
-					BlockOwnerDeletion:	&blockOwnerDeletion,
-					Controller:			&isController,
-
-				},
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: corev1.ServiceSpec{
@@ -130,22 +110,12 @@ func WorkerXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile)
 
 	servType := "ClusterIP"
 
-	blockOwnerDeletion := true
-	isController := true
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:     r.Service.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				metav1.OwnerReference{
-					APIVersion:			apimanager.APIVersion,
-					Kind:				apimanager.Kind,
-					Name:				apimanager.Name,
-					UID:				apimanager.UID,
-					BlockOwnerDeletion:	&blockOwnerDeletion,
-					Controller:			&isController,
-
-				},
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: corev1.ServiceSpec{

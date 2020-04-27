@@ -36,8 +36,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profil
 		"deployment": r.Name,
 	}
 	apimXVolumeMount, apimXVolume := getApimXVolumes(apimanager, *r, x)
-	blockOwnerDeletion := true
-	isController := true
+
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depApiVersion,
@@ -47,15 +46,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profil
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				metav1.OwnerReference{
-					APIVersion:			apimanager.APIVersion,
-					Kind:				apimanager.Kind,
-					Name:				apimanager.Name,
-					UID:				apimanager.UID,
-					BlockOwnerDeletion:	&blockOwnerDeletion,
-					Controller:			&isController,
-
-				},
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -166,8 +157,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.P
 	runasuser := int64(802)
 
 	dashVolumeMount, dashVolume := getDashboardXVolumes(apimanager, *r)
-	blockOwnerDeletion := true
-	isController := true
+
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depApiVersion,
@@ -177,15 +167,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.P
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				metav1.OwnerReference{
-					APIVersion:			apimanager.APIVersion,
-					Kind:				apimanager.Kind,
-					Name:				apimanager.Name,
-					UID:				apimanager.UID,
-					BlockOwnerDeletion:	&blockOwnerDeletion,
-					Controller:			&isController,
-
-				},
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -303,8 +285,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.P
 // for handling analytics-worker deployment
 func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
 	workervolumemounts, workervolume := getWorkerXVolumes(apimanager, *r)
-	blockOwnerDeletion := true
-	isController := true
+
 	labels := map[string]string{
 		"deployment": r.Name,
 	}
@@ -318,15 +299,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Prof
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				metav1.OwnerReference{
-					APIVersion:			apimanager.APIVersion,
-					Kind:				apimanager.Kind,
-					Name:				apimanager.Name,
-					UID:				apimanager.UID,
-					BlockOwnerDeletion:	&blockOwnerDeletion,
-					Controller:			&isController,
-
-				},
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{

@@ -43,7 +43,7 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 			Name:      "mysql-"+apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
