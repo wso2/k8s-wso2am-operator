@@ -449,7 +449,7 @@ func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.Config
 			Namespace: apimanager.Namespace,
 			Labels:    labels,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Data: configMap.Data,

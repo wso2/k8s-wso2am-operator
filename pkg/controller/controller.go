@@ -192,7 +192,7 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) error {
 	defer c.workqueue.ShutDown()
 
 	// Start the informer factories to begin populating the informer caches
-	klog.Info("Starting Apimanager controller")
+	klog.Info("Starting APIManager controller")
 
 	// Wait for the caches to be synced before starting workers
 	//if controller is down and then once its up, controller query api server for objects, so it has to wait for objects in cache to sync
@@ -237,6 +237,7 @@ func (c *Controller) processNextWorkItem() bool {
 		// not call Forget if a transient error occurs, instead the item is
 		// put back on the workqueue and attempted again after a back-off
 		// period.
+		klog.Infof("Current object in workqueue: %s", obj)
 		defer c.workqueue.Done(obj)
 		var key string
 		var ok bool
@@ -250,6 +251,7 @@ func (c *Controller) processNextWorkItem() bool {
 			// Forget here else we'd go into a loop of attempting to
 			// process a work item that is invalid.
 			c.workqueue.Forget(obj)
+			klog.Warningf("Invalid item in workqueue: %s", key)
 			utilruntime.HandleError(fmt.Errorf("expected string in workqueue but got %#v", obj))
 			return nil
 		}
@@ -631,19 +633,19 @@ func (c *Controller) syncHandler(key string) error {
 
 			// If the apim ingress is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(amingress, apimanager) {
-				msg := fmt.Sprintf("am ingress %q already exists and is not managed by Apimanager", amingress.Name)
+				msg := fmt.Sprintf("am ingress %q already exists and is not managed by APIManager", amingress.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
 			// If the apim ingress is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(gatewayingress, apimanager) {
-				msg := fmt.Sprintf("gateway ingress %q already exists and is not managed by Apimanager", gatewayingress.Name)
+				msg := fmt.Sprintf("gateway ingress %q already exists and is not managed by APIManager", gatewayingress.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
 			// If the apim ingress is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(dashingress, apimanager) {
-				msg := fmt.Sprintf("dashboard ingress %q already exists and is not managed by Apimanager", dashingress.Name)
+				msg := fmt.Sprintf("dashboard ingress %q already exists and is not managed by APIManager", dashingress.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
@@ -654,28 +656,28 @@ func (c *Controller) syncHandler(key string) error {
 
 		// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(deployment, apimanager) {
-			msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by Apimanager", deployment.Name)
+			msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by APIManager", deployment.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 
 		// If the apim instance 2 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(deployment2, apimanager) {
-			msg := fmt.Sprintf("Deployment2 %q already exists and is not managed by Apimanager", deployment2.Name)
+			msg := fmt.Sprintf("Deployment2 %q already exists and is not managed by APIManager", deployment2.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 
 		// If the analytics dashboard Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(dashdeployment, apimanager) {
-			msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", dashdeployment.Name)
+			msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by APIManager", dashdeployment.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 
 		// If the analytics worker Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(workerdeployment, apimanager) {
-			msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by Apimanager", workerdeployment.Name)
+			msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by APIManager", workerdeployment.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
@@ -683,7 +685,7 @@ func (c *Controller) syncHandler(key string) error {
 		if useMysqlPod {
 			//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(mysqldeployment, apimanager) {
-				msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
+				msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by APIManager", mysqldeployment.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
@@ -692,35 +694,35 @@ func (c *Controller) syncHandler(key string) error {
 
 		// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(service, apimanager) {
-			msg := fmt.Sprintf("service1 %q already exists and is not managed by Apimanager", service.Name)
+			msg := fmt.Sprintf("service1 %q already exists and is not managed by APIManager", service.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 
 		// If the apim instance 2 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(service2, apimanager) {
-			msg := fmt.Sprintf("service2 %q already exists and is not managed by Apimanager", service2.Name)
+			msg := fmt.Sprintf("service2 %q already exists and is not managed by APIManager", service2.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 
 		// If the analytics dashboard Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(dashservice, apimanager) {
-			msg := fmt.Sprintf("dashboard Service %q already exists and is not managed by Apimanager", dashservice.Name)
+			msg := fmt.Sprintf("dashboard Service %q already exists and is not managed by APIManager", dashservice.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 
 		// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(workerservice, apimanager) {
-			msg := fmt.Sprintf("worker Service %q already exists and is not managed by Apimanager", workerservice.Name)
+			msg := fmt.Sprintf("worker Service %q already exists and is not managed by APIManager", workerservice.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 
 		// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(commonservice, apimanager) {
-			msg := fmt.Sprintf("common Service %q already exists and is not managed by Apimanager", commonservice.Name)
+			msg := fmt.Sprintf("common Service %q already exists and is not managed by APIManager", commonservice.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
@@ -731,7 +733,7 @@ func (c *Controller) syncHandler(key string) error {
 
 			mysqlservice, _ := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 			if !metav1.IsControlledBy(mysqlservice, apimanager) {
-				msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
+				msg := fmt.Sprintf("mysql service %q already exists and is not managed by APIManager", mysqlservice.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
@@ -740,20 +742,20 @@ func (c *Controller) syncHandler(key string) error {
 
 		// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(pvc1, apimanager) {
-			msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by Apimanager", pvc1.Name)
+			msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by APIManager", pvc1.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 		// If the execution-plan pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(pvc2, apimanager) {
-			msg := fmt.Sprintf("execution-plans pvc %q already exists and is not managed by Apimanager", pvc2.Name)
+			msg := fmt.Sprintf("execution-plans pvc %q already exists and is not managed by APIManager", pvc2.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
 		if useMysqlPod {
 			// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(pvc3, apimanager) {
-				msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by Apimanager", pvc3.Name)
+				msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by APIManager", pvc3.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
@@ -767,28 +769,28 @@ func (c *Controller) syncHandler(key string) error {
 		// current desired replicas on the Deployment, we should update the Deployment resource.
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
 			x := pattern1.AssignApimConfigMapValues(apimanager,configmap,am1num)
-			klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+			klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim1Deployment(apimanager, x,am1num))
 		}
 
 		//for apim instance 2 also
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
 			z := pattern1.AssignApimConfigMapValues(apimanager,configmap,am2num)
-			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
+			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
 			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, z,am2num))
 		}
 
 		//for analytics dashboard deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
 			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
-			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
+			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
 			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, y,dashnum))
 		}
 
 		//for analytics worker deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
 			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
-			klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
+			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
 			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, y,worknum))
 		}
 
@@ -796,7 +798,7 @@ func (c *Controller) syncHandler(key string) error {
 			//for instance mysql deployment
 			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
 				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-				klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
+				klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
 				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
 			}
 		}
@@ -841,7 +843,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		c.recorder.Event(apimanager, corev1.EventTypeNormal, "synced", "Apimanager synced successfully")
+		c.recorder.Event(apimanager, corev1.EventTypeNormal, "synced", "APIManager synced successfully")
 		return nil
 
 	}
@@ -894,13 +896,13 @@ func (c *Controller) syncHandler(key string) error {
 
 			// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(deployment, apimanager) {
-				msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by Apimanager", deployment.Name)
+				msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by APIManager", deployment.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
 			// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(service, apimanager) {
-				msg := fmt.Sprintf("apimananger service %q already exists and is not managed by Apimanager", service.Name)
+				msg := fmt.Sprintf("apimananger service %q already exists and is not managed by APIManager", service.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
@@ -910,7 +912,7 @@ func (c *Controller) syncHandler(key string) error {
 
 			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
 				x := patternX.AssignApimXConfigMapValues(apimanager,configmap,r)
-				klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+				klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r,x))
 			}
 
@@ -966,13 +968,13 @@ func (c *Controller) syncHandler(key string) error {
 
 				// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(deployment, apimanager) {
-					msg := fmt.Sprintf("dashboard deployment %q already exists and is not managed by Apimanager", deployment.Name)
+					msg := fmt.Sprintf("dashboard deployment %q already exists and is not managed by APIManager", deployment.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
 				// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(service, apimanager) {
-					msg := fmt.Sprintf("dashboard service %q already exists and is not managed by Apimanager", service.Name)
+					msg := fmt.Sprintf("dashboard service %q already exists and is not managed by APIManager", service.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
@@ -982,7 +984,7 @@ func (c *Controller) syncHandler(key string) error {
 
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
 					x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
-					klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+					klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r,x))
 				}
 
@@ -1038,13 +1040,13 @@ func (c *Controller) syncHandler(key string) error {
 
 				// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(deployment, apimanager) {
-					msg := fmt.Sprintf("worker deployment %q already exists and is not managed by Apimanager", deployment.Name)
+					msg := fmt.Sprintf("worker deployment %q already exists and is not managed by APIManager", deployment.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
 				// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(service, apimanager) {
-					msg := fmt.Sprintf("worker service %q already exists and is not managed by Apimanager", service.Name)
+					msg := fmt.Sprintf("worker service %q already exists and is not managed by APIManager", service.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
@@ -1056,7 +1058,7 @@ func (c *Controller) syncHandler(key string) error {
 
 					x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
 
-					klog.V(4).Infof("Apimanager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+					klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
 					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.WorkerXDeployment(apimanager, &r,x))
 				}
 
@@ -1120,13 +1122,13 @@ func (c *Controller) syncHandler(key string) error {
 
 			// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(pvc1, apimanager) {
-				msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by Apimanager", pvc1.Name)
+				msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by APIManager", pvc1.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
 			// If the execution-plan pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(pvc2, apimanager) {
-				msg := fmt.Sprintf("execution-plans pvc %q already exists and is not managed by Apimanager", pvc2.Name)
+				msg := fmt.Sprintf("execution-plans pvc %q already exists and is not managed by APIManager", pvc2.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
@@ -1163,28 +1165,28 @@ func (c *Controller) syncHandler(key string) error {
 
 				//// If the mysql Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(mysqldeployment, apimanager) {
-					msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by Apimanager", mysqldeployment.Name)
+					msg := fmt.Sprintf("mysql deployment %q already exists and is not managed by APIManager", mysqldeployment.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
 
 				// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(mysqlservice, apimanager) {
-					msg := fmt.Sprintf("mysql service %q already exists and is not managed by Apimanager", mysqlservice.Name)
+					msg := fmt.Sprintf("mysql service %q already exists and is not managed by APIManager", mysqlservice.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
 
 				// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(pvc3, apimanager) {
-					msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by Apimanager", pvc3.Name)
+					msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by APIManager", pvc3.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
 				//for instance mysql deployment
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
 					//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-					klog.V(4).Infof("Apimanager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
+					klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
 					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
 				}
 
@@ -1200,7 +1202,7 @@ func (c *Controller) syncHandler(key string) error {
 		//////////finally update the deployment resources after done checking
 
 
-		c.recorder.Event(apimanager, corev1.EventTypeNormal, "synced", "Apimanager synced successfully")
+		c.recorder.Event(apimanager, corev1.EventTypeNormal, "synced", "APIManager synced successfully")
 		return nil
 
 	}
@@ -1265,7 +1267,7 @@ func (c *Controller) handleObject(obj interface{}) {
 	klog.V(4).Infof("Processing object: %s", object.GetName())
 	if ownerRef := metav1.GetControllerOf(object); ownerRef != nil {
 		// If this object is not owned by a Apimanager, we should not do anything more with it.
-		if ownerRef.Kind != "Apimanager" {
+		if ownerRef.Kind != "APIManager" {
 			return
 		}
 

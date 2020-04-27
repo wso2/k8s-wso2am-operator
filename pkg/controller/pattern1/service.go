@@ -105,7 +105,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 			Name:      "wso2-am-analytics-dashboard-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: corev1.ServiceSpec{
@@ -128,7 +128,7 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 			Name:      "wso2-am-analytics-worker-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: corev1.ServiceSpec{

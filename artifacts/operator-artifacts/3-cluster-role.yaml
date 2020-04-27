@@ -85,6 +85,7 @@ rules:
       - apim.wso2.com
     resources:
       - apimanagers
+      - apimanagers/finalizers
     verbs:
       - get
       - list

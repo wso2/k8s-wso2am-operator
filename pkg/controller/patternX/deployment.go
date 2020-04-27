@@ -46,7 +46,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profil
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -167,7 +167,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.P
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -299,7 +299,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Prof
 			Name:      r.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{

@@ -115,7 +115,7 @@ func WorkerXService(apimanager *apimv1alpha1.APIManager,r *apimv1alpha1.Profile)
 			Name:     r.Service.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: corev1.ServiceSpec{

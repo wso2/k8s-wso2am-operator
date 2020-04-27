@@ -47,6 +47,7 @@ type configvalues struct {
 	Limitcpu           resource.Quantity
 	Limitmem           resource.Quantity
 	APIMVersion        string
+	UseMysqlPod        bool
 	ImagePullSecret    string
 	ServiceAccountName string
 }
@@ -58,6 +59,7 @@ func AssignApimXConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *
 	apimVersion := ControlConfigData["api-manager-version"]
 	imagePullSecret := ControlConfigData["image-pull-secret-name"]
 	serviceAccountName := ControlConfigData["service-account-name"]
+	useMysqlPod, _ := strconv.ParseBool(ControlConfigData["use-mysql-pod"])
 
 	replicas, _ := strconv.ParseInt(ControlConfigData["apim-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
@@ -140,6 +142,7 @@ func AssignApimXConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *
 		Limitmem:           limitMem,
 		Replicas:           int32(replicas),
 		APIMVersion:        apimVersion,
+		UseMysqlPod:        useMysqlPod,
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
 	}
@@ -166,6 +169,7 @@ func AssignApimAnalyticsConfigMapValues(apimanager *apimv1alpha1.APIManager, con
 
 	imagePullSecret := ControlConfigData["image-pull-secret-name"]
 	serviceAccountName := ControlConfigData["service-account-name"]
+	useMysqlPod, _ := strconv.ParseBool(ControlConfigData["use-mysql-pod"])
 
 	imagePull, _ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["pX-apim-analytics-deployment-resources-requests-cpu"])
@@ -242,6 +246,7 @@ func AssignApimAnalyticsConfigMapValues(apimanager *apimv1alpha1.APIManager, con
 		Limitcpu:           limitCPU,
 		Limitmem:           limitMem,
 		Replicas:           int32(replicas),
+		UseMysqlPod:        useMysqlPod,
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
 	}
@@ -254,13 +259,14 @@ func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.Config
 		"deployment": "wso2am-pattern-1-am",
 		"node":       "wso2am-pattern-1-am-1",
 	}
+	
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      configMap.Name + "-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			Labels:    labels,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Data: configMap.Data,

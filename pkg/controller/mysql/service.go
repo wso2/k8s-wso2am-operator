@@ -37,7 +37,7 @@ func MysqlService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 			Name:      "mysql-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("Apimanager")),
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
 		Spec: corev1.ServiceSpec{
