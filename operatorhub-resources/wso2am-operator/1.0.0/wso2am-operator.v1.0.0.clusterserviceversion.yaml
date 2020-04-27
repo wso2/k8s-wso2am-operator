@@ -55,7 +55,7 @@ metadata:
         Deploying WSO2 API Manager Patterns and custom patterns in Kubernetes through a simple
         command. Introducing a new Custom Resource Definition called APIManager
         for a deployment.
-    containerImage: 'wso2/k8s-wso2am-operator:1.0.0'
+    containerImage: 'rakhitharr/k8s-wso2am-operator:100-betav29'
     support: ''
     capabilities: 'Basic Install'
     repository: 'https://github.com/wso2/k8s-wso2am-operator'
@@ -287,6 +287,7 @@ spec:
                 - apim.wso2.com
               resources:
                 - apimanagers
+                - apimanagers/finalizers
               verbs:
                 - get
                 - list
@@ -309,7 +310,7 @@ spec:
               spec:
                 containers:
                   - name: wso2am-controller
-                    image: 'wso2/k8s-wso2am-operator:1.0.0'
+                    image: 'rakhitharr/k8s-wso2am-operator:100-betav29'
                     imagePullPolicy: Always
                     env:
                       - name: WATCH_NAMESPACE
