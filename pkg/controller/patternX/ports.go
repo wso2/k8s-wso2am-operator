@@ -99,6 +99,18 @@ func getApimCommonSvcPorts() []corev1.ServicePort {
 		Port:       5672,
 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 5672},
 	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "thrift-binary",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9611,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
+	})
+	apimsvs1ports = append(apimsvs1ports, corev1.ServicePort{
+		Name:       "thrift-binary-secure",
+		Protocol:   corev1.ProtocolTCP,
+		Port:       9711,
+		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
+	})
 
 	return apimsvs1ports
 }
