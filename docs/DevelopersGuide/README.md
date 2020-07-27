@@ -32,7 +32,7 @@
 
 ```
     docker build -t USERNAME/wso2am-controller:TAGNAME .
-    sudo docker push USERNAME/wso2am-controller:TAGNAME
+    docker push USERNAME/wso2am-controller:TAGNAME
 ```
 
 * The following is the output of the above commands.
