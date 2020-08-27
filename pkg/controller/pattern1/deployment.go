@@ -50,12 +50,43 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 	initContainers := []corev1.Container{}
 
 	if x.UseMysqlPod {
-		mysqlContainer := corev1.Container{}
-		mysqlContainer.Name = "init-mysql"
-		mysqlContainer.Image = "busybox:1.31"
+		// Downloading mysql connector
+		// init container
+		mysqlConnectorContainer := corev1.Container{}
+		mysqlConnectorContainer.Name = "init-mysql-connector-download"
+		mysqlConnectorContainer.Image = "busybox:1.32"
+		downloadCmdStr := `set -e
+              connector_version=8.0.17
+              wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/`
+		mysqlConnectorContainer.Command = []string{"/bin/sh", "-c", downloadCmdStr}
+		mysqlConnectorContainer.VolumeMounts = []corev1.VolumeMount{
+			{
+				Name:      "mysql-connector-jar",
+				MountPath: "/mysql-connector-jar",
+			},
+		}
+		initContainers = append(initContainers, mysqlConnectorContainer)
+		// volume for downloaded mysql connector
+		apim1Volume = append(apim1Volume, corev1.Volume{
+			Name: "mysql-connector-jar",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
+			},
+		})
+		// volume mount for downloaded mysql connector
+		apim1VolumeMount = append(apim1VolumeMount, corev1.VolumeMount{
+			Name:      "mysql-connector-jar",
+			MountPath: "/home/wso2carbon/wso2-artifact-volume/lib",
+		})
+
+		// Checking for the availability of MySQL Server deployment
+		// init container
+		mysqlWaitContainer := corev1.Container{}
+		mysqlWaitContainer.Name = "init-mysql"
+		mysqlWaitContainer.Image = "busybox:1.32"
 		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
-		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
-		initContainers = append(initContainers, mysqlContainer)
+		mysqlWaitContainer.Command = []string{"/bin/sh", "-c", executionStr}
+		initContainers = append(initContainers, mysqlWaitContainer)
 	}
 
 	return &appsv1.Deployment{
@@ -191,17 +222,49 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 	initContainers := []corev1.Container{}
 
 	if z.UseMysqlPod {
-		mysqlContainer := corev1.Container{}
-		mysqlContainer.Name = "init-mysql"
-		mysqlContainer.Image = "busybox:1.31"
+		// Downloading mysql connector
+		// init container
+		mysqlConnectorContainer := corev1.Container{}
+		mysqlConnectorContainer.Name = "init-mysql-connector-download"
+		mysqlConnectorContainer.Image = "busybox:1.32"
+		downloadCmdStr := `set -e
+              connector_version=8.0.17
+              wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/`
+		mysqlConnectorContainer.Command = []string{"/bin/sh", "-c", downloadCmdStr}
+		mysqlConnectorContainer.VolumeMounts = []corev1.VolumeMount{
+			{
+				Name:      "mysql-connector-jar",
+				MountPath: "/mysql-connector-jar",
+			},
+		}
+		initContainers = append(initContainers, mysqlConnectorContainer)
+		// volume for downloaded mysql connector
+		apim2Volume = append(apim2Volume, corev1.Volume{
+			Name: "mysql-connector-jar",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
+			},
+		})
+		// volume mount for downloaded mysql connector
+		apim2VolumeMount = append(apim2VolumeMount, corev1.VolumeMount{
+			Name:      "mysql-connector-jar",
+			MountPath: "/home/wso2carbon/wso2-artifact-volume/lib",
+		})
+
+		// Checking for the availability of MySQL Server deployment
+		// init container
+		mysqlWaitContainer := corev1.Container{}
+		mysqlWaitContainer.Name = "init-mysql"
+		mysqlWaitContainer.Image = "busybox:1.32"
 		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
-		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
-		initContainers = append(initContainers, mysqlContainer)
+		mysqlWaitContainer.Command = []string{"/bin/sh", "-c", executionStr}
+		initContainers = append(initContainers, mysqlWaitContainer)
 	}
 
+	// Checking for the availability of API Manager Server 1 deployment
 	apim1InitContainer := corev1.Container{}
 	apim1InitContainer.Name = "init-apim-1"
-	apim1InitContainer.Image = "busybox:1.31"
+	apim1InitContainer.Image = "busybox:1.32"
 	executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
 	apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
 	initContainers = append(initContainers, apim1InitContainer)
@@ -342,12 +405,43 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	initContainers := []corev1.Container{}
 
 	if y.UseMysqlPod {
-		mysqlContainer := corev1.Container{}
-		mysqlContainer.Name = "init-mysql"
-		mysqlContainer.Image = "busybox:1.31"
+		// Downloading mysql connector
+		// init container
+		mysqlConnectorContainer := corev1.Container{}
+		mysqlConnectorContainer.Name = "init-mysql-connector-download"
+		mysqlConnectorContainer.Image = "busybox:1.32"
+		downloadCmdStr := `set -e
+              connector_version=8.0.17
+              wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/`
+		mysqlConnectorContainer.Command = []string{"/bin/sh", "-c", downloadCmdStr}
+		mysqlConnectorContainer.VolumeMounts = []corev1.VolumeMount{
+			{
+				Name:      "mysql-connector-jar",
+				MountPath: "/mysql-connector-jar",
+			},
+		}
+		initContainers = append(initContainers, mysqlConnectorContainer)
+		// volume for downloaded mysql connector
+		dashVolume = append(dashVolume, corev1.Volume{
+			Name: "mysql-connector-jar",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
+			},
+		})
+		// volume mount for downloaded mysql connector
+		dashVolumeMount = append(dashVolumeMount, corev1.VolumeMount{
+			Name:      "mysql-connector-jar",
+			MountPath: "/home/wso2carbon/wso2-artifact-volume/lib",
+		})
+
+		// Checking for the availability of MySQL Server deployment
+		// init container
+		mysqlWaitContainer := corev1.Container{}
+		mysqlWaitContainer.Name = "init-mysql"
+		mysqlWaitContainer.Image = "busybox:1.32"
 		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
-		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
-		initContainers = append(initContainers, mysqlContainer)
+		mysqlWaitContainer.Command = []string{"/bin/sh", "-c", executionStr}
+		initContainers = append(initContainers, mysqlWaitContainer)
 	}
 
 	return &appsv1.Deployment{
@@ -469,16 +563,46 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 	workerContainerPorts := getWorkerContainerPorts()
 
-
 	initContainers := []corev1.Container{}
 
 	if y.UseMysqlPod {
-		mysqlContainer := corev1.Container{}
-		mysqlContainer.Name = "init-mysql"
-		mysqlContainer.Image = "busybox:1.31"
+		// Downloading mysql connector
+		// init container
+		mysqlConnectorContainer := corev1.Container{}
+		mysqlConnectorContainer.Name = "init-mysql-connector-download"
+		mysqlConnectorContainer.Image = "busybox:1.32"
+		downloadCmdStr := `set -e
+              connector_version=8.0.17
+              wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${connector_version}/mysql-connector-java-${connector_version}.jar -P /mysql-connector-jar/`
+		mysqlConnectorContainer.Command = []string{"/bin/sh", "-c", downloadCmdStr}
+		mysqlConnectorContainer.VolumeMounts = []corev1.VolumeMount{
+			{
+				Name:      "mysql-connector-jar",
+				MountPath: "/mysql-connector-jar",
+			},
+		}
+		initContainers = append(initContainers, mysqlConnectorContainer)
+		// volume for downloaded mysql connector
+		workervolume = append(workervolume, corev1.Volume{
+			Name: "mysql-connector-jar",
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{},
+			},
+		})
+		// volume mount for downloaded mysql connector
+		workervolumemounts = append(workervolumemounts, corev1.VolumeMount{
+			Name:      "mysql-connector-jar",
+			MountPath: "/home/wso2carbon/wso2-artifact-volume/lib",
+		})
+
+		// Checking for the availability of MySQL Server deployment
+		// init container
+		mysqlWaitContainer := corev1.Container{}
+		mysqlWaitContainer.Name = "init-mysql"
+		mysqlWaitContainer.Image = "busybox:1.32"
 		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
-		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
-		initContainers = append(initContainers, mysqlContainer)
+		mysqlWaitContainer.Command = []string{"/bin/sh", "-c", executionStr}
+		initContainers = append(initContainers, mysqlWaitContainer)
 	}
 
 	return &appsv1.Deployment{
@@ -581,7 +705,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser: &runasuser,
 							},
-							Ports: workerContainerPorts,
+							Ports:        workerContainerPorts,
 							VolumeMounts: workervolumemounts,
 						},
 					},
