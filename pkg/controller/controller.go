@@ -320,7 +320,7 @@ func (c *Controller) syncHandler(key string) error {
 		dashboardServiceName := "wso2-am-analytics-dashboard-svc"
 		workerDeploymentName := "wso2-am-analytics-worker-"+apimanager.Name
         workerServiceName := "wso2-am-analytics-worker-svc"
-        
+
         synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
 		executionPlanPVCName := "wso2am-p1-am-execution-plans"
 		mysqlPVCName := "wso2am-mysql"
@@ -396,7 +396,7 @@ func (c *Controller) syncHandler(key string) error {
 		pvcConfName := "pvc-config"
 		pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
 
-		
+
 		// Get mysql-pvc name using hardcoded value
 		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
 		// If the resource doesn't exist, we'll create it
@@ -558,6 +558,13 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
+		// Get apim instance 1 service name using hardcoded value
+		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim1Service(apimanager))
+		}
+
 		// Get apim instance 2 deployment name using hardcoded value
 		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 		// If the resource doesn't exist, we'll create it
@@ -568,13 +575,6 @@ func (c *Controller) syncHandler(key string) error {
 			if err != nil {
 				return err
 			}
-		}
-
-		// Get apim instance 1 service name using hardcoded value
-		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim1Service(apimanager))
 		}
 
 		// Get apim instance 2 service name using hardcoded value
@@ -738,7 +738,7 @@ func (c *Controller) syncHandler(key string) error {
 				return fmt.Errorf(msg)
 			}
 		}
-        
+
 
 		// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(pvc1, apimanager) {
@@ -1104,7 +1104,7 @@ func (c *Controller) syncHandler(key string) error {
 					fmt.Println("Creating mysql dbscripts configmap in user specified ns",mysqlDbConfUser)
 				}
 			}
-			
+
 			// Get synapse-configs-pvc name using hardcoded value
 			pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
 			// If the resource doesn't exist, we'll create it
