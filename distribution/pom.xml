@@ -23,7 +23,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>apim.wso2.com</groupId>
     <artifactId>k8s-wso2am-operator-distribution</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <name>K8S WSO2AM Operator Distribution</name>
 
     <build>

@@ -47,16 +47,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		"nc -z localhost 9443",
 	}
 
-	initContainers := []corev1.Container{}
-
-	if x.UseMysqlPod {
-		mysqlContainer := corev1.Container{}
-		mysqlContainer.Name = "init-mysql"
-		mysqlContainer.Image = "busybox:1.31"
-		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
-		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
-		initContainers = append(initContainers, mysqlContainer)
-	}
+	initContainers := getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -188,20 +179,12 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 		"nc -z localhost 9443",
 	}
 
-	initContainers := []corev1.Container{}
+	initContainers := getMysqlInitContainers(apimanager, &apim2Volume, &apim2VolumeMount)
 
-	if z.UseMysqlPod {
-		mysqlContainer := corev1.Container{}
-		mysqlContainer.Name = "init-mysql"
-		mysqlContainer.Image = "busybox:1.31"
-		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
-		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
-		initContainers = append(initContainers, mysqlContainer)
-	}
-
+	// Checking for the availability of API Manager Server 1 deployment
 	apim1InitContainer := corev1.Container{}
 	apim1InitContainer.Name = "init-apim-1"
-	apim1InitContainer.Image = "busybox:1.31"
+	apim1InitContainer.Image = "busybox:1.32"
 	executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
 	apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
 	initContainers = append(initContainers, apim1InitContainer)
@@ -339,16 +322,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
-	initContainers := []corev1.Container{}
-
-	if y.UseMysqlPod {
-		mysqlContainer := corev1.Container{}
-		mysqlContainer.Name = "init-mysql"
-		mysqlContainer.Image = "busybox:1.31"
-		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
-		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
-		initContainers = append(initContainers, mysqlContainer)
-	}
+	initContainers := getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -460,7 +434,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 // for handling analytics-worker deployment
 func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
 
-	workervolumemounts, workervolume := getAnalyticsWorkerVolumes(apimanager, num)
+	workerVolMounts, workerVols := getAnalyticsWorkerVolumes(apimanager, num)
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-worker",
@@ -469,17 +443,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 	workerContainerPorts := getWorkerContainerPorts()
 
-
-	initContainers := []corev1.Container{}
-
-	if y.UseMysqlPod {
-		mysqlContainer := corev1.Container{}
-		mysqlContainer.Name = "init-mysql"
-		mysqlContainer.Image = "busybox:1.31"
-		executionStr := "echo -e \"Checking for the availability of MySQL Server deployment\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\";"
-		mysqlContainer.Command = []string{"/bin/sh", "-c", executionStr}
-		initContainers = append(initContainers, mysqlContainer)
-	}
+	initContainers := getMysqlInitContainers(apimanager, &workerVols, &workerVolMounts)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -581,8 +545,8 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 							SecurityContext: &corev1.SecurityContext{
 								RunAsUser: &runasuser,
 							},
-							Ports: workerContainerPorts,
-							VolumeMounts: workervolumemounts,
+							Ports:        workerContainerPorts,
+							VolumeMounts: workerVolMounts,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
@@ -591,7 +555,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 							Name: y.ImagePullSecret,
 						},
 					},
-					Volumes: workervolume,
+					Volumes: workerVols,
 				},
 			},
 		},

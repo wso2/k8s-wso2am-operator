@@ -36,6 +36,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profil
 		"deployment": r.Name,
 	}
 	apimXVolumeMount, apimXVolume := getApimXVolumes(apimanager, *r, x)
+	initContainers := getMysqlInitContainers(apimanager, &apimXVolume, &apimXVolumeMount)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -61,6 +62,7 @@ func ApimXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profil
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
+					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
 							Name:  r.Name + "-container",
@@ -157,6 +159,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.P
 	runasuser := int64(802)
 
 	dashVolumeMount, dashVolume := getDashboardXVolumes(apimanager, *r)
+	initContainers := getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -182,6 +185,7 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.P
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
+					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
 							Name:  r.Name + "-container",
@@ -284,7 +288,8 @@ func DashboardXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.P
 
 // for handling analytics-worker deployment
 func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Profile, x *configvalues) *appsv1.Deployment {
-	workervolumemounts, workervolume := getWorkerXVolumes(apimanager, *r)
+	workerVolMounts, workerVols := getWorkerXVolumes(apimanager, *r)
+	initContainers := getMysqlInitContainers(apimanager, &workerVols, &workerVolMounts)
 
 	labels := map[string]string{
 		"deployment": r.Name,
@@ -314,6 +319,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Prof
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
+					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
 							Name:  r.Name + "-container",
@@ -420,7 +426,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Prof
 								},
 							},
 
-							VolumeMounts: workervolumemounts,
+							VolumeMounts: workerVolMounts,
 						},
 					},
 					ServiceAccountName: x.ServiceAccountName,
@@ -430,7 +436,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Prof
 						},
 					},
 
-					Volumes: workervolume,
+					Volumes: workerVols,
 				},
 			},
 		},

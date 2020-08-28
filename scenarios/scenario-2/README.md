@@ -2,7 +2,7 @@
 
 In this scenario we are deploying API Manager Pattern-1 by using the following simple yaml definition.
 
-```
+```yaml
 apiVersion: apim.wso2.com/v1alpha1
 kind: APIManager
 metadata:

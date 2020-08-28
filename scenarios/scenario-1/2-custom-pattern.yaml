@@ -22,6 +22,7 @@ spec:
   pattern: Pattern-X
   service:
     type: NodePort
+  useMysql: "false"
   profiles:
     - name: all-in-one-api-manager
       type: api-manager

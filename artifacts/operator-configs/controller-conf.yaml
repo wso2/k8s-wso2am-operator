@@ -21,11 +21,9 @@ metadata:
   namespace: wso2-system
 data:
 
-  api-manager-version: "3.2.0-beta"
+  api-manager-version: "3.2.0"
   image-pull-secret-name: ""
   service-account-name: ""
-  # Set this flag to false if you want to manually configure a database rather than using the default mysql deployment in a pod. 
-  use-mysql-pod: "true"
 
   # common configs for apim-instances
   apim-deployment-replicas: "1"
@@ -54,30 +52,30 @@ data:
   apim-analytics-deployment-readinessProbe-failureThreshold: "3"
 
   # pattern specific configs for apim-instances
-  p1-apim-deployment-image: "pubudu/wso2am:3.2.0-beta"
+  p1-apim-deployment-image: "wso2/wso2am:3.2.0"
   p1-apim-deployment-resources-requests-cpu: "2000m"
   p1-apim-deployment-resources-requests-memory: "2Gi"
   p1-apim-deployment-resources-limits-cpu: "2000m"
   p1-apim-deployment-resources-limits-memory: "2Gi"
 
   # custom pattern specific configs for apim-instances
-  pX-apim-deployment-image: "pubudu/wso2am:3.2.0-beta"
+  pX-apim-deployment-image: "wso2/wso2am:3.2.0"
   pX-apim-deployment-resources-requests-cpu: "2000m"
   pX-apim-deployment-resources-requests-memory: "2Gi"
   pX-apim-deployment-resources-limits-cpu: "2000m"
   pX-apim-deployment-resources-limits-memory: "2Gi"
 
   # pattern specific configs for apim-analytics
-  p1-apim-analytics-deployment-dashboard-image: "pubudu/wso2am-analytics-dashboard:3.2.0-beta"
-  p1-apim-analytics-deployment-worker-image: "pubudu/wso2am-analytics-worker:3.2.0-beta"
+  p1-apim-analytics-deployment-dashboard-image: "wso2/wso2am-analytics-dashboard:3.2.0"
+  p1-apim-analytics-deployment-worker-image: "wso2/wso2am-analytics-worker:3.2.0"
   p1-apim-analytics-deployment-resources-requests-cpu: "2000m"
   p1-apim-analytics-deployment-resources-requests-memory: "4Gi"
   p1-apim-analytics-deployment-resources-limits-cpu: "2000m"
   p1-apim-analytics-deployment-resources-limits-memory: "4Gi"
 
   # custom pattern specific configs for apim-analytics
-  pX-apim-analytics-deployment-dashboard-image: "pubudu/wso2am-analytics-dashboard:3.2.0-beta"
-  pX-apim-analytics-deployment-worker-image: "pubudu/wso2am-analytics-worker:3.2.0-beta"
+  pX-apim-analytics-deployment-dashboard-image: "wso2/wso2am-analytics-dashboard:3.2.0"
+  pX-apim-analytics-deployment-worker-image: "wso2/wso2am-analytics-worker:3.2.0"
   pX-apim-analytics-deployment-resources-requests-cpu: "2000m"
   pX-apim-analytics-deployment-resources-requests-memory: "4Gi"
   pX-apim-analytics-deployment-resources-limits-cpu: "2000m"

@@ -21,10 +21,15 @@
 package controller
 
 import (
+	"fmt"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/mysql"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/patternX"
-	"github.com/wso2/k8s-wso2am-operator/pkg/controller/mysql"
-	"fmt"
+	clientset "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
+	samplescheme "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned/scheme"
+	informers "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/apim/v1alpha1"
+	listers "github.com/wso2/k8s-wso2am-operator/pkg/generated/listers/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -45,14 +50,8 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
-	"time"
 	"strconv"
-
-	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
-	clientset "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
-	samplescheme "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned/scheme"
-	informers "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/apim/v1alpha1"
-	listers "github.com/wso2/k8s-wso2am-operator/pkg/generated/listers/apim/v1alpha1"
+	"time"
 )
 
 const controllerAgentName = "wso2am-controller"
@@ -305,7 +304,15 @@ func (c *Controller) syncHandler(key string) error {
 
 	configMapName := "wso2am-operator-controller-config"
 	configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
-	useMysqlPod, _ := strconv.ParseBool(configmap.Data["use-mysql-pod"])
+
+	// UseMysql - default to true
+	useMysqlPod := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysqlPod, err = strconv.ParseBool(apimanager.Spec.UseMysql)
+		if err != nil {
+			return err
+		}
+	}
 
 	if apimanager.Spec.Pattern == "Pattern-1" {
 
@@ -320,7 +327,7 @@ func (c *Controller) syncHandler(key string) error {
 		dashboardServiceName := "wso2-am-analytics-dashboard-svc"
 		workerDeploymentName := "wso2-am-analytics-worker-"+apimanager.Name
         workerServiceName := "wso2-am-analytics-worker-svc"
-        
+
         synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
 		executionPlanPVCName := "wso2am-p1-am-execution-plans"
 		mysqlPVCName := "wso2am-mysql"
@@ -396,7 +403,7 @@ func (c *Controller) syncHandler(key string) error {
 		pvcConfName := "pvc-config"
 		pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
 
-		
+
 		// Get mysql-pvc name using hardcoded value
 		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
 		// If the resource doesn't exist, we'll create it
@@ -558,6 +565,13 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
+		// Get apim instance 1 service name using hardcoded value
+		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
+		// If the resource doesn't exist, we'll create it
+		if errors.IsNotFound(err) {
+			service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim1Service(apimanager))
+		}
+
 		// Get apim instance 2 deployment name using hardcoded value
 		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 		// If the resource doesn't exist, we'll create it
@@ -568,13 +582,6 @@ func (c *Controller) syncHandler(key string) error {
 			if err != nil {
 				return err
 			}
-		}
-
-		// Get apim instance 1 service name using hardcoded value
-		service, err := c.servicesLister.Services(apimanager.Namespace).Get(apim1serviceName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.Apim1Service(apimanager))
 		}
 
 		// Get apim instance 2 service name using hardcoded value
@@ -738,7 +745,7 @@ func (c *Controller) syncHandler(key string) error {
 				return fmt.Errorf(msg)
 			}
 		}
-        
+
 
 		// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(pvc1, apimanager) {
@@ -1104,7 +1111,7 @@ func (c *Controller) syncHandler(key string) error {
 					fmt.Println("Creating mysql dbscripts configmap in user specified ns",mysqlDbConfUser)
 				}
 			}
-			
+
 			// Get synapse-configs-pvc name using hardcoded value
 			pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
 			// If the resource doesn't exist, we'll create it
@@ -1281,4 +1288,3 @@ func (c *Controller) handleObject(obj interface{}) {
 		return
 	}
 }
-

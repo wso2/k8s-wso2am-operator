@@ -111,12 +111,14 @@ type Artifacts struct {
 
 // APIManagerSpec is the spec for a APIManager resource
 type APIManagerSpec struct {
-	Pattern        string             `json:"pattern"`
-	Replicas       *int32             `json:"replicas"`
-	Profiles 	[]Profile  				`json:"profiles"`
-	Service Service `json:"service"`
-	Expose	string `json:"expose"`
-
+	// Here set UseMysql as string type to set true as default, and since using apiextensions.k8s.io/v1beta1
+	// and not using apiextensions.k8s.io/v1
+	UseMysql string    `json:"useMysql"`
+	Pattern  string    `json:"pattern"`
+	Replicas *int32    `json:"replicas"`
+	Profiles []Profile `json:"profiles"`
+	Service  Service   `json:"service"`
+	Expose   string    `json:"expose"`
 }
 
 // APIManagerStatus is the status for a APIManager resource

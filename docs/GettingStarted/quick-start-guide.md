@@ -12,17 +12,17 @@ In this document, we will walk through the following.
 
 ### Installation Prerequisites
 
-* [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
+* [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.14 or above
     * Minimum CPU : **4 vCPU** 
     * Minimum Memory : **6 GB** <br>
     
     **Note:** This is for running scenario-1.
 
-* Download [k8s-wso2am-operator-1.0.1.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/v1.0.1/k8s-wso2am-operator-1.0.1.zip) and extract it. 
+* Download [k8s-wso2am-operator-1.1.0.zip](https://github.com/wso2/k8s-wso2am-operator/releases/download/v1.1.0/k8s-wso2am-operator-1.1.0.zip) and extract it. 
 
     This zip contains the artifacts that required to deploy in Kubernetes.
 
-    **Note:** You need to run all commands from within the k8s-wso2am-operator-1.0.1 directory.
+    **Note:** You need to run all commands from within the k8s-wso2am-operator-1.1.0 directory.
 
 <br>
 
