@@ -21,12 +21,12 @@
 package pattern1
 
 import (
-	"strconv"
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"strconv"
 )
 
 type configvalues struct {
@@ -47,7 +47,6 @@ type configvalues struct {
 	Limitcpu           resource.Quantity
 	Limitmem           resource.Quantity
 	APIMVersion        string
-	UseMysqlPod        bool
 	ImagePullSecret    string
 	ServiceAccountName string
 }
@@ -61,7 +60,6 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 	serviceAccountName := ControlConfigData["service-account-name"]
 
 	apimVersion := ControlConfigData["api-manager-version"]
-	useMysqlPod, _ := strconv.ParseBool(ControlConfigData["use-mysql-pod"])
 	replicas, _ := strconv.ParseInt(ControlConfigData["apim-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-deployment-maxSurge"], 10, 32)
@@ -166,7 +164,6 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 		Limitmem:           limitMem,
 		Replicas:           int32(replicas),
 		APIMVersion:        apimVersion,
-		UseMysqlPod:        useMysqlPod,
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
 	}
@@ -182,7 +179,6 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	imagePullSecret := ControlConfigData["image-pull-secret-name"]
 	serviceAccountName := ControlConfigData["service-account-name"]
 
-	useMysqlPod, _ := strconv.ParseBool(ControlConfigData["use-mysql-pod"])
 	replicas, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
@@ -289,7 +285,6 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 		Limitcpu:           limitCPU,
 		Limitmem:           limitMem,
 		Replicas:           int32(replicas),
-		UseMysqlPod:        useMysqlPod,
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
 	}
@@ -304,7 +299,6 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	imagePullSecret := ControlConfigData["image-pull-secret-name"]
 	serviceAccountName := ControlConfigData["service-account-name"]
 
-	useMysqlPod, _ := strconv.ParseBool(ControlConfigData["use-mysql-pod"])
 	replicas, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
@@ -411,7 +405,6 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 		Limitcpu:           limitCPU,
 		Limitmem:           limitMem,
 		Replicas:           int32(replicas),
-		UseMysqlPod:        useMysqlPod,
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
 	}

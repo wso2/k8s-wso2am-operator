@@ -42,6 +42,7 @@ rules:
       - serviceaccounts
       - configmaps
       - persistentvolumeclaims
+      - ingresses
     verbs:
       - get
       - list

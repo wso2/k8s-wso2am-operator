@@ -21,10 +21,15 @@
 package controller
 
 import (
+	"fmt"
+	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/mysql"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/patternX"
-	"github.com/wso2/k8s-wso2am-operator/pkg/controller/mysql"
-	"fmt"
+	clientset "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
+	samplescheme "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned/scheme"
+	informers "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/apim/v1alpha1"
+	listers "github.com/wso2/k8s-wso2am-operator/pkg/generated/listers/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -45,14 +50,8 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
-	"time"
 	"strconv"
-
-	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
-	clientset "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
-	samplescheme "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned/scheme"
-	informers "github.com/wso2/k8s-wso2am-operator/pkg/generated/informers/externalversions/apim/v1alpha1"
-	listers "github.com/wso2/k8s-wso2am-operator/pkg/generated/listers/apim/v1alpha1"
+	"time"
 )
 
 const controllerAgentName = "wso2am-controller"
@@ -305,7 +304,15 @@ func (c *Controller) syncHandler(key string) error {
 
 	configMapName := "wso2am-operator-controller-config"
 	configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
-	useMysqlPod, _ := strconv.ParseBool(configmap.Data["use-mysql-pod"])
+
+	// UseMysql - default to true
+	useMysqlPod := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysqlPod, err = strconv.ParseBool(apimanager.Spec.UseMysql)
+		if err != nil {
+			return err
+		}
+	}
 
 	if apimanager.Spec.Pattern == "Pattern-1" {
 
@@ -1281,4 +1288,3 @@ func (c *Controller) handleObject(obj interface{}) {
 		return
 	}
 }
-
