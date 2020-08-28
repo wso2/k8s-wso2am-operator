@@ -330,7 +330,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Prof
 										Command: []string{
 											"/bin/sh",
 											"-c",
-											"nc -z localhost 9444",
+											"nc -z localhost 7712",
 										},
 									},
 								},
@@ -344,7 +344,7 @@ func WorkerXDeployment(apimanager *apimv1alpha1.APIManager, r *apimv1alpha1.Prof
 										Command: []string{
 											"/bin/sh",
 											"-c",
-											"nc -z localhost 9444",
+											"nc -z localhost 7712",
 										},
 									},
 								},
