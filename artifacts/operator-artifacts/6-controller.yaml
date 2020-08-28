@@ -31,6 +31,6 @@ spec:
     spec:
       containers:
         - name: wso2am-controller
-          image: renukafernando/k8s-wso2am-operator:1.1.0
+          image: wso2/k8s-wso2am-operator:1.1.0
           imagePullPolicy: Always
       serviceAccountName: wso2am-pattern-1-svc-account
