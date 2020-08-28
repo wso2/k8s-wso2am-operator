@@ -12,7 +12,7 @@ In this document, we will walk through the following.
 
 ### Installation Prerequisites
 
-* [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.12 or above
+* [Kubernetes cluster](https://kubernetes.io/docs/setup/) and client v1.14 or above
     * Minimum CPU : **4 vCPU** 
     * Minimum Memory : **6 GB** <br>
     

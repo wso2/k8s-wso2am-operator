@@ -60,6 +60,7 @@ spec:
   pattern: Pattern-X
   service:
     type: NodePort
+  useMysql: "<true|false>"
   profiles:
     - name: <NEW_PROFILE_NAME>
       type: api-manager
