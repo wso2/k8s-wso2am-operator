@@ -4,6 +4,8 @@ With WSO2 API Manager Operator, it makes easy to deploy WSO2 API Manager in Kube
 
 ![K8S CRD workflow](docs/images/wso2am-operator.png "K8S CRD workflow")
 
+### Supported WSO2 API Manager version: v3.2.0
+
 ## Quick Start Guide
 
 In this document, we will walk through the following.
