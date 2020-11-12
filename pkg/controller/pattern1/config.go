@@ -21,12 +21,13 @@
 package pattern1
 
 import (
+	"strconv"
+
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strconv"
 )
 
 type configvalues struct {
@@ -78,9 +79,9 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
 
 	if totalProfiles > 0 {
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if *replicasFromYaml != 0 {
+			replicas = int64(*replicasFromYaml)
 		}
 
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
@@ -200,9 +201,9 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-dashboard" {
 
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if *replicasFromYaml != 0 {
+			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if minReadySecFromYaml != 0 {
@@ -320,9 +321,9 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-worker" {
 
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if *replicasFromYaml != 0 {
+			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if minReadySecFromYaml != 0 {
