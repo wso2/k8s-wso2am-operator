@@ -267,6 +267,18 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 		if readyThresFromYaml != 0 {
 			readyThres = int64(readyThresFromYaml)
 		}
+
+		// Get maxSurge value from the YAML file.
+		maxSurgesFromYaml := apimanager.Spec.Profiles[num].Deployment.Strategy.RollingUpdate.MaxSurge
+		if maxSurgesFromYaml != 1 {
+			maxSurges = int64(maxSurgesFromYaml)
+		}
+
+		//Get maxUnavailable value from the YAML file.
+		maxUnavailFromYaml := apimanager.Spec.Profiles[num].Deployment.Strategy.RollingUpdate.MaxUnavail
+		if maxUnavailFromYaml != 0 {
+			maxUnavail = int64(maxUnavailFromYaml)
+		}
 	}
 
 	cmvalues := &configvalues{
