@@ -43,48 +43,57 @@ type PVCServer struct {
 
 type Storage struct {
 	Memory string `json:"memory"`
-	CPU string `json:"cpu"`
+	CPU    string `json:"cpu"`
 }
 
 type Resources struct {
 	Requests Storage `json:"requests"`
-	Limits Storage `json:"limits"`
+	Limits   Storage `json:"limits"`
 }
 
 type Probe struct {
-	InitialDelaySeconds int32 		`json:"initialDelaySeconds"`
-	FailureThreshold    int32		`json:"failureThreshold"`
-	PeriodSeconds		int32		`json:"periodSeconds"`
+	InitialDelaySeconds int32 `json:"initialDelaySeconds"`
+	FailureThreshold    int32 `json:"failureThreshold"`
+	PeriodSeconds       int32 `json:"periodSeconds"`
 }
 
 type NewVolume struct {
-	Name string `json:"name"`
+	Name      string `json:"name"`
 	MountPath string `json:"mountPath"`
 }
 
 type Configmap struct {
-	DeploymentConfigmap string `json:"deploymentConfigMap"`
-	NewConfigmap []NewVolume `json:"newConfigMap"`
-
+	DeploymentConfigmap string      `json:"deploymentConfigMap"`
+	NewConfigmap        []NewVolume `json:"newConfigMap"`
 }
 
 type PVC struct {
-	SynapseConfigs string `json:"synapseConfigs"`
-	ExecutionPlans string `json:"executionPlans"`
-	NewClaim []NewVolume `json:"newClaim"`
+	SynapseConfigs string      `json:"synapseConfigs"`
+	ExecutionPlans string      `json:"executionPlans"`
+	NewClaim       []NewVolume `json:"newClaim"`
 }
 
 type Deployment struct {
-	Resources Resources `json:"resources"`
-	Replicas *int32 `json:"replicas"`
-	MinReadySeconds int32 `json:"minReadySeconds"`
-	//Strategy Strategy `json:"strategy"`
-	Image string `json:"image"`
-	ImagePullPolicy string `json:"imagePullPolicy"`
-	LivenessProbe Probe `json:"livenessProbe"`
-	ReadinessProbe Probe `json:"readinessProbe"`
-	Configmaps Configmap `json:"configMaps"`
-	PersistentVolumeClaim PVC `json:"persistentVolumeClaim"`
+	Resources             Resources `json:"resources"`
+	Replicas              *int32    `json:"replicas"`
+	MinReadySeconds       int32     `json:"minReadySeconds"`
+	Strategy              Strategy  `json:"strategy"`
+	Image                 string    `json:"image"`
+	ImagePullPolicy       string    `json:"imagePullPolicy"`
+	LivenessProbe         Probe     `json:"livenessProbe"`
+	ReadinessProbe        Probe     `json:"readinessProbe"`
+	Configmaps            Configmap `json:"configMaps"`
+	PersistentVolumeClaim PVC       `json:"persistentVolumeClaim"`
+}
+
+type Strategy struct {
+	Type          string        `json:"type"`
+	RollingUpdate RollingUpdate `json:"rollingUpdate"`
+}
+
+type RollingUpdate struct {
+	MaxSurge   int32 `json:"maxSurge"`
+	MaxUnavail int32 `json:"maxUnavailable"`
 }
 
 type Ports struct {
@@ -93,16 +102,15 @@ type Ports struct {
 }
 
 type Service struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name  string  `json:"name"`
+	Type  string  `json:"type"`
 	Ports []Ports `json:"ports"`
 }
 type Profile struct {
-	Name  string `json:"name"`
+	Name       string     `json:"name"`
 	Deployment Deployment `json:"deployment"`
-	Type string `json:"type"`
-	Service Service `json:"service"`
-
+	Type       string     `json:"type"`
+	Service    Service    `json:"service"`
 }
 
 type Artifacts struct {
