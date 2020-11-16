@@ -50,6 +50,7 @@ type configvalues struct {
 	APIMVersion        string
 	ImagePullSecret    string
 	ServiceAccountName string
+	SecurityContext    string
 }
 
 func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
@@ -65,6 +66,7 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-deployment-maxSurge"], 10, 32)
 	maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-deployment-maxUnavailable"], 10, 32)
+	securityContext := ControlConfigData["apim-deployment-securityContext"]
 	amImages := ControlConfigData["p1-apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["p1-apim-deployment-resources-requests-cpu"])
@@ -146,6 +148,11 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 		if readyThresFromYaml != 0 {
 			readyThres = int64(readyThresFromYaml)
 		}
+
+		securityContextFromYaml := apimanager.Spec.Profiles[num].Deployment.SecurityContext
+		if securityContextFromYaml != "" {
+			securityContext = securityContextFromYaml
+		}
 	}
 	cmvalues := &configvalues{
 		Livedelay:          int32(liveDelay),
@@ -167,6 +174,7 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 		APIMVersion:        apimVersion,
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
+		SecurityContext:    securityContext,
 	}
 
 	return cmvalues
@@ -184,6 +192,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
 	maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxUnavailable"], 10, 32)
+	securityContext := ControlConfigData["apim-deployment-securityContext"]
 	amImages := ControlConfigData["p1-apim-analytics-deployment-dashboard-image"]
 	imagePull, _ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-cpu"])
@@ -279,6 +288,11 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 		if maxUnavailFromYaml != 0 {
 			maxUnavail = int64(maxUnavailFromYaml)
 		}
+
+		securityContextFromYaml := apimanager.Spec.Profiles[num].Deployment.SecurityContext
+		if securityContextFromYaml != "" {
+			securityContext = securityContextFromYaml
+		}
 	}
 
 	cmvalues := &configvalues{
@@ -300,6 +314,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 		Replicas:           int32(replicas),
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
+		SecurityContext:    securityContext,
 	}
 	return cmvalues
 
@@ -316,6 +331,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-minReadySeconds"], 10, 32)
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
 	maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxUnavailable"], 10, 32)
+	securityContext := ControlConfigData["apim-deployment-securityContext"]
 	amImages := ControlConfigData["p1-apim-analytics-deployment-worker-image"]
 	imagePull, _ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-cpu"])
@@ -399,6 +415,11 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 		if readyThresFromYaml != 0 {
 			readyThres = int64(readyThresFromYaml)
 		}
+
+		securityContextFromYaml := apimanager.Spec.Profiles[num].Deployment.SecurityContext
+		if securityContextFromYaml != "" {
+			securityContext = securityContextFromYaml
+		}
 	}
 
 	cmvalues := &configvalues{
@@ -420,6 +441,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 		Replicas:           int32(replicas),
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
+		SecurityContext:    securityContext,
 	}
 	return cmvalues
 

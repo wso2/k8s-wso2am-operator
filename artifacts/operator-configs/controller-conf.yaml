@@ -37,6 +37,7 @@ data:
   apim-deployment-readinessProbe-initialDelaySeconds: "120"
   apim-deployment-readinessProbe-periodSeconds: "10"
   apim-deployment-readinessProbe-failureThreshold: "3"
+  apim-deployment-securityContext: "runAsUser: 802"
 
   # common configs for apim-analytics
   apim-analytics-deployment-replicas: "1"

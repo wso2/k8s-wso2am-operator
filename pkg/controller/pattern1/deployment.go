@@ -21,6 +21,9 @@
 package pattern1
 
 import (
+	"strconv"
+	"strings"
+
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -45,6 +48,29 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		"/bin/sh",
 		"-c",
 		"nc -z localhost 9443",
+	}
+
+	apim1SecurityContext := &corev1.SecurityContext{}
+	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
+	securityContextType := securityContextString[0]
+	if securityContextType == "runAsUser" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		apim1SecurityContext.RunAsUser = &securityContextVal
+	} else if securityContextType == "runAsGroup" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		apim1SecurityContext.RunAsGroup = &securityContextVal
+	} else if securityContextType == "runAsNonRoot" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		apim1SecurityContext.RunAsNonRoot = &securityContextVal
+	} else if securityContextType == "privileged" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		apim1SecurityContext.Privileged = &securityContextVal
+	} else if securityContextType == "readOnlyRootFilesystem" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		apim1SecurityContext.ReadOnlyRootFilesystem = &securityContextVal
+	} else if securityContextType == "allowPrivilegeEscalation" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		apim1SecurityContext.AllowPrivilegeEscalation = &securityContextVal
 	}
 
 	initContainers := getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
@@ -134,6 +160,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 									corev1.ResourceMemory: x.Limitmem,
 								},
 							},
+							SecurityContext: apim1SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 							Ports:           apim1deployports,
 							Env: []corev1.EnvVar{
@@ -188,6 +215,30 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 	executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
 	apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
 	initContainers = append(initContainers, apim1InitContainer)
+
+	apim2SecurityContext := &corev1.SecurityContext{}
+	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
+	securityContextType := securityContextString[0]
+
+	if securityContextType == "runAsUser" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		apim2SecurityContext.RunAsUser = &securityContextVal
+	} else if securityContextType == "runAsGroup" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		apim2SecurityContext.RunAsGroup = &securityContextVal
+	} else if securityContextType == "runAsNonRoot" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		apim2SecurityContext.RunAsNonRoot = &securityContextVal
+	} else if securityContextType == "privileged" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		apim2SecurityContext.Privileged = &securityContextVal
+	} else if securityContextType == "readOnlyRootFilesystem" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		apim2SecurityContext.ReadOnlyRootFilesystem = &securityContextVal
+	} else if securityContextType == "allowPrivilegeEscalation" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		apim2SecurityContext.AllowPrivilegeEscalation = &securityContextVal
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -275,6 +326,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 									corev1.ResourceMemory: z.Limitmem,
 								},
 							},
+							SecurityContext: apim2SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 							Ports:           apim2deployports,
 							Env: []corev1.EnvVar{
@@ -317,12 +369,36 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
-	runasuser := int64(802)
+	//runasuser := int64(802)
 	//defaultMode := int32(0407)
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
 	initContainers := getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
+
+	dashbordSecurityContext := &corev1.SecurityContext{}
+	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
+	securityContextType := securityContextString[0]
+
+	if securityContextType == "runAsUser" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		dashbordSecurityContext.RunAsUser = &securityContextVal
+	} else if securityContextType == "runAsGroup" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		dashbordSecurityContext.RunAsGroup = &securityContextVal
+	} else if securityContextType == "runAsNonRoot" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		dashbordSecurityContext.RunAsNonRoot = &securityContextVal
+	} else if securityContextType == "privileged" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		dashbordSecurityContext.Privileged = &securityContextVal
+	} else if securityContextType == "readOnlyRootFilesystem" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		dashbordSecurityContext.ReadOnlyRootFilesystem = &securityContextVal
+	} else if securityContextType == "allowPrivilegeEscalation" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		dashbordSecurityContext.AllowPrivilegeEscalation = &securityContextVal
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -410,10 +486,11 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 									corev1.ResourceMemory: y.Limitmem,
 								},
 							},
+							SecurityContext: dashbordSecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
-							SecurityContext: &corev1.SecurityContext{
-								RunAsUser: &runasuser,
-							},
+							// SecurityContext: &corev1.SecurityContext{
+							// 	RunAsUser: &runasuser,
+							// },
 							Ports:        dashdeployports,
 							VolumeMounts: dashVolumeMount,
 						},
@@ -429,6 +506,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 			},
 		},
 	}
+
 }
 
 // for handling analytics-worker deployment
@@ -439,11 +517,35 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-worker",
 	}
-	runasuser := int64(802)
+	//runasuser := int64(802)
 
 	workerContainerPorts := getWorkerContainerPorts()
 
 	initContainers := getMysqlInitContainers(apimanager, &workerVols, &workerVolMounts)
+
+	workerSecurityContext := &corev1.SecurityContext{}
+	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
+	securityContextType := securityContextString[0]
+
+	if securityContextType == "runAsUser" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		workerSecurityContext.RunAsUser = &securityContextVal
+	} else if securityContextType == "runAsGroup" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		workerSecurityContext.RunAsGroup = &securityContextVal
+	} else if securityContextType == "runAsNonRoot" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		workerSecurityContext.RunAsNonRoot = &securityContextVal
+	} else if securityContextType == "privileged" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		workerSecurityContext.Privileged = &securityContextVal
+	} else if securityContextType == "readOnlyRootFilesystem" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		workerSecurityContext.ReadOnlyRootFilesystem = &securityContextVal
+	} else if securityContextType == "allowPrivilegeEscalation" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		workerSecurityContext.AllowPrivilegeEscalation = &securityContextVal
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -539,12 +641,11 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 									corev1.ResourceMemory: y.Limitmem,
 								},
 							},
-
+							SecurityContext: workerSecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
-
-							SecurityContext: &corev1.SecurityContext{
-								RunAsUser: &runasuser,
-							},
+							// SecurityContext: &corev1.SecurityContext{
+							// 	RunAsUser: &runasuser,
+							// },
 							Ports:        workerContainerPorts,
 							VolumeMounts: workerVolMounts,
 						},
@@ -560,4 +661,5 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 			},
 		},
 	}
+
 }

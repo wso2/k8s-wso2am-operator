@@ -84,6 +84,7 @@ type Deployment struct {
 	ReadinessProbe        Probe     `json:"readinessProbe"`
 	Configmaps            Configmap `json:"configMaps"`
 	PersistentVolumeClaim PVC       `json:"persistentVolumeClaim"`
+	SecurityContext       string    `json:"securityContext"`
 }
 
 type Strategy struct {
