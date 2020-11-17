@@ -67,20 +67,6 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RecreateDeploymentStrategyType),
 			},
-			// Strategy: appsv1.DeploymentStrategy{
-			// 	Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
-			// 	RollingUpdate: &appsv1.RollingUpdateDeployment{
-			// 		MaxSurge: &intstr.IntOrString{
-			// 			Type:   intstr.Int,
-			// 			IntVal: x.Maxsurge,
-			// 		},
-			// 		MaxUnavailable: &intstr.IntOrString{
-			// 			Type:   intstr.Int,
-			// 			IntVal: x.Maxunavail,
-			// 		},
-			// 	},
-			// },
-
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
@@ -211,20 +197,6 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RecreateDeploymentStrategyType),
 			},
-			// Strategy: appsv1.DeploymentStrategy{
-			// 	Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
-			// 	RollingUpdate: &appsv1.RollingUpdateDeployment{
-			// 		MaxSurge: &intstr.IntOrString{
-			// 			Type:   intstr.Int,
-			// 			IntVal: z.Maxsurge,
-			// 		},
-			// 		MaxUnavailable: &intstr.IntOrString{
-			// 			Type:   intstr.Int,
-			// 			IntVal: z.Maxunavail,
-			// 		},
-			// 	},
-			// },
-
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
@@ -324,7 +296,6 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
 	runasuser := int64(802)
-	//defaultMode := int32(0407)
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
