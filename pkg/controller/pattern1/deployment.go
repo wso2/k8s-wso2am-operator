@@ -52,26 +52,8 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 
 	apim1SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
-	securityContextType := securityContextString[0]
-	if securityContextType == "runAsUser" {
-		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
-		apim1SecurityContext.RunAsUser = &securityContextVal
-	} else if securityContextType == "runAsGroup" {
-		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
-		apim1SecurityContext.RunAsGroup = &securityContextVal
-	} else if securityContextType == "runAsNonRoot" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		apim1SecurityContext.RunAsNonRoot = &securityContextVal
-	} else if securityContextType == "privileged" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		apim1SecurityContext.Privileged = &securityContextVal
-	} else if securityContextType == "readOnlyRootFilesystem" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		apim1SecurityContext.ReadOnlyRootFilesystem = &securityContextVal
-	} else if securityContextType == "allowPrivilegeEscalation" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		apim1SecurityContext.AllowPrivilegeEscalation = &securityContextVal
-	}
+
+	AssignSecurityContext(securityContextString, apim1SecurityContext)
 
 	initContainers := getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
 
@@ -218,27 +200,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 
 	apim2SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
-	securityContextType := securityContextString[0]
 
-	if securityContextType == "runAsUser" {
-		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
-		apim2SecurityContext.RunAsUser = &securityContextVal
-	} else if securityContextType == "runAsGroup" {
-		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
-		apim2SecurityContext.RunAsGroup = &securityContextVal
-	} else if securityContextType == "runAsNonRoot" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		apim2SecurityContext.RunAsNonRoot = &securityContextVal
-	} else if securityContextType == "privileged" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		apim2SecurityContext.Privileged = &securityContextVal
-	} else if securityContextType == "readOnlyRootFilesystem" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		apim2SecurityContext.ReadOnlyRootFilesystem = &securityContextVal
-	} else if securityContextType == "allowPrivilegeEscalation" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		apim2SecurityContext.AllowPrivilegeEscalation = &securityContextVal
-	}
+	AssignSecurityContext(securityContextString, apim2SecurityContext)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -378,27 +341,8 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 
 	dashbordSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
-	securityContextType := securityContextString[0]
 
-	if securityContextType == "runAsUser" {
-		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
-		dashbordSecurityContext.RunAsUser = &securityContextVal
-	} else if securityContextType == "runAsGroup" {
-		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
-		dashbordSecurityContext.RunAsGroup = &securityContextVal
-	} else if securityContextType == "runAsNonRoot" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		dashbordSecurityContext.RunAsNonRoot = &securityContextVal
-	} else if securityContextType == "privileged" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		dashbordSecurityContext.Privileged = &securityContextVal
-	} else if securityContextType == "readOnlyRootFilesystem" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		dashbordSecurityContext.ReadOnlyRootFilesystem = &securityContextVal
-	} else if securityContextType == "allowPrivilegeEscalation" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		dashbordSecurityContext.AllowPrivilegeEscalation = &securityContextVal
-	}
+	AssignSecurityContext(securityContextString, dashbordSecurityContext)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -525,27 +469,8 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 	workerSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
-	securityContextType := securityContextString[0]
 
-	if securityContextType == "runAsUser" {
-		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
-		workerSecurityContext.RunAsUser = &securityContextVal
-	} else if securityContextType == "runAsGroup" {
-		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
-		workerSecurityContext.RunAsGroup = &securityContextVal
-	} else if securityContextType == "runAsNonRoot" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		workerSecurityContext.RunAsNonRoot = &securityContextVal
-	} else if securityContextType == "privileged" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		workerSecurityContext.Privileged = &securityContextVal
-	} else if securityContextType == "readOnlyRootFilesystem" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		workerSecurityContext.ReadOnlyRootFilesystem = &securityContextVal
-	} else if securityContextType == "allowPrivilegeEscalation" {
-		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
-		workerSecurityContext.AllowPrivilegeEscalation = &securityContextVal
-	}
+	AssignSecurityContext(securityContextString, workerSecurityContext)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -662,4 +587,28 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 		},
 	}
 
+}
+
+// AssignSecurityContext is ..
+func AssignSecurityContext(securityContextString []string, securityContext *corev1.SecurityContext) {
+
+	if securityContextString[0] == "runAsUser" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		securityContext.RunAsUser = &securityContextVal
+	} else if securityContextString[0] == "runAsGroup" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		securityContext.RunAsGroup = &securityContextVal
+	} else if securityContextString[0] == "runAsNonRoot" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		securityContext.RunAsNonRoot = &securityContextVal
+	} else if securityContextString[0] == "privileged" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		securityContext.Privileged = &securityContextVal
+	} else if securityContextString[0] == "readOnlyRootFilesystem" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		securityContext.ReadOnlyRootFilesystem = &securityContextVal
+	} else if securityContextString[0] == "allowPrivilegeEscalation" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		securityContext.AllowPrivilegeEscalation = &securityContextVal
+	}
 }
