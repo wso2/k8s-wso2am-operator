@@ -332,8 +332,6 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
-	//runasuser := int64(802)
-	//defaultMode := int32(0407)
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
@@ -432,11 +430,8 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 							},
 							SecurityContext: dashbordSecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
-							// SecurityContext: &corev1.SecurityContext{
-							// 	RunAsUser: &runasuser,
-							// },
-							Ports:        dashdeployports,
-							VolumeMounts: dashVolumeMount,
+							Ports:           dashdeployports,
+							VolumeMounts:    dashVolumeMount,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
@@ -461,7 +456,6 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-worker",
 	}
-	//runasuser := int64(802)
 
 	workerContainerPorts := getWorkerContainerPorts()
 
@@ -568,11 +562,8 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 							},
 							SecurityContext: workerSecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
-							// SecurityContext: &corev1.SecurityContext{
-							// 	RunAsUser: &runasuser,
-							// },
-							Ports:        workerContainerPorts,
-							VolumeMounts: workerVolMounts,
+							Ports:           workerContainerPorts,
+							VolumeMounts:    workerVolMounts,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
