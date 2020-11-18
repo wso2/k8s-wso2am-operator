@@ -21,6 +21,9 @@
 package pattern1
 
 import (
+	"strconv"
+	"strings"
+
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -46,6 +49,11 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		"-c",
 		"nc -z localhost 9443",
 	}
+
+	apim1SecurityContext := &corev1.SecurityContext{}
+	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
+
+	AssignSecurityContext(securityContextString, apim1SecurityContext)
 
 	initContainers := getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
 
@@ -123,6 +131,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 									corev1.ResourceMemory: x.Limitmem,
 								},
 							},
+							SecurityContext: apim1SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 							Ports:           apim1deployports,
 							Env: []corev1.EnvVar{
@@ -177,6 +186,11 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 	executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
 	apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
 	initContainers = append(initContainers, apim1InitContainer)
+
+	apim2SecurityContext := &corev1.SecurityContext{}
+	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
+
+	AssignSecurityContext(securityContextString, apim2SecurityContext)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -253,6 +267,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 									corev1.ResourceMemory: z.Limitmem,
 								},
 							},
+							SecurityContext: apim2SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 							Ports:           apim2deployports,
 							Env: []corev1.EnvVar{
@@ -295,11 +310,15 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
-	runasuser := int64(802)
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
 	initContainers := getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
+
+	dashbordSecurityContext := &corev1.SecurityContext{}
+	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
+
+	AssignSecurityContext(securityContextString, dashbordSecurityContext)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -387,12 +406,10 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 									corev1.ResourceMemory: y.Limitmem,
 								},
 							},
+							SecurityContext: dashbordSecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
-							SecurityContext: &corev1.SecurityContext{
-								RunAsUser: &runasuser,
-							},
-							Ports:        dashdeployports,
-							VolumeMounts: dashVolumeMount,
+							Ports:           dashdeployports,
+							VolumeMounts:    dashVolumeMount,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
@@ -406,6 +423,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 			},
 		},
 	}
+
 }
 
 // for handling analytics-worker statefulset
@@ -416,11 +434,14 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-worker",
 	}
-	runasuser := int64(802)
 
 	workerContainerPorts := getWorkerContainerPorts()
 
 	initContainers := getMysqlInitContainers(apimanager, &workerVols, &workerVolMounts)
+	workerSecurityContext := &corev1.SecurityContext{}
+	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
+
+	AssignSecurityContext(securityContextString, workerSecurityContext)
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -501,14 +522,10 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 									corev1.ResourceMemory: y.Limitmem,
 								},
 							},
-
+							SecurityContext: workerSecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
-
-							SecurityContext: &corev1.SecurityContext{
-								RunAsUser: &runasuser,
-							},
-							Ports:        workerContainerPorts,
-							VolumeMounts: workerVolMounts,
+							Ports:           workerContainerPorts,
+							VolumeMounts:    workerVolMounts,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
@@ -521,5 +538,30 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 				},
 			},
 		},
+	}
+
+}
+
+// AssignSecurityContext is ..
+func AssignSecurityContext(securityContextString []string, securityContext *corev1.SecurityContext) {
+
+	if securityContextString[0] == "runAsUser" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		securityContext.RunAsUser = &securityContextVal
+	} else if securityContextString[0] == "runAsGroup" {
+		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
+		securityContext.RunAsGroup = &securityContextVal
+	} else if securityContextString[0] == "runAsNonRoot" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		securityContext.RunAsNonRoot = &securityContextVal
+	} else if securityContextString[0] == "privileged" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		securityContext.Privileged = &securityContextVal
+	} else if securityContextString[0] == "readOnlyRootFilesystem" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		securityContext.ReadOnlyRootFilesystem = &securityContextVal
+	} else if securityContextString[0] == "allowPrivilegeEscalation" {
+		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
+		securityContext.AllowPrivilegeEscalation = &securityContextVal
 	}
 }
