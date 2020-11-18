@@ -431,8 +431,8 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	}
 }
 
-// for handling analytics-worker deployment
-func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
+// for handling analytics-worker statefulset
+func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.StatefulSet {
 
 	workerVolMounts, workerVols := getAnalyticsWorkerVolumes(apimanager, num)
 
@@ -445,10 +445,10 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 	initContainers := getMysqlInitContainers(apimanager, &workerVols, &workerVolMounts)
 
-	return &appsv1.Deployment{
+	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depApiVersion,
-			Kind:       deploymentKind,
+			Kind:       "StatefulSet",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "wso2-am-analytics-worker-" + apimanager.Name,
@@ -457,23 +457,8 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
-		Spec: appsv1.DeploymentSpec{
-			Replicas:        apimanager.Spec.Replicas,
-			MinReadySeconds: y.Minreadysec,
-			Strategy: appsv1.DeploymentStrategy{
-				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
-				RollingUpdate: &appsv1.RollingUpdateDeployment{
-					MaxSurge: &intstr.IntOrString{
-						Type:   intstr.Int,
-						IntVal: y.Maxsurge,
-					},
-					MaxUnavailable: &intstr.IntOrString{
-						Type:   intstr.Int,
-						IntVal: y.Maxunavail,
-					},
-				},
-			},
-
+		Spec: appsv1.StatefulSetSpec{
+			Replicas: apimanager.Spec.Replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
