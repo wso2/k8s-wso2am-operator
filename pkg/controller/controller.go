@@ -22,6 +22,9 @@ package controller
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/mysql"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
@@ -50,35 +53,30 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
-	"strconv"
-	"time"
 )
 
 const controllerAgentName = "wso2am-controller"
 
 // Controller is the controller implementation for Apimanager resources
 type Controller struct {
-	kubeclientset kubernetes.Interface      		// kubeclientset is a standard kubernetes clientset
-	sampleclientset clientset.Interface     		// sampleclientset is a clientset for our own API group
-	deploymentsLister appslisters.DeploymentLister
-	servicesLister    corelisters.ServiceLister
-	ingressLister extensionsv1beta1listers.IngressLister   //for ingress lister
-	deploymentsSynced cache.InformerSynced
-	servicesSynced    cache.InformerSynced
-	apimanagerslister listers.APIManagerLister
-	apimanagersSynced cache.InformerSynced
-    configMapLister   corev1listers.ConfigMapLister
-    persistentVolumeClaimsLister corelisters.PersistentVolumeClaimLister
-	recorder record.EventRecorder          			// recorder is an event recorder for recording Event resources to the Kubernetes API.
-	workqueue workqueue.RateLimitingInterface
+	kubeclientset                kubernetes.Interface // kubeclientset is a standard kubernetes clientset
+	sampleclientset              clientset.Interface  // sampleclientset is a clientset for our own API group
+	deploymentsLister            appslisters.DeploymentLister
+	statefulSetsLister           appslisters.StatefulSetLister
+	servicesLister               corelisters.ServiceLister
+	ingressLister                extensionsv1beta1listers.IngressLister //for ingress lister
+	deploymentsSynced            cache.InformerSynced
+	servicesSynced               cache.InformerSynced
+	apimanagerslister            listers.APIManagerLister
+	apimanagersSynced            cache.InformerSynced
+	configMapLister              corev1listers.ConfigMapLister
+	persistentVolumeClaimsLister corelisters.PersistentVolumeClaimLister
+	recorder                     record.EventRecorder // recorder is an event recorder for recording Event resources to the Kubernetes API.
+	workqueue                    workqueue.RateLimitingInterface
 	// workqueue is a rate limited work queue. This is used to queue work to be processed instead of performing it as
 	// soon as a change happens. This means we can ensure we only process a fixed amount of resources at a time, and
 	// makes it easy to ensure we are never processing the same item simultaneously in two different workers.
 }
-
-
-
-
 
 // NewController returns a new wso2am controller
 func NewController(
@@ -87,8 +85,8 @@ func NewController(
 	deploymentInformer appsinformers.DeploymentInformer,
 	ingressinformer externsionsv1beta1informers.IngressInformer,
 	serviceInformer coreinformers.ServiceInformer,
-    configmapInformer coreinformers.ConfigMapInformer,
-    persistentVolumeClaimInformer coreinformers.PersistentVolumeClaimInformer,
+	configmapInformer coreinformers.ConfigMapInformer,
+	persistentVolumeClaimInformer coreinformers.PersistentVolumeClaimInformer,
 	apimanagerInformer informers.APIManagerInformer) *Controller {
 
 	// Create event broadcaster.
@@ -101,19 +99,19 @@ func NewController(
 	recorder := eventBroadcaster.NewRecorder(scheme.Scheme, corev1.EventSource{Component: controllerAgentName})
 
 	controller := &Controller{
-		kubeclientset:     kubeclientset,
-		sampleclientset:   sampleclientset,
-		deploymentsLister: deploymentInformer.Lister(),
-		deploymentsSynced: deploymentInformer.Informer().HasSynced,
-		servicesLister:    serviceInformer.Lister(),
-		ingressLister:    ingressinformer.Lister(),
-		servicesSynced:    serviceInformer.Informer().HasSynced,
-        configMapLister:   configmapInformer.Lister(),
-        persistentVolumeClaimsLister: persistentVolumeClaimInformer.Lister(),
-		apimanagerslister: apimanagerInformer.Lister(),
-		apimanagersSynced: apimanagerInformer.Informer().HasSynced,
-		workqueue:         workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Apimanagers"),
-		recorder:          recorder,
+		kubeclientset:                kubeclientset,
+		sampleclientset:              sampleclientset,
+		deploymentsLister:            deploymentInformer.Lister(),
+		deploymentsSynced:            deploymentInformer.Informer().HasSynced,
+		servicesLister:               serviceInformer.Lister(),
+		ingressLister:                ingressinformer.Lister(),
+		servicesSynced:               serviceInformer.Informer().HasSynced,
+		configMapLister:              configmapInformer.Lister(),
+		persistentVolumeClaimsLister: persistentVolumeClaimInformer.Lister(),
+		apimanagerslister:            apimanagerInformer.Lister(),
+		apimanagersSynced:            apimanagerInformer.Informer().HasSynced,
+		workqueue:                    workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "Apimanagers"),
+		recorder:                     recorder,
 	}
 
 	klog.Info("Setting up event handlers")
@@ -157,7 +155,7 @@ func NewController(
 		DeleteFunc: controller.handleObject,
 	})
 
-    persistentVolumeClaimInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+	persistentVolumeClaimInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc:    controller.handleObject,
 		DeleteFunc: controller.handleObject,
 	})
@@ -167,8 +165,8 @@ func NewController(
 		UpdateFunc: func(old, new interface{}) {
 			newConf := new.(*corev1.ConfigMap)
 			oldConf := old.(*corev1.ConfigMap)
-			newConf.ResourceVersion =""
-			oldConf.ResourceVersion =""
+			newConf.ResourceVersion = ""
+			oldConf.ResourceVersion = ""
 
 			controller.handleObject(new)
 		},
@@ -276,8 +274,6 @@ func (c *Controller) processNextWorkItem() bool {
 	return true
 }
 
-
-
 // syncHandler compares the actual state with the desired, and attempts to converge the two.
 // It then updates the Status block of the Apimanager resource with the current status of the resource.
 // c is the Controller object type pointer as a parameter
@@ -316,93 +312,92 @@ func (c *Controller) syncHandler(key string) error {
 
 	if apimanager.Spec.Pattern == "Pattern-1" {
 
-		apim1deploymentName := "wso2-am-1-"+apimanager.Name
-		apim2deploymentName := "wso2-am-2-"+apimanager.Name
+		apim1deploymentName := "wso2-am-1-" + apimanager.Name
+		apim2deploymentName := "wso2-am-2-" + apimanager.Name
 		apim1serviceName := "wso2-am-1-svc"
 		apim2serviceName := "wso2-am-2-svc"
 		apimcommonservice := "wso2-am-svc"
-		mysqldeploymentName := "mysql-"+apimanager.Name
+		mysqldeploymentName := "mysql-" + apimanager.Name
 		mysqlserviceName := "mysql-svc"
-		dashboardDeploymentName := "wso2-am-analytics-dashboard-"+apimanager.Name
+		dashboardDeploymentName := "wso2-am-analytics-dashboard-" + apimanager.Name
 		dashboardServiceName := "wso2-am-analytics-dashboard-svc"
-		workerDeploymentName := "wso2-am-analytics-worker-"+apimanager.Name
-        workerServiceName := "wso2-am-analytics-worker-svc"
+		workerDeploymentName := "wso2-am-analytics-worker-" + apimanager.Name
+		workerServiceName := "wso2-am-analytics-worker-svc"
 
-        synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
+		synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
 		executionPlanPVCName := "wso2am-p1-am-execution-plans"
 		mysqlPVCName := "wso2am-mysql"
 
 		dashConfName := "wso2am-p1-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
-		dashConfUserName:= "wso2am-p1-analytics-dash-conf-"+apimanager.Name
+		dashConfUserName := "wso2am-p1-analytics-dash-conf-" + apimanager.Name
 		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
-		if errors.IsNotFound(err){
-			dashConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,dashConfWso2))
-			if err!= nil{
-				fmt.Println("Creating dashboard configmap in user specified ns",dashConfUser)
+		if errors.IsNotFound(err) {
+			dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashConfWso2))
+			if err != nil {
+				fmt.Println("Creating dashboard configmap in user specified ns", dashConfUser)
 			}
 		}
 
 		mysqlDbConfName := "wso2am-p1-mysql-dbscripts"
 		mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
-		mysqlDbConfUserName:= "wso2am-p1-mysql-dbscripts-"+apimanager.Name
+		mysqlDbConfUserName := "wso2am-p1-mysql-dbscripts-" + apimanager.Name
 		mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfUserName)
-		if errors.IsNotFound(err){
-			mysqlDbConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,mysqlDbConfWso2))
-			if err!= nil{
-				fmt.Println("Creating mysql dbscripts configmap in user specified ns",mysqlDbConfUser)
+		if errors.IsNotFound(err) {
+			mysqlDbConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, mysqlDbConfWso2))
+			if err != nil {
+				fmt.Println("Creating mysql dbscripts configmap in user specified ns", mysqlDbConfUser)
 			}
 		}
 
 		workerConfName := "wso2am-p1-analytics-worker-conf"
 		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
-		workerConfUserName:= "wso2am-p1-analytics-worker-conf-"+apimanager.Name
+		workerConfUserName := "wso2am-p1-analytics-worker-conf-" + apimanager.Name
 		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
-		if errors.IsNotFound(err){
-			workerConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,workerConfWso2))
-			if err!= nil {
-				fmt.Println("Creating worker configmap in user specified ns",workerConfUser)
+		if errors.IsNotFound(err) {
+			workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, workerConfWso2))
+			if err != nil {
+				fmt.Println("Creating worker configmap in user specified ns", workerConfUser)
 
 			}
 		}
 
 		am1ConfName := "wso2am-p1-apim-1-conf"
 		am1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am1ConfName)
-		am1ConfUserName:= "wso2am-p1-apim-1-conf-"+apimanager.Name
+		am1ConfUserName := "wso2am-p1-apim-1-conf-" + apimanager.Name
 		am1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am1ConfUserName)
-		if errors.IsNotFound(err){
-			am1ConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,am1ConfWso2))
-			if err!= nil{
-				fmt.Println("Creating am1 configmap in user specified ns",am1ConfUser)
+		if errors.IsNotFound(err) {
+			am1ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, am1ConfWso2))
+			if err != nil {
+				fmt.Println("Creating am1 configmap in user specified ns", am1ConfUser)
 
 			}
 		}
 
 		am2ConfName := "wso2am-p1-apim-2-conf"
 		am2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am2ConfName)
-		am2ConfUserName:= "wso2am-p1-apim-2-conf-"+apimanager.Name
+		am2ConfUserName := "wso2am-p1-apim-2-conf-" + apimanager.Name
 		am2ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am2ConfUserName)
-		if errors.IsNotFound(err){
-			am2ConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,am2ConfWso2))
-			if err!= nil{
-				fmt.Println("Creating am2 configmap in user specified ns",am2ConfUser)
+		if errors.IsNotFound(err) {
+			am2ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, am2ConfWso2))
+			if err != nil {
+				fmt.Println("Creating am2 configmap in user specified ns", am2ConfUser)
 			}
 		}
 
 		dashBinConfName := "wso2am-p1-analytics-dash-bin"
 		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
-		dashBinConfUserName:= "wso2am-p1-analytics-dash-bin-"+apimanager.Name
+		dashBinConfUserName := "wso2am-p1-analytics-dash-bin-" + apimanager.Name
 		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
-		if errors.IsNotFound(err){
-			dashBinConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,dashBinConfWso2))
-			if err!= nil{
-				fmt.Println("Creating dashboard bin configmap in user specified ns",dashBinConfUser)
+		if errors.IsNotFound(err) {
+			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashBinConfWso2))
+			if err != nil {
+				fmt.Println("Creating dashboard bin configmap in user specified ns", dashBinConfUser)
 			}
 		}
 
 		pvcConfName := "pvc-config"
 		pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
-
 
 		// Get mysql-pvc name using hardcoded value
 		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
@@ -412,13 +407,12 @@ func (c *Controller) syncHandler(key string) error {
 			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(mysql.MakeMysqlPvc(apimanager, sqlconf))
 		}
 
-
 		// Parse the object and look for it’s deployment
 		// Use a Lister to find the deployment object referred to in the Apimanager resource
 		// Get apim instance 1 deployment name using hardcoded value
 
-		am1num :=  0
-		am2num :=  0
+		am1num := 0
+		am2num := 0
 		dashnum := 0
 		worknum := 0
 
@@ -426,7 +420,7 @@ func (c *Controller) syncHandler(key string) error {
 
 		i := 0
 
-		if totalProfiles>0 {
+		if totalProfiles > 0 {
 			for i = 0; i < totalProfiles; i++ {
 				if apimanager.Spec.Profiles[i].Name == "api-manager-1" {
 					am1num = i
@@ -443,7 +437,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		if totalProfiles > 0 &&  apimanager.Spec.Profiles[am1num].Name=="api-manager-1"{
+		if totalProfiles > 0 && apimanager.Spec.Profiles[am1num].Name == "api-manager-1" {
 			synapseConfFromYaml := apimanager.Spec.Profiles[am1num].Deployment.PersistentVolumeClaim.SynapseConfigs
 			if synapseConfFromYaml != "" {
 				synapseConfigsPVCName = synapseConfFromYaml
@@ -454,7 +448,7 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		if totalProfiles > 0 &&  apimanager.Spec.Profiles[am2num].Name=="api-manager-2"{
+		if totalProfiles > 0 && apimanager.Spec.Profiles[am2num].Name == "api-manager-2" {
 			synapseConfFromYaml := apimanager.Spec.Profiles[am2num].Deployment.PersistentVolumeClaim.SynapseConfigs
 			if synapseConfFromYaml != "" {
 				synapseConfigsPVCName = synapseConfFromYaml
@@ -513,7 +507,7 @@ func (c *Controller) syncHandler(key string) error {
 		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
+			y := pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
 
 			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.DashboardDeployment(apimanager, y, dashnum))
 			if err != nil {
@@ -529,12 +523,15 @@ func (c *Controller) syncHandler(key string) error {
 		}
 
 		// Get analytics worker deployment name using hardcoded value
-		workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+
+		// workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+		workerdeployment, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
+			y := pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
 
-			workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
+			// workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
+			workerdeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
 			if err != nil {
 				return err
 			}
@@ -557,7 +554,7 @@ func (c *Controller) syncHandler(key string) error {
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			x := pattern1.AssignApimConfigMapValues(apimanager,configmap,am1num)
+			x := pattern1.AssignApimConfigMapValues(apimanager, configmap, am1num)
 
 			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim1Deployment(apimanager, x, am1num))
 			if err != nil {
@@ -576,7 +573,7 @@ func (c *Controller) syncHandler(key string) error {
 		deployment2, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim2deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			z := pattern1.AssignApimConfigMapValues(apimanager,configmap,am2num)
+			z := pattern1.AssignApimConfigMapValues(apimanager, configmap, am2num)
 
 			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.Apim2Deployment(apimanager, z, am2num))
 			if err != nil {
@@ -604,7 +601,6 @@ func (c *Controller) syncHandler(key string) error {
 		if err != nil {
 			return err
 		}
-
 
 		if apimanager.Spec.Expose == "Ingress" {
 			// Get apim instance 1 service name using hardcoded value
@@ -658,7 +654,6 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-
 		/////////////checking whether resources are controlled by apimanager with same owner reference
 
 		// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
@@ -698,7 +693,6 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-
 		// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(service, apimanager) {
 			msg := fmt.Sprintf("service1 %q already exists and is not managed by APIManager", service.Name)
@@ -734,7 +728,6 @@ func (c *Controller) syncHandler(key string) error {
 			return fmt.Errorf(msg)
 		}
 
-
 		if useMysqlPod {
 			// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 
@@ -745,7 +738,6 @@ func (c *Controller) syncHandler(key string) error {
 				return fmt.Errorf(msg)
 			}
 		}
-
 
 		// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(pvc1, apimanager) {
@@ -768,37 +760,36 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-
 		///////////check replicas are same as defined for deployments
 
 		// If the Apimanager resource has changed update the deployment
 		// If this number of the replicas on the Apimanager resource is specified, and the number does not equal the
 		// current desired replicas on the Deployment, we should update the Deployment resource.
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-			x := pattern1.AssignApimConfigMapValues(apimanager,configmap,am1num)
+			x := pattern1.AssignApimConfigMapValues(apimanager, configmap, am1num)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim1Deployment(apimanager, x,am1num))
+			deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim1Deployment(apimanager, x, am1num))
 		}
 
 		//for apim instance 2 also
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment2.Spec.Replicas {
-			z := pattern1.AssignApimConfigMapValues(apimanager,configmap,am2num)
+			z := pattern1.AssignApimConfigMapValues(apimanager, configmap, am2num)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *deployment2.Spec.Replicas)
-			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, z,am2num))
+			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, z, am2num))
 		}
 
 		//for analytics dashboard deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
-			y:= pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager,configmap,dashnum)
+			y := pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, y,dashnum))
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, y, dashnum))
 		}
 
 		//for analytics worker deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
-			y:= pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager,configmap,worknum)
+			y := pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, y,worknum))
+			workerdeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, y, worknum))
 		}
 
 		if useMysqlPod {
@@ -837,7 +828,7 @@ func (c *Controller) syncHandler(key string) error {
 		}
 
 		//for analytics worker deployment
-		err = c.updateApimanagerStatus(apimanager, workerdeployment)
+		err = c.updateApiMangerStatusForStatefulSet(apimanager, workerdeployment)
 		if err != nil {
 			return err
 		}
@@ -868,79 +859,71 @@ func (c *Controller) syncHandler(key string) error {
 		var dashVolDefined bool = false
 		var workerVolDefined bool = false
 
-
 		for _, r := range apimanager.Spec.Profiles {
 
 			if r.Type == "api-manager" {
 
+				apim1deploymentName := r.Name
+				apimpvc := r.Deployment.PersistentVolumeClaim
+				apimVolDefined = apimpvc.SynapseConfigs != "" && apimpvc.ExecutionPlans != ""
 
-			apim1deploymentName := r.Name
-			apimpvc := r.Deployment.PersistentVolumeClaim
-			apimVolDefined = apimpvc.SynapseConfigs != "" && apimpvc.ExecutionPlans != ""
+				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
+				// If the resource doesn't exist, we'll create it
+				x := patternX.AssignApimXConfigMapValues(apimanager, configmap, r)
+				if errors.IsNotFound(err) {
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.ApimXDeployment(apimanager, &r, x))
+					if err != nil {
+						return err
+					}
+				}
+				// Get apim instance 1 service name using hardcoded value
+				apimXserviceName := r.Service.Name
+				service, err := c.servicesLister.Services(apimanager.Namespace).Get(apimXserviceName)
+				// If the resource doesn't exist, we'll create it
+				if errors.IsNotFound(err) {
+					service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(patternX.ApimXService(apimanager, &r))
+				}
 
-			deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
-			// If the resource doesn't exist, we'll create it
-			x := patternX.AssignApimXConfigMapValues(apimanager,configmap,r)
-			if errors.IsNotFound(err) {
-				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.ApimXDeployment(apimanager, &r, x))
 				if err != nil {
 					return err
 				}
-			}
-			// Get apim instance 1 service name using hardcoded value
-			apimXserviceName := r.Service.Name
-			service, err := c.servicesLister.Services(apimanager.Namespace).Get(apimXserviceName)
-			// If the resource doesn't exist, we'll create it
-			if errors.IsNotFound(err) {
-				service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(patternX.ApimXService(apimanager, &r))
-			}
 
+				/////////////checking whether resources are controlled by apimanager with same owner reference
+
+				// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(deployment, apimanager) {
+					msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by APIManager", deployment.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+				// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+				if !metav1.IsControlledBy(service, apimanager) {
+					msg := fmt.Sprintf("apimananger service %q already exists and is not managed by APIManager", service.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+
+				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
+					x := patternX.AssignApimXConfigMapValues(apimanager, configmap, r)
+					klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r, x))
+				}
+
+				// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
+				// This could have been caused by a temporary network failure, or any other transient reason.
 				if err != nil {
-				return err
+					return err
+				}
+
+				// Finally, we update the status block of the Apimanager resource to reflect the current state of the world
+				err = c.updateApimanagerStatus(apimanager, deployment)
+				if err != nil {
+					return err
+				}
+
 			}
-
-			/////////////checking whether resources are controlled by apimanager with same owner reference
-
-			// If the apim instance 1 Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-			if !metav1.IsControlledBy(deployment, apimanager) {
-				msg := fmt.Sprintf("Deployment1 %q already exists and is not managed by APIManager", deployment.Name)
-				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-				return fmt.Errorf(msg)
-			}
-			// If the apim instance 1 Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-			if !metav1.IsControlledBy(service, apimanager) {
-				msg := fmt.Sprintf("apimananger service %q already exists and is not managed by APIManager", service.Name)
-				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-				return fmt.Errorf(msg)
-			}
-
-
-
-
-			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-				x := patternX.AssignApimXConfigMapValues(apimanager,configmap,r)
-				klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-				deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r,x))
-			}
-
-
-			// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
-			// This could have been caused by a temporary network failure, or any other transient reason.
-			if err != nil {
-				return err
-			}
-
-			// Finally, we update the status block of the Apimanager resource to reflect the current state of the world
-			err = c.updateApimanagerStatus(apimanager, deployment)
-			if err != nil {
-				return err
-			}
-
-
-		}
 
 			if r.Type == "analytics-dashboard" {
-
 
 				dashdeploymentName := r.Name
 				dashpvc := r.Deployment.PersistentVolumeClaim
@@ -948,10 +931,10 @@ func (c *Controller) syncHandler(key string) error {
 
 				deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashdeploymentName)
 				// If the resource doesn't exist, we'll create it
-				x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
+				x := patternX.AssignApimAnalyticsConfigMapValues(apimanager, configmap, r)
 
 				if errors.IsNotFound(err) {
-					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.DashboardXDeployment(apimanager, &r,x))
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.DashboardXDeployment(apimanager, &r, x))
 					if err != nil {
 						return err
 					}
@@ -963,9 +946,6 @@ func (c *Controller) syncHandler(key string) error {
 				if errors.IsNotFound(err) {
 					service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(patternX.DashboardXService(apimanager, &r))
 				}
-
-
-
 
 				if err != nil {
 					return err
@@ -986,15 +966,11 @@ func (c *Controller) syncHandler(key string) error {
 					return fmt.Errorf(msg)
 				}
 
-
-
-
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
-					x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
+					x := patternX.AssignApimAnalyticsConfigMapValues(apimanager, configmap, r)
 					klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r,x))
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.ApimXDeployment(apimanager, &r, x))
 				}
-
 
 				// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
 				// This could have been caused by a temporary network failure, or any other transient reason.
@@ -1008,12 +984,10 @@ func (c *Controller) syncHandler(key string) error {
 					return err
 				}
 
-
 			}
 
 			if r.Type == "analytics-worker" {
-				x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
-
+				x := patternX.AssignApimAnalyticsConfigMapValues(apimanager, configmap, r)
 
 				workerdeploymentName := r.Name
 				workerpvc := r.Deployment.PersistentVolumeClaim
@@ -1023,7 +997,7 @@ func (c *Controller) syncHandler(key string) error {
 				// If the resource doesn't exist, we'll create it
 
 				if errors.IsNotFound(err) {
-					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.WorkerXDeployment(apimanager, &r,x))
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(patternX.WorkerXDeployment(apimanager, &r, x))
 					if err != nil {
 						return err
 					}
@@ -1035,9 +1009,6 @@ func (c *Controller) syncHandler(key string) error {
 				if errors.IsNotFound(err) {
 					service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(patternX.WorkerXService(apimanager, &r))
 				}
-
-
-
 
 				if err != nil {
 					return err
@@ -1058,17 +1029,13 @@ func (c *Controller) syncHandler(key string) error {
 					return fmt.Errorf(msg)
 				}
 
-
-
-
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *deployment.Spec.Replicas {
 
-					x := patternX.AssignApimAnalyticsConfigMapValues(apimanager,configmap,r)
+					x := patternX.AssignApimAnalyticsConfigMapValues(apimanager, configmap, r)
 
 					klog.V(4).Infof("APIManager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *deployment.Spec.Replicas)
-					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.WorkerXDeployment(apimanager, &r,x))
+					deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(patternX.WorkerXDeployment(apimanager, &r, x))
 				}
-
 
 				// If an error occurs during Update, we'll requeue the item so we can attempt processing again later.
 				// This could have been caused by a temporary network failure, or any other transient reason.
@@ -1082,7 +1049,6 @@ func (c *Controller) syncHandler(key string) error {
 					return err
 				}
 
-
 			}
 			//else {
 			//	fmt.Println("sorry NO matching type found, so no deployments & services are made")
@@ -1092,23 +1058,22 @@ func (c *Controller) syncHandler(key string) error {
 
 		if apimVolDefined && dashVolDefined && workerVolDefined {
 
-
 			synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
 			executionPlanPVCName := "wso2am-p1-am-execution-plans"
 			mysqlPVCName := "wso2am-p1-mysql"
 			pvcConfName := "pvc-config"
 			pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
-			mysqldeploymentName := "mysql-"+apimanager.Name
+			mysqldeploymentName := "mysql-" + apimanager.Name
 			mysqlserviceName := "mysql-svc"
 
 			mysqlDbConfName := "wso2am-p1-mysql-dbscripts"
 			mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
-			mysqlDbConfUserName:= "wso2am-p1-mysql-dbscripts-"+apimanager.Name
+			mysqlDbConfUserName := "wso2am-p1-mysql-dbscripts-" + apimanager.Name
 			mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfUserName)
-			if errors.IsNotFound(err){
-				mysqlDbConfUser, err= c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager,mysqlDbConfWso2))
-				if err!= nil{
-					fmt.Println("Creating mysql dbscripts configmap in user specified ns",mysqlDbConfUser)
+			if errors.IsNotFound(err) {
+				mysqlDbConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, mysqlDbConfWso2))
+				if err != nil {
+					fmt.Println("Creating mysql dbscripts configmap in user specified ns", mysqlDbConfUser)
 				}
 			}
 
@@ -1208,7 +1173,6 @@ func (c *Controller) syncHandler(key string) error {
 
 		//////////finally update the deployment resources after done checking
 
-
 		c.recorder.Event(apimanager, corev1.EventTypeNormal, "synced", "APIManager synced successfully")
 		return nil
 
@@ -1217,9 +1181,19 @@ func (c *Controller) syncHandler(key string) error {
 	return nil
 }
 
-
-
-
+func (c *Controller) updateApiMangerStatusForStatefulSet(apimanager *apimv1alpha1.APIManager, statefulSet *appsv1.StatefulSet) error {
+	// NEVER modify objects from the store. It's a read-only, local cache.
+	// You can use DeepCopy() to make a deep copy of original object and modify this copy
+	// Or create a copy manually for better performance
+	apimanagerCopy := apimanager.DeepCopy()
+	apimanagerCopy.Status.AvailableReplicas = statefulSet.Status.CurrentReplicas
+	// If the CustomResourceSubresources feature gate is not enabled,
+	// we must use Update instead of UpdateStatus to update the Status block of the Apimanager resource.
+	// UpdateStatus will not allow changes to the Spec of the resource,
+	// which is ideal for ensuring nothing other than resource status has been updated.
+	_, err := c.sampleclientset.ApimV1alpha1().APIManagers(apimanager.Namespace).Update(apimanagerCopy)
+	return err
+}
 
 func (c *Controller) updateApimanagerStatus(apimanager *apimv1alpha1.APIManager, deployment *appsv1.Deployment) error {
 	// NEVER modify objects from the store. It's a read-only, local cache.
