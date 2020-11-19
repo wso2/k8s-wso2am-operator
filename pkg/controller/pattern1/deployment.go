@@ -57,6 +57,9 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 
 	initContainers := getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
 
+	// appending the analytics-worker init container
+	initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
+
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depApiVersion,
@@ -186,6 +189,9 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 	executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
 	apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
 	initContainers = append(initContainers, apim1InitContainer)
+
+	// appending the analytics-worker init container
+	initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
 
 	apim2SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")

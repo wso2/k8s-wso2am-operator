@@ -21,9 +21,10 @@
 package pattern1
 
 import (
+	"strconv"
+
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	"strconv"
 )
 
 // getMysqlInitContainers returns init containers for mysql deployment
@@ -78,4 +79,15 @@ func getMysqlInitContainers(apimanager *apimv1alpha1.APIManager, vols *[]corev1.
 	}
 
 	return initContainers
+}
+
+func getAnalyticsWorkerInitContainers() corev1.Container {
+
+	analyticsWorkerInitContainer := corev1.Container{}
+	analyticsWorkerInitContainer.Name = "init-am-analytics-worker"
+	analyticsWorkerInitContainer.Image = "busybox:1.32"
+	analyticsExecutionStr := "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\"; while ! nc -z wso2am-pattern1-am-analytics-worker-service 7712; do sleep 1; printf \"-\"; done; echo -e \"  >> WSO2 API Manager Analytics Worker has started\";"
+	analyticsWorkerInitContainer.Command = []string{"sh", "-c", analyticsExecutionStr}
+
+	return analyticsWorkerInitContainer
 }
