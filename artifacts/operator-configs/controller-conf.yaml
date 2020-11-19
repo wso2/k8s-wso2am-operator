@@ -39,6 +39,7 @@ data:
   apim-deployment-readinessProbe-failureThreshold: "3"
   apim-deployment-securityContext: "runAsUser: 802"
 
+
   # common configs for apim-analytics
   apim-analytics-deployment-replicas: "1"
   apim-analytics-deployment-minReadySeconds: "30"
@@ -58,6 +59,8 @@ data:
   p1-apim-deployment-resources-requests-memory: "2Gi"
   p1-apim-deployment-resources-limits-cpu: "2000m"
   p1-apim-deployment-resources-limits-memory: "2Gi"
+  p1-apim-deployment-env-jvm-heap-memory-xms: "1024m"
+  p1-apim-deployment-env-jvm-heap-memory-xmx: "1024m"
 
   # custom pattern specific configs for apim-instances
   pX-apim-deployment-image: "wso2/wso2am:3.2.0"
@@ -73,6 +76,8 @@ data:
   p1-apim-analytics-deployment-resources-requests-memory: "4Gi"
   p1-apim-analytics-deployment-resources-limits-cpu: "2000m"
   p1-apim-analytics-deployment-resources-limits-memory: "4Gi"
+  p1-apim-analytics-deployment-env-jvm-heap-memory-xms: "2048m"
+  p1-apim-analytics-deployment-env-jvm-heap-memory-xmx: "2048m"
 
   # custom pattern specific configs for apim-analytics
   pX-apim-analytics-deployment-dashboard-image: "wso2/wso2am-analytics-dashboard:3.2.0"
