@@ -143,6 +143,10 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 										},
 									},
 								},
+								{
+									Name:  "JVM_MEM_OPTS",
+									Value: x.JvmMemOpts,
+								},
 							},
 							VolumeMounts: apim1VolumeMount,
 						},
@@ -278,6 +282,10 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 											FieldPath: "status.podIP",
 										},
 									},
+								},
+								{
+									Name:  "JVM_MEM_OPTS",
+									Value: z.JvmMemOpts,
 								},
 							},
 							VolumeMounts: apim2VolumeMount,

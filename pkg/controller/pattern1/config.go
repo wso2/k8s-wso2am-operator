@@ -51,6 +51,7 @@ type configvalues struct {
 	ImagePullSecret    string
 	ServiceAccountName string
 	SecurityContext    string
+	JvmMemOpts         string
 }
 
 func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
@@ -79,6 +80,9 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
+	memXmx := ControlConfigData["apim-deployment-env-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["apim-deployment-env-jvm-heap-memory-xms"]
+	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	if totalProfiles > 0 {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
@@ -175,6 +179,7 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 		ImagePullSecret:    imagePullSecret,
 		ServiceAccountName: serviceAccountName,
 		SecurityContext:    securityContext,
+		JvmMemOpts:         memOpts,
 	}
 
 	return cmvalues
