@@ -84,8 +84,10 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-analytics-dashboard",
 	}
-	servType := ""
+	servType := "ClusterIP"
 	dashports := []corev1.ServicePort{}
+	dashports = getDashBoardPorts()
+
 	if apimanager.Spec.Service.Type == "NodePort" {
 		dashports = getDashBoardNPPorts()
 		servType = "NodePort"
@@ -95,9 +97,6 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	} else if apimanager.Spec.Service.Type == "ClusterIP" {
 		dashports = getDashBoardPorts()
 		servType = "ClusterIP"
-	} else {
-		dashports = getDashBoardPorts()
-		servType = "LoadBalancer"
 	}
 
 	return &corev1.Service{
@@ -183,7 +182,9 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 
 	apimcommonsvsports := []corev1.ServicePort{}
-	servType := ""
+	servType := "ClusterIP"
+	apimcommonsvsports = getApimCommonSvcPorts()
+
 	if apimanager.Spec.Service.Type == "NodePort" {
 		apimcommonsvsports = getApimCommonSvcNPPorts()
 		servType = "NodePort"
@@ -193,9 +194,6 @@ func ApimCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	} else if apimanager.Spec.Service.Type == "ClusterIP" {
 		apimcommonsvsports = getApimCommonSvcPorts()
 		servType = "ClusterIP"
-	} else {
-		apimcommonsvsports = getApimCommonSvcPorts()
-		servType = "LoadBalancer"
 	}
 
 	return &corev1.Service{
