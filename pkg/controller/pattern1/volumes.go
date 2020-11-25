@@ -26,10 +26,10 @@ import (
 )
 
 func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
-  
-	deployconfigmap := "wso2am-p1-apim-1-conf-"+apimanager.Name
-	synapseConf := "wso2am-p1-am-synapse-configs"
-	execPlan := "wso2am-p1-am-execution-plans"
+
+	deployconfigmap := "wso2am-p1-apim-1-conf-" + apimanager.Name
+	// synapseConf := "wso2am-p1-am-synapse-configs"
+	// execPlan := "wso2am-p1-am-execution-plans"
 
 	var am1volumemounts []corev1.VolumeMount
 	var am1volume []corev1.Volume
@@ -43,14 +43,14 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 			deployconfigmap = deployConfFromYaml
 		}
 
-		synapseConfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
-		if synapseConfFromYaml != "" {
-			synapseConf = synapseConfFromYaml
-		}
-		execPlanFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.ExecutionPlans
-		if execPlanFromYaml != "" {
-			execPlan = execPlanFromYaml
-		}
+		// synapseConfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
+		// if synapseConfFromYaml != "" {
+		// 	synapseConf = synapseConfFromYaml
+		// }
+		// execPlanFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.ExecutionPlans
+		// if execPlanFromYaml != "" {
+		// 	execPlan = execPlanFromYaml
+		// }
 
 		//for newly created set of configmaps by user
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
@@ -60,12 +60,12 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 			})
 		}
 		//for newly created set of PVCs by user
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			am1volumemounts = append(am1volumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	am1volumemounts = append(am1volumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			am1volume = append(am1volume, corev1.Volume{
@@ -79,16 +79,16 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 				},
 			})
 		}
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			am1volume = append(am1volume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-						ClaimName: c.Name,
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	am1volume = append(am1volume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+		// 				ClaimName: c.Name,
+		// 			},
+		// 		},
+		// 	})
+		// }
 	}
 
 	//adding default deploymentConfigmap
@@ -96,16 +96,6 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 		Name:      deployconfigmap,
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 		SubPath:   "deployment.toml",
-	})
-	//adding default synapseConfigs pvc
-	am1volumemounts = append(am1volumemounts, corev1.VolumeMount{
-		Name:      synapseConf,
-		MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/synapse-configs",
-	})
-	//adding default executionPlans pvc
-	am1volumemounts = append(am1volumemounts, corev1.VolumeMount{
-		Name:      execPlan,
-		MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/executionplans",
 	})
 
 	am1volume = append(am1volume, corev1.Volume{
@@ -118,22 +108,6 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 			},
 		},
 	})
-	am1volume = append(am1volume, corev1.Volume{
-		Name: synapseConf,
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: synapseConf,
-			},
-		},
-	})
-	am1volume = append(am1volume, corev1.Volume{
-		Name: execPlan,
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: execPlan,
-			},
-		},
-	})
 
 	return am1volumemounts, am1volume
 
@@ -142,8 +116,8 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
 	deployconfigmap := "wso2am-p1-apim-2-conf-" + apimanager.Name
-	synapseConf := "wso2am-p1-am-synapse-configs"
-	execPlan := "wso2am-p1-am-execution-plans"
+	// synapseConf := "wso2am-p1-am-synapse-configs"
+	// execPlan := "wso2am-p1-am-execution-plans"
 
 	var am2volumemounts []corev1.VolumeMount
 	var am2volume []corev1.Volume
@@ -157,14 +131,14 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 			deployconfigmap = deployConfFromYaml
 		}
 
-		synapseConfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
-		if synapseConfFromYaml != "" {
-			synapseConf = synapseConfFromYaml
-		}
-		execPlanFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.ExecutionPlans
-		if execPlanFromYaml != "" {
-			execPlan = execPlanFromYaml
-		}
+		// synapseConfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
+		// if synapseConfFromYaml != "" {
+		// 	synapseConf = synapseConfFromYaml
+		// }
+		// execPlanFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.ExecutionPlans
+		// if execPlanFromYaml != "" {
+		// 	execPlan = execPlanFromYaml
+		// }
 
 		//for newly created set of configmaps by user
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
@@ -174,12 +148,12 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 			})
 		}
 		//for newly created set of PVCs by user
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			am2volume = append(am2volume, corev1.Volume{
@@ -193,16 +167,16 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 				},
 			})
 		}
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			am2volume = append(am2volume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-						ClaimName: c.Name,
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	am2volume = append(am2volume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+		// 				ClaimName: c.Name,
+		// 			},
+		// 		},
+		// 	})
+		// }
 	}
 
 	//adding default deploymentConfigmap
@@ -212,15 +186,16 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 		SubPath:   "deployment.toml",
 	})
 	//adding default synapseConfigs pvc
-	am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
-		Name:      synapseConf,
-		MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/synapse-configs",
-	})
+	// am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
+	// 	Name:      synapseConf,
+	// 	MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/synapse-configs",
+	// })
+
 	//adding default executionPlans pvc
-	am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
-		Name:      execPlan,
-		MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/executionplans",
-	})
+	// am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
+	// 	Name:      execPlan,
+	// 	MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/executionplans",
+	// })
 
 	am2volume = append(am2volume, corev1.Volume{
 		Name: deployconfigmap,
@@ -232,22 +207,23 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 			},
 		},
 	})
-	am2volume = append(am2volume, corev1.Volume{
-		Name: synapseConf,
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: synapseConf,
-			},
-		},
-	})
-	am2volume = append(am2volume, corev1.Volume{
-		Name: execPlan,
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: execPlan,
-			},
-		},
-	})
+	// am2volume = append(am2volume, corev1.Volume{
+	// 	Name: synapseConf,
+	// 	VolumeSource: corev1.VolumeSource{
+	// 		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+	// 			ClaimName: synapseConf,
+	// 		},
+	// 	},
+	// })
+
+	// am2volume = append(am2volume, corev1.Volume{
+	// 	Name: execPlan,
+	// 	VolumeSource: corev1.VolumeSource{
+	// 		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+	// 			ClaimName: execPlan,
+	// 		},
+	// 	},
+	// })
 
 	return am2volumemounts, am2volume
 
@@ -267,7 +243,6 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 		if dashconfFromYaml != "" {
 			dashconfigmap = dashconfFromYaml
 		}
-
 
 		//for newly created set of configmaps by user
 
