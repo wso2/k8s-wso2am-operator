@@ -66,6 +66,7 @@ type Controller struct {
 	servicesLister               corelisters.ServiceLister
 	ingressLister                extensionsv1beta1listers.IngressLister //for ingress lister
 	deploymentsSynced            cache.InformerSynced
+	statefulSetsSynced           cache.InformerSynced
 	servicesSynced               cache.InformerSynced
 	apimanagerslister            listers.APIManagerLister
 	apimanagersSynced            cache.InformerSynced
@@ -83,6 +84,7 @@ func NewController(
 	kubeclientset kubernetes.Interface,
 	sampleclientset clientset.Interface,
 	deploymentInformer appsinformers.DeploymentInformer,
+	statefulsetInformer appsinformers.StatefulSetInformer,
 	ingressinformer externsionsv1beta1informers.IngressInformer,
 	serviceInformer coreinformers.ServiceInformer,
 	configmapInformer coreinformers.ConfigMapInformer,
@@ -103,6 +105,8 @@ func NewController(
 		sampleclientset:              sampleclientset,
 		deploymentsLister:            deploymentInformer.Lister(),
 		deploymentsSynced:            deploymentInformer.Informer().HasSynced,
+		statefulSetsLister:           statefulsetInformer.Lister(),
+		statefulSetsSynced:           statefulsetInformer.Informer().HasSynced,
 		servicesLister:               serviceInformer.Lister(),
 		ingressLister:                ingressinformer.Lister(),
 		servicesSynced:               serviceInformer.Informer().HasSynced,
@@ -134,6 +138,18 @@ func NewController(
 			if newDepl.ResourceVersion == oldDepl.ResourceVersion {
 				// Periodic resync will send update events for all known Deployments.
 				// Two different versions of the same Deployment will always have different RVs.
+				return
+			}
+			controller.handleObject(new)
+		},
+		DeleteFunc: controller.handleObject,
+	})
+	statefulsetInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: controller.handleObject,
+		UpdateFunc: func(old, new interface{}) {
+			newDepl := new.(*appsv1.StatefulSet)
+			oldDel := old.(*appsv1.StatefulSet)
+			if newDepl.ResourceVersion == oldDel.ResourceVersion {
 				return
 			}
 			controller.handleObject(new)
@@ -476,6 +492,7 @@ func (c *Controller) syncHandler(key string) error {
 
 		// Get mysql deployment name using hardcoded value
 		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
+		klog.Error("MySQl-Depl: ", err)
 
 		if useMysqlPod {
 			// If the resource doesn't exist, we'll create it
@@ -505,6 +522,7 @@ func (c *Controller) syncHandler(key string) error {
 
 		// Get analytics dashboard deployment name using hardcoded value
 		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
+		klog.Error("Dashboard-Depl: ", err)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
@@ -517,15 +535,20 @@ func (c *Controller) syncHandler(key string) error {
 
 		// Get analytics dashboard service name using hardcoded value
 		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
+		klog.Error("Dashboard-Service Error: ", dashservice)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.DashboardService(apimanager))
+			klog.Info("Handled Error")
+			klog.Error("Dasboard Service Cond Error: ", err)
 		}
 
 		// Get analytics worker deployment name using hardcoded value
 
 		// workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+		klog.Info("Done Dashboard")
 		workerdeployment, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
+		klog.Error("Worker Error: ", err)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
@@ -545,10 +568,11 @@ func (c *Controller) syncHandler(key string) error {
 		}
 
 		// Waiting for Analytics worker nodes
-		workerdeploymentupdated, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+		workerdeploymentupdated, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
+		klog.Error("Worker-Depl-Updated: ", workerdeploymentupdated)
 		for workerdeploymentupdated.Status.ReadyReplicas == 0 {
 			time.Sleep(5 * time.Second)
-			workerdeploymentupdated, err = c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
+			workerdeploymentupdated, err = c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
 		}
 
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
