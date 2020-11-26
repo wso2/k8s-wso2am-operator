@@ -68,6 +68,38 @@ data:
   apim-analytics-deployment-resources-limits-memory: "4Gi"
   apim-analytics-deployment-resources-limits-cpu: "2000m"
 
+  # pattern specific configs for apim instances
+  p2-apim-deployment-image: "wso2/wso2am:3.2.0"
+  p2-apim-deployment-resources-requests-cpu: "1000m"
+  p2-apim-deployment-resources-requests-memory: "1Gi"
+  p2-apim-deployment-resources-limits-cpu: "2Gi"
+  p2-apim-deployment-resources-limits-memory: "2000m"
+  p2-apim-deployment-resources-jvm-heap-memory-xms: "512m"
+  p2-apim-deployment-resources-jvm-heap-memory-xmx: "512m"
+
+
+  # pattern-specific configs for pun-dev-tm instances
+  p2-apim-deployment-pubdevtm-livelinessProbe-initialDelaySeconds: "180"
+  p2-apim-deployment-pubdevtm-livelinessProbe-periodSeconds: "10"
+  p2-apim-deployment-pubdevtm-readinessProbe-initialDelaySeconds: "180"
+  p2-apim-deployment-pubdevtm-readinessProbe-periodSeconds: "10"
+
+  # pattern specific configs for key manager instances
+  p2-apim-km-deployment-livelinessProbe-periodSeconds: "10"
+  p2-apim-km-deployment-livelinessProbe-initialDelaySeconds: "60"
+  p2-apim-km-deployment-readinessProbe-periodSeconds: "10"
+  p2-apim-km-deployment-readinessProbe-initialDelaySeconds: "60"
+  p2-apim-km-deployment-replicas: "2"
+
+  # pattern specific configs for gateway instances
+  p2-apim-gw-deployment-livelinessProbe-periodSeconds: "10"
+  p2-apim-gw-deployment-livelinessProbe-initialDelaySeconds: "60"
+  p2-apim-gw-deployment-readinessProbe-periodSeconds: "10"
+  p2-apim-gw-deployment-readinessProbe-initialDelaySeconds: "60"
+  p2-apim-gw-deployment-replicas: "2"
+  p2-apim-gw-deployment-maxSurge: "2"
+  p2-apim-gw-deployment-maxUnavailable: "0"
+
   # custom pattern specific configs for apim-instances
   pX-apim-deployment-image: "wso2/wso2am:3.2.0"
   pX-apim-deployment-resources-requests-cpu: "2000m"
