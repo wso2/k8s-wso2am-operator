@@ -100,12 +100,12 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 	//adding default synapseConfigs pvc
 	am1volumemounts = append(am1volumemounts, corev1.VolumeMount{
 		Name:      synapseConf,
-		MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/synapse-configs",
+		MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/synapse-configs",
 	})
 	//adding default executionPlans pvc
 	am1volumemounts = append(am1volumemounts, corev1.VolumeMount{
 		Name:      execPlan,
-		MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/executionplans",
+		MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/executionplans",
 	})
 
 	am1volume = append(am1volume, corev1.Volume{
@@ -214,12 +214,12 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 	//adding default synapseConfigs pvc
 	am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
 		Name:      synapseConf,
-		MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/synapse-configs",
+		MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/synapse-configs",
 	})
 	//adding default executionPlans pvc
 	am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
 		Name:      execPlan,
-		MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/executionplans",
+		MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/executionplans",
 	})
 
 	am2volume = append(am2volume, corev1.Volume{
