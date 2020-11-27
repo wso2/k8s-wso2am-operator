@@ -524,14 +524,6 @@ func (c *Controller) syncHandler(key string) error {
 			workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerService(apimanager))
 		}
 
-		// Waiting for Analytics worker nodes
-		workerdeploymentupdated, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
-		klog.Error("Worker-Depl-Updated: ", workerdeploymentupdated)
-		for workerdeploymentupdated.Status.ReadyReplicas == 0 {
-			time.Sleep(5 * time.Second)
-			workerdeploymentupdated, err = c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
-		}
-
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
