@@ -763,7 +763,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 }
 
 // for handling analytics-worker deployment
-func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
+func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.StatefulSet {
 
 	workerVolMounts, workerVols := getAnalyticsWorkerVolumes(apimanager, num)
 
@@ -780,7 +780,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 	AssignSecurityContext(securityContextString, workerSecurityContext)
 
-	return &appsv1.Deployment{
+	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depApiVersion,
 			Kind:       "StaefulSet",
@@ -792,7 +792,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
 		},
-		Spec: appsv1.DeploymentSpec{
+		Spec: appsv1.StatefulSetSpec{
 			Replicas: apimanager.Spec.Replicas,
 			// MinReadySeconds: y.Minreadysec,
 			// Strategy: appsv1.DeploymentStrategy{

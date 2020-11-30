@@ -55,7 +55,7 @@ type configvalues struct {
 	JvmMemOpts         string
 }
 
-func AssignDevPubTmconfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
+func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
 	ControlConfigData := configMap.Data
 	totalProfiles := len(apimanager.Spec.Profiles)
