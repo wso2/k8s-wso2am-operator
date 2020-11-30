@@ -14,8 +14,23 @@
 # specific language governing permissions and limitations
 # under the License.
 
-apiVersion: v1
-kind: ServiceAccount
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: wso2am-pattern-1-svc-account
-  namespace : wso2-system
+  name: wso2am-controller
+  namespace: wso2-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wso2am-controller
+  template:
+    metadata:
+      labels:
+        app: wso2am-controller
+    spec:
+      containers:
+        - name: wso2am-controller
+          image: "pattern2-image"
+          imagePullPolicy: Always
+      serviceAccountName: wso2am-pattern-2-svc-account
