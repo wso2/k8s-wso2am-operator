@@ -24,6 +24,8 @@ import (
 	"strconv"
 	"strings"
 
+	"k8s.io/klog"
+
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -42,6 +44,8 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 	}
 
 	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager, num)
+	klog.Info("APIM1-Volunme Mount:", apim1VolumeMount)
+	klog.Info("APIM1-Volunmes: ", apim1Volume)
 	apim1deployports := getApimContainerPorts()
 
 	cmdstring := []string{
@@ -58,7 +62,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 	initContainers := getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
 
 	// appending the analytics-worker init container
-	initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
+	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -195,7 +199,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 	initContainers = append(initContainers, apim1InitContainer)
 
 	// appending the analytics-worker init container
-	initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
+	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
 
 	apim2SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")

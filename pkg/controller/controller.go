@@ -66,6 +66,7 @@ type Controller struct {
 	servicesLister               corelisters.ServiceLister
 	ingressLister                extensionsv1beta1listers.IngressLister //for ingress lister
 	deploymentsSynced            cache.InformerSynced
+	statefulSetsSynced           cache.InformerSynced
 	servicesSynced               cache.InformerSynced
 	apimanagerslister            listers.APIManagerLister
 	apimanagersSynced            cache.InformerSynced
@@ -83,6 +84,7 @@ func NewController(
 	kubeclientset kubernetes.Interface,
 	sampleclientset clientset.Interface,
 	deploymentInformer appsinformers.DeploymentInformer,
+	statefulsetInformer appsinformers.StatefulSetInformer,
 	ingressinformer externsionsv1beta1informers.IngressInformer,
 	serviceInformer coreinformers.ServiceInformer,
 	configmapInformer coreinformers.ConfigMapInformer,
@@ -103,6 +105,8 @@ func NewController(
 		sampleclientset:              sampleclientset,
 		deploymentsLister:            deploymentInformer.Lister(),
 		deploymentsSynced:            deploymentInformer.Informer().HasSynced,
+		statefulSetsLister:           statefulsetInformer.Lister(),
+		statefulSetsSynced:           statefulsetInformer.Informer().HasSynced,
 		servicesLister:               serviceInformer.Lister(),
 		ingressLister:                ingressinformer.Lister(),
 		servicesSynced:               serviceInformer.Informer().HasSynced,
@@ -134,6 +138,18 @@ func NewController(
 			if newDepl.ResourceVersion == oldDepl.ResourceVersion {
 				// Periodic resync will send update events for all known Deployments.
 				// Two different versions of the same Deployment will always have different RVs.
+				return
+			}
+			controller.handleObject(new)
+		},
+		DeleteFunc: controller.handleObject,
+	})
+	statefulsetInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: controller.handleObject,
+		UpdateFunc: func(old, new interface{}) {
+			newDepl := new.(*appsv1.StatefulSet)
+			oldDel := old.(*appsv1.StatefulSet)
+			if newDepl.ResourceVersion == oldDel.ResourceVersion {
 				return
 			}
 			controller.handleObject(new)
@@ -324,8 +340,6 @@ func (c *Controller) syncHandler(key string) error {
 		workerDeploymentName := "wso2-am-analytics-worker-" + apimanager.Name
 		workerServiceName := "wso2-am-analytics-worker-svc"
 
-		synapseConfigsPVCName := "wso2am-p1-am-synapse-configs"
-		executionPlanPVCName := "wso2am-p1-am-execution-plans"
 		mysqlPVCName := "wso2am-mysql"
 
 		dashConfName := "wso2am-p1-analytics-dash-conf"
@@ -437,43 +451,6 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		if totalProfiles > 0 && apimanager.Spec.Profiles[am1num].Name == "api-manager-1" {
-			synapseConfFromYaml := apimanager.Spec.Profiles[am1num].Deployment.PersistentVolumeClaim.SynapseConfigs
-			if synapseConfFromYaml != "" {
-				synapseConfigsPVCName = synapseConfFromYaml
-			}
-			execPlanFromYaml := apimanager.Spec.Profiles[am1num].Deployment.PersistentVolumeClaim.ExecutionPlans
-			if execPlanFromYaml != "" {
-				executionPlanPVCName = execPlanFromYaml
-			}
-		}
-
-		if totalProfiles > 0 && apimanager.Spec.Profiles[am2num].Name == "api-manager-2" {
-			synapseConfFromYaml := apimanager.Spec.Profiles[am2num].Deployment.PersistentVolumeClaim.SynapseConfigs
-			if synapseConfFromYaml != "" {
-				synapseConfigsPVCName = synapseConfFromYaml
-			}
-			execPlanFromYaml := apimanager.Spec.Profiles[am2num].Deployment.PersistentVolumeClaim.ExecutionPlans
-			if execPlanFromYaml != "" {
-				executionPlanPVCName = execPlanFromYaml
-			}
-		}
-
-		// Get synapse-configs-pvc name using hardcoded value
-		pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			sconf := pattern1.AssignConfigMapValuesForSynapseConfigsPvc(apimanager, pvcConfWso2)
-			pvc1, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeSynapseConfigsPvc(apimanager, sconf))
-		}
-		// Get execution-plans-pvc name using hardcoded value
-		pvc2, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(executionPlanPVCName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) {
-			epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
-			pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
-		}
-
 		// Get mysql deployment name using hardcoded value
 		mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 
@@ -505,6 +482,7 @@ func (c *Controller) syncHandler(key string) error {
 
 		// Get analytics dashboard deployment name using hardcoded value
 		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
+
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
@@ -517,15 +495,17 @@ func (c *Controller) syncHandler(key string) error {
 
 		// Get analytics dashboard service name using hardcoded value
 		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
+		klog.Error("Dashboard-Service Error: ", dashservice)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.DashboardService(apimanager))
+			klog.Info("Handled Error")
+			klog.Error("Dasboard Service Cond Error: ", err)
 		}
 
 		// Get analytics worker deployment name using hardcoded value
-
-		// workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
 		workerdeployment, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
+
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
@@ -542,13 +522,6 @@ func (c *Controller) syncHandler(key string) error {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerService(apimanager))
-		}
-
-		// Waiting for Analytics worker nodes
-		workerdeploymentupdated, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
-		for workerdeploymentupdated.Status.ReadyReplicas == 0 {
-			time.Sleep(5 * time.Second)
-			workerdeploymentupdated, err = c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
 		}
 
 		deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(apim1deploymentName)
@@ -739,18 +712,6 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-		if !metav1.IsControlledBy(pvc1, apimanager) {
-			msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by APIManager", pvc1.Name)
-			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-			return fmt.Errorf(msg)
-		}
-		// If the execution-plan pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-		if !metav1.IsControlledBy(pvc2, apimanager) {
-			msg := fmt.Sprintf("execution-plans pvc %q already exists and is not managed by APIManager", pvc2.Name)
-			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-			return fmt.Errorf(msg)
-		}
 		if useMysqlPod {
 			// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(pvc3, apimanager) {

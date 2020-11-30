@@ -43,14 +43,11 @@ var (
 	kubeconfig string
 )
 
-
-
 //Set up the signal handlers (So a ctrl+c or SIG{X} will be handled by the controller)
 //Parse the command line flags
 //Build up two client sets, and start two informers that watch for the signal handler
 //Build the controller configuration
 //Start the newly configured controller, and again pass the signal handler
-
 
 func main() {
 	klog.InitFlags(nil)
@@ -79,10 +76,11 @@ func main() {
 
 	controller := controller.NewController(kubeClient, exampleClient,
 		kubeInformerFactory.Apps().V1().Deployments(),
+		kubeInformerFactory.Apps().V1().StatefulSets(),
 		kubeInformerFactory.Extensions().V1beta1().Ingresses(),
 		kubeInformerFactory.Core().V1().Services(),
-	    kubeInformerFactory.Core().V1().ConfigMaps(),
-        kubeInformerFactory.Core().V1().PersistentVolumeClaims(),
+		kubeInformerFactory.Core().V1().ConfigMaps(),
+		kubeInformerFactory.Core().V1().PersistentVolumeClaims(),
 		exampleInformerFactory.Apim().V1alpha1().APIManagers())
 
 	// notice that there is no need to run Start methods in a separate goroutine. (i.e. go kubeInformerFactory.Start(stopCh)

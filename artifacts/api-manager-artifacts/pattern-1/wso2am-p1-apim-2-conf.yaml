@@ -38,6 +38,21 @@ data:
     [user_store]
     type = "database_unique_id"
 
+    [apim.sync_runtime_artifacts.publisher]
+    artifact_saver = "DBSaver"
+    publish_directly_to_gateway = "true"
+
+    [apim.sync_runtime_artifacts.gateway]
+    gateway_labels =["Production and Sandbox"]
+    artifact_retriever = "DBRetriever"
+    deployment_retry_duration = 15000
+    data_retrieval_mode = "sync"
+    event_waiting_time = 5000
+
+    [apim.event_hub]
+    enable = true
+    service_url = "https://traffic-manager:9443"  
+
     [database.apim_db]
     type = "mysql"
     url = "jdbc:mysql://mysql-svc:3306/WSO2AM_APIMGT_DB?useSSL=false"
