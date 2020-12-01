@@ -43,6 +43,11 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		"node":       "wso2am-pattern-1-am-1",
 	}
 
+	allowAnalytics := true
+	if apimanager.Spec.AllowAnalytics != "" {
+		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	}
+
 	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager, num)
 	klog.Info("APIM1-Volunme Mount:", apim1VolumeMount)
 	klog.Info("APIM1-Volunmes: ", apim1Volume)
@@ -154,6 +159,10 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 									Name:  "JVM_MEM_OPTS",
 									Value: x.JvmMemOpts,
 								},
+								{
+									Name:  "ALLOW_ANALYTICS",
+									Value: strconv.FormatBool(allowAnalytics),
+								},
 							},
 							VolumeMounts: apim1VolumeMount,
 						},
@@ -176,6 +185,10 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 
 	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager, num)
 	apim2deployports := getApimContainerPorts()
+	allowAnalytics := true
+	if apimanager.Spec.AllowAnalytics != "" {
+		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	}
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
@@ -296,6 +309,10 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 								{
 									Name:  "JVM_MEM_OPTS",
 									Value: z.JvmMemOpts,
+								},
+								{
+									Name:  "ALLOW_ANALYTICS",
+									Value: strconv.FormatBool(allowAnalytics),
 								},
 							},
 							VolumeMounts: apim2VolumeMount,
