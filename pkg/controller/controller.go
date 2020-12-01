@@ -350,8 +350,6 @@ func (c *Controller) syncHandler(key string) error {
 		workerServiceName := "wso2-am-analytics-worker-svc"
 		workerHlServiceName := "wso2-am-analytics-worker-headless-svc"
 
-		mysqlPVCName := "wso2am-mysql"
-
 		dashConfName := "wso2am-p1-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
 		dashConfUserName := "wso2am-p1-analytics-dash-conf-" + apimanager.Name
@@ -422,17 +420,6 @@ func (c *Controller) syncHandler(key string) error {
 			if err != nil {
 				fmt.Println("Creating dashboard bin configmap in user specified ns", dashBinConfUser)
 			}
-		}
-
-		pvcConfName := "pvc-config"
-		pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
-
-		// Get mysql-pvc name using hardcoded value
-		pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
-		// If the resource doesn't exist, we'll create it
-		if errors.IsNotFound(err) && useMysqlPod {
-			sqlconf := mysql.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
-			pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(mysql.MakeMysqlPvc(apimanager, sqlconf))
 		}
 
 		// Parse the object and look for it’s deployment
@@ -758,15 +745,6 @@ func (c *Controller) syncHandler(key string) error {
 			mysqlservice, _ := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 			if !metav1.IsControlledBy(mysqlservice, apimanager) {
 				msg := fmt.Sprintf("mysql service %q already exists and is not managed by APIManager", mysqlservice.Name)
-				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-				return fmt.Errorf(msg)
-			}
-		}
-
-		if useMysqlPod {
-			// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-			if !metav1.IsControlledBy(pvc3, apimanager) {
-				msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by APIManager", pvc3.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
