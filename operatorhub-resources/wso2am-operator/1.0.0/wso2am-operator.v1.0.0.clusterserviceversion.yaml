@@ -216,10 +216,10 @@ spec:
     strategy: deployment
     spec:
       permissions:
-        - serviceAccountName: wso2am-pattern-1-svc-account
+        - serviceAccountName: wso2am-svc-account
           rules: []
       clusterPermissions:
-        - serviceAccountName: wso2am-pattern-1-svc-account
+        - serviceAccountName: wso2am-svc-account
           rules:
             - apiGroups:
                 - apps
@@ -320,7 +320,7 @@ spec:
                             fieldPath: metadata.name
                       - name: OPERATOR_NAME
                         value: wso2am-operator
-                serviceAccountName: wso2am-pattern-1-svc-account
+                serviceAccountName: wso2am-svc-account
   installModes:
     - type: OwnNamespace
       supported: true
