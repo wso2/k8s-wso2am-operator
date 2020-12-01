@@ -495,6 +495,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
+			ServiceName: "wso2-am-analytics-worker-headless-svc",
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: labels,
