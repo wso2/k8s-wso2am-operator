@@ -112,7 +112,7 @@ func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-2-km-svc",
+			Name:      "wso2-am-km-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -196,7 +196,7 @@ func WorkerHeadlessService(apimanager *apimv1alpha1.APIManager) *corev1.Service 
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2am-pattern-2-am-analytics-worker-headless-service",
+			Name:      "wso2-am-analytics-worker-headless-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),

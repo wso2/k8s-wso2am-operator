@@ -608,7 +608,8 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		},
 
 		Spec: appsv1.StatefulSetSpec{
-			Replicas: apimanager.Spec.Replicas,
+			Replicas:    apimanager.Spec.Replicas,
+			ServiceName: "wso2-am-km-svc",
 			// MinReadySeconds: z.Minreadysec,
 			// Strategy: appsv1.DeploymentStrategy{
 			// 	Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
@@ -896,7 +897,8 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 			},
 		},
 		Spec: appsv1.StatefulSetSpec{
-			Replicas: apimanager.Spec.Replicas,
+			Replicas:    apimanager.Spec.Replicas,
+			ServiceName: "wso2-am-analytics-worker-headless-svc",
 			// MinReadySeconds: y.Minreadysec,
 			// Strategy: appsv1.DeploymentStrategy{
 			// 	Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),

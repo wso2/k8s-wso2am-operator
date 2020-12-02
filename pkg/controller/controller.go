@@ -1206,7 +1206,7 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 }
 
-func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, configmap *v1.ConfigMap, name string) {
+func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, configmap *v1.ConfigMap, name string) error {
 
 	useMysqlPod := true
 	allowAnalytics := true
@@ -1221,7 +1221,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	pubDevTm2deploymentName := "wso2-am-2-" + apimanager.Name
 	pubDevTm1serviceName := "wso2-am-1-svc"
 	pubDevTm2serviceName := "wso2-am-2-svc"
-	pubDevTmcommonservice := "wso2-am-svc"
+	pubDevTmcommonserviceName := "wso2-am-svc"
 	kmdeploymentName := "wso2-am-km-" + apimanager.Name
 	kmserviceName := "wso2-am-km-svc"
 	gwdeploymentName := "wso2-am-gw-" + apimanager.Name
@@ -1232,8 +1232,9 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	dashboardServiceName := "wso2-am-analytics-dashboard-svc"
 	workerDeploymentName := "wso2-am-analytics-worker-" + apimanager.Name
 	workerServiceName := "wso2-am-analytics-worker-svc"
+	workerhlServiceName := "wso2-am-analytics-worker-headless-svc"
 
-	mysqlPVCName := "wso2am-mysql"
+	//mysqlPVCName := "wso2am-mysql"
 
 	pubDevTmIngressName := "wso2-am-ingress"
 	gatewayIngressName := "wso2am-am-gw-ingress"
@@ -1310,7 +1311,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	gatewayConfUserName := "wso2am-p2-am-gateway-conf-" + apimanager.Name
 	gatewayConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gatewayConfUserName)
 	if errors.IsNotFound(err) {
-		gatewayConfUser, err = c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gatewayConfName)
+		gatewayConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, gatewayConfWso2))
 		if err != nil {
 			fmt.Println("Creating Gateway configmap in user specific ns", gatewayConfUser)
 		}
@@ -1321,7 +1322,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	kmConfUserName := "wso2-p2-am-km-conf" + apimanager.Name
 	kmConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(kmConfUserName)
 	if errors.IsNotFound(err) {
-		kmConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(kmConfName)
+		kmConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, kmConfWso2))
 		if err != nil {
 			fmt.Println("Creating Key Manager configmap in user specific ns", kmConfUser)
 		}
@@ -1477,6 +1478,8 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.DashboardService(apimanager))
+		} else {
+			fmt.Println("Dash Service is already available. [Service name] ,", dashservice)
 		}
 
 		// Get ingress name using hardcoded value
@@ -1484,9 +1487,8 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		// If resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern2.DashboardIngress(apimanager))
-			if err != nil {
-				return err
-			}
+		} else {
+			fmt.Println("Dash Ingress is already available. [Ingress name] ,", dashIngress)
 		}
 
 	}
@@ -1512,6 +1514,15 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.WorkerService(apimanager))
+		} else {
+			fmt.Println("Worker Service is already available. [Service name] ,", workerservice)
+		}
+
+		workerhlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerhlServiceName)
+		if errors.IsNotFound(err) {
+			workerhlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.WorkerHeadlessService(apimanager))
+		} else {
+			fmt.Println("Worker Headless Service is already available. [Service name] ,", workerhlservice)
 		}
 	}
 
@@ -1534,7 +1545,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	// Get apim instance 1 service name using hardcoded value
-	pubDevTm1Service, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTm2serviceName)
+	pubDevTm1Service, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTm1serviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		pubDevTm1Service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.PubDevTm1Service(apimanager))
@@ -1560,7 +1571,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	// Get apim common service name using hardcoded value
-	commonservice, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTmcommonservice)
+	commonservice, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTmcommonserviceName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		commonservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.PubDevTmCommonService(apimanager))
@@ -1664,7 +1675,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 		// If the analytics worker Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(workerdeployment, apimanager) {
-			msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by APIManager", workerdeployment.Name)
+			msg := fmt.Sprintf("Analytics Worker Deployment %q already exists and is not managed by APIManager", workerdeployment.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
@@ -1710,7 +1721,10 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	if allowAnalytics {
-		dashservice := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
+		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
+		if err != nil {
+			return err
+		}
 		// If the analytics dashboard Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(dashservice, apimanager) {
 			msg := fmt.Sprintf("dashboard Service %q already exists and is not managed by APIManager", dashservice.Name)
@@ -1718,17 +1732,28 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			return fmt.Errorf(msg)
 		}
 
-		workerservice := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
+		workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
+		if err != nil {
+			return err
+		}
 		// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(workerservice, apimanager) {
 			msg := fmt.Sprintf("worker Service %q already exists and is not managed by APIManager", workerservice.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 			return fmt.Errorf(msg)
 		}
+
+		workerhlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerhlServiceName)
+		// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+		if !metav1.IsControlledBy(workerhlservice, apimanager) {
+			msg := fmt.Sprintf("Worker Headless Service %q already exists and is not managed by APIManager", workerhlservice.Name)
+			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+			return fmt.Errorf(msg)
+		}
 	}
 
 	// If the analytics worker Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	if !metav1.IsControlledBy(pubDevTmcommonservice, apimanager) {
+	if !metav1.IsControlledBy(commonservice, apimanager) {
 		msg := fmt.Sprintf("pub-dev-tm-common Service %q already exists and is not managed by APIManager", commonservice.Name)
 		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 		return fmt.Errorf(msg)
@@ -1737,7 +1762,10 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if useMysqlPod {
 		// If the mysql Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 
-		//mysqlservice, _ := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
+		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
+		if err != nil {
+			return err
+		}
 		if !metav1.IsControlledBy(mysqlservice, apimanager) {
 			msg := fmt.Sprintf("mysql service %q already exists and is not managed by APIManager", mysqlservice.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
@@ -1760,6 +1788,11 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	if allowAnalytics {
+		// Get ingress name using hardcoded value
+		dashIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
+		if err != nil {
+			return err
+		}
 		if !metav1.IsControlledBy(dashIngress, apimanager) {
 			msg := fmt.Sprintf("Dashboard ingress %q already exists and is not managed by  APIManager", dashIngress.Name)
 			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
@@ -1783,14 +1816,14 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	// 	return fmt.Errorf(msg)
 	// }
 
-	if useMysqlPod {
-		// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-		if !metav1.IsControlledBy(pvc3, apimanager) {
-			msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by APIManager", pvc3.Name)
-			c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-			return fmt.Errorf(msg)
-		}
-	}
+	// if useMysqlPod {
+	// 	// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
+	// 	if !metav1.IsControlledBy(pvc3, apimanager) {
+	// 		msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by APIManager", pvc3.Name)
+	// 		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+	// 		return fmt.Errorf(msg)
+	// 	}
+	// }
 
 	///////////check replicas are same as defined for deployments
 
