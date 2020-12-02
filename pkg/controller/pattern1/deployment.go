@@ -170,7 +170,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 									Value: x.JvmMemOpts,
 								},
 								{
-									Name:  "ALLOW_ANALYTICS",
+									Name:  "ENABLE_ANALYTICS",
 									Value: strconv.FormatBool(allowAnalytics),
 								},
 							},
@@ -332,7 +332,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 									Value: z.JvmMemOpts,
 								},
 								{
-									Name:  "ALLOW_ANALYTICS",
+									Name:  "ENABLE_ANALYTICS",
 									Value: strconv.FormatBool(allowAnalytics),
 								},
 							},
