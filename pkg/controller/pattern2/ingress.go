@@ -32,7 +32,7 @@ func PubDevTmIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2am-pattern2-am-ingress",
+			Name:      "wso2-am-ingress",
 			Namespace: apimanager.Namespace,
 			Annotations: map[string]string{
 				"kubernetes.io/ingress.class":                     "nginx",
@@ -55,7 +55,7 @@ func PubDevTmIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2am-pattern2-am-service",
+										ServiceName: "wso2-am-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
 									},
 								},
@@ -79,7 +79,7 @@ func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-gateway-p1-ingress",
+			Name:      "wso2-am-gw-ingress",
 			Namespace: apimanager.Namespace,
 			Annotations: map[string]string{
 				"kubernetes.io/ingress.class":                  "nginx",
@@ -99,7 +99,7 @@ func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2am-pattern-2-am-gateway-service",
+										ServiceName: "wso2-am-gw-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
 									},
 								},
@@ -123,7 +123,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-analytics-dashboard-p1-ingress",
+			Name:      "wso2-am-analytics-dashboard-ingress",
 			Namespace: apimanager.Namespace,
 			Annotations: map[string]string{
 				"kubernetes.io/ingress.class":                  "nginx",
@@ -144,7 +144,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2am-pattern-2-am-analytics-dashboard-service",
+										ServiceName: "wso2-am-analytics-dashboard-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
 									},
 								},

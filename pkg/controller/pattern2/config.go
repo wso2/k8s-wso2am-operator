@@ -50,11 +50,11 @@ type configvalues struct {
 	APIMVersion        string
 	ImagePullSecret    string
 	ServiceAccountName string
-	StrategyType       string
 	SecurityContext    string
 	JvmMemOpts         string
 }
 
+//AssignDevPubTmConfigMapValues is to assign config-map values...
 func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
 	ControlConfigData := configMap.Data
@@ -64,12 +64,9 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 	serviceAccountName := ControlConfigData["service-account-name"]
 
 	apimVersion := ControlConfigData["api-manager-version"]
-	// strategyType := ControlConfigData["p2-apim-deployment-strategy"]
 	replicas, _ := strconv.ParseInt(ControlConfigData["apim-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
-	// maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-deployment-maxSurge"], 10, 32)
-	// maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-deployment-maxUnavailable"], 10, 32)
-	amImages := ControlConfigData["p2-apim-pubdev-deployment-image"]
+	amImages := ControlConfigData["p2-apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
 	reqCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-cpu"])
@@ -86,7 +83,7 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 	memXms := ControlConfigData["apim-deployment-env-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
-	if totalProfiles > 0 {
+	if totalProfiles > 0 && (apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-1" || apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-2") {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if replicasFromYaml != 0 {
 			replicas = int64(replicasFromYaml)
@@ -161,15 +158,13 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 		}
 	}
 	cmvalues := &configvalues{
-		Livedelay:   int32(liveDelay),
-		Liveperiod:  int32(livePeriod),
-		Livethres:   int32(liveThres),
-		Readydelay:  int32(readyDelay),
-		Readyperiod: int32(readyPeriod),
-		Readythres:  int32(readyThres),
-		Minreadysec: int32(minReadySec),
-		// Maxsurge:           int32(maxSurges),
-		// Maxunavail:         int32(maxUnavail),
+		Livedelay:          int32(liveDelay),
+		Liveperiod:         int32(livePeriod),
+		Livethres:          int32(liveThres),
+		Readydelay:         int32(readyDelay),
+		Readyperiod:        int32(readyPeriod),
+		Readythres:         int32(readyThres),
+		Minreadysec:        int32(minReadySec),
 		Imagepull:          imagePull,
 		Image:              amImages,
 		Reqcpu:             reqCPU,
@@ -188,7 +183,7 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 
 }
 
-// AssignApimGatewayConfigMapValues is ...
+// AssignApimGatewayConfigMapValues is to assign config-map values...
 func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
 	ControlConfigData := configMap.Data
@@ -217,12 +212,10 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 	memXmx := ControlConfigData["apim-deployment-env-jvm-heap-memory-xmx"]
 	memXms := ControlConfigData["apim-deployment-env-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
-	//strategyType, _ := ControlConfigData["p2-apim-gateway-deployment-strategy"]
-	/** env values. Check helm charts deployemtn.yaml */
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "gateway-worker" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-gateway" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
 		if *replicasFromYaml != 0 {
@@ -291,11 +284,6 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 		if readyThresFromYaml != 0 {
 			readyThres = int64(readyThresFromYaml)
 		}
-
-		// strategyTypeFromYaml := apimanager.Spec.Profiles[num].Deployment.Strategy.Type
-		// if strategyType != "" {
-		// 	strategyType = strategyTypeFromYaml
-		// }
 
 		maxSurgesFromYaml := apimanager.Spec.Profiles[num].Deployment.Strategy.RollingUpdate.MaxSurge
 		if maxSurgesFromYaml != 0 {
@@ -340,6 +328,7 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 
 }
 
+//AssignKeyManagerConfigMapValues is to assign config-map values...
 func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
 	ControlConfigData := configMap.Data
@@ -351,8 +340,6 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
 	replicas, _ := strconv.ParseInt(ControlConfigData["p2-apim-km-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
-	// maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-gateway-deployment-maxSurge"], 10, 32)
-	// maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-gateway-deployment-maxUnavailable"], 10, 32)
 	amImages := ControlConfigData["p2-apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-cpu"])
@@ -368,13 +355,10 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 	memXmx := ControlConfigData["apim-deployment-env-jvm-heap-memory-xmx"]
 	memXms := ControlConfigData["apim-deployment-env-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
-	// strategyType, _ := ControlConfigData["p2-apim-keymanager-deployment-strategy"]
-
-	/** env values. Check helm charts deployemtn.yaml */
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-key-manager" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-keymanager" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
 		if *replicasFromYaml != 0 {
@@ -452,15 +436,13 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 	}
 
 	cmvalues := &configvalues{
-		Livedelay:   int32(liveDelay),
-		Liveperiod:  int32(livePeriod),
-		Livethres:   int32(liveThres),
-		Readydelay:  int32(readyDelay),
-		Readyperiod: int32(readyPeriod),
-		Readythres:  int32(readyThres),
-		Minreadysec: int32(minReadySec),
-		// Maxsurge:           int32(maxSurges),
-		// Maxunavail:         int32(maxUnavail),
+		Livedelay:          int32(liveDelay),
+		Liveperiod:         int32(livePeriod),
+		Livethres:          int32(liveThres),
+		Readydelay:         int32(readyDelay),
+		Readyperiod:        int32(readyPeriod),
+		Readythres:         int32(readyThres),
+		Minreadysec:        int32(minReadySec),
 		Imagepull:          imagePull,
 		Image:              amImages,
 		Reqcpu:             reqCPU,
@@ -616,6 +598,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 
 }
 
+//AssignApimAnalyticsWorkerConfigMapValues is to assign config-map...
 func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
 	ControlConfigData := configMap.Data
@@ -753,6 +736,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 
 }
 
+//AssignMysqlConfigMapValues is to assign config-map values...
 func AssignMysqlConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap) *configvalues {
 
 	ControlConfigData := configMap.Data
@@ -773,6 +757,7 @@ func AssignMysqlConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *
 
 }
 
+//MakeConfigMap is to create config-map...
 func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.ConfigMap) *corev1.ConfigMap {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",

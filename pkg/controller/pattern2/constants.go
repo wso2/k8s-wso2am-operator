@@ -1,6 +1,7 @@
 package pattern2
 
 const (
-	deploymentKind = "deployment"
-	depApiVersion  = "apps/v1"
+	deploymentKind  = "Deployment"
+	depAPIVersion   = "apps/v1"
+	statefulsetKind = "StatefulSet"
 )

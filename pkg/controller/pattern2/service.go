@@ -24,10 +24,10 @@ import (
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// newService creates a new Service for a Apimanager resource.
-// It expose the service with Nodeport type with minikube ip as the externel ip.
+// PubDevTm1Service creates a new Service for a Apimanager resource.
 func PubDevTm1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
@@ -35,11 +35,11 @@ func PubDevTm1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 
 	pubdevtm1ports := getPubDevTmSpecificSvcPorts()
-	servType := "ClusterIP"
+	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2am-pattern-2-am-1-service",
+			Name:      "wso2-am-1-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -47,24 +47,24 @@ func PubDevTm1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     corev1.ServiceType(servType),
-			Ports:    pubdevtm1ports,
+			// Type:     corev1.ServiceType(servType),
+			Ports: pubdevtm1ports,
 		},
 	}
 }
 
-// for handling pub-dev-tm-2 service
+// PubDevTm2Service for handling pub-dev-tm-2 service
 func PubDevTm2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
 		"node":       "wso2am-pattern-2-am-2",
 	}
 	pubdevtm2ports := getPubDevTmSpecificSvcPorts()
-	servType := "ClusterIP"
+	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2am-pattern-2-am-2-service",
+			Name:      "wso2-am-2-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -72,22 +72,23 @@ func PubDevTm2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     corev1.ServiceType(servType),
-			Ports:    pubdevtm2ports,
+			// Type:     corev1.ServiceType(servType),
+			Ports: pubdevtm2ports,
 		},
 	}
 }
 
+//GatewayService is for handling gateway-sevice...
 func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am-gateway",
 	}
 	gatewayports := getGatewaySpecificSvcPorts()
-	servType := "ClusterIP"
+	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2am-pattern-2-am-gateway-service",
+			Name:      "wso2-am-gw-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -95,22 +96,23 @@ func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     corev1.ServiceType(servType),
-			Ports:    gatewayports,
+			// Type:     corev1.ServiceType(servType),
+			Ports: gatewayports,
 		},
 	}
 }
 
+//KeyManagerService is for handling key manager service...
 func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-2-km-service",
+		"deployment": "wso2am-pattern-2-km",
 	}
 	keymanagerports := getKeyManagerSpecificSvcPorts()
-	servType := "ClusterIP"
+	///servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2am-pattern-2-km-service",
+			Name:      "wso2-am-2-km-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -118,36 +120,37 @@ func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     corev1.ServiceType(servType),
-			Ports:    keymanagerports,
+			// Type:     corev1.ServiceType(servType),
+			Ports: keymanagerports,
 		},
 	}
 }
 
-// for handling analytics-dashboard service
+// DashboardService for handling analytics-dashboard service...
 func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am-analytics-dashboard",
 	}
-	servType := ""
-	dashports := []corev1.ServicePort{}
-	if apimanager.Spec.Service.Type == "NodePort" {
-		dashports = getDashBoardNPPorts()
-		servType = "NodePort"
-	} else if apimanager.Spec.Service.Type == "LoadBalancer" {
-		dashports = getDashBoardPorts()
-		servType = "LoadBalancer"
-	} else if apimanager.Spec.Service.Type == "ClusterIP" {
-		dashports = getDashBoardPorts()
-		servType = "ClusterIP"
-	} else {
-		dashports = getDashBoardPorts()
-		servType = "ClusterIP"
-	}
+	//servType := ""
+	//dashports := []corev1.ServicePort{}
+	dashports := getDashBoardPorts()
+	// if apimanager.Spec.Service.Type == "NodePort" {
+	// 	dashports = getDashBoardNPPorts()
+	// 	servType = "NodePort"
+	// } else if apimanager.Spec.Service.Type == "LoadBalancer" {
+	// 	dashports = getDashBoardPorts()
+	// 	servType = "LoadBalancer"
+	// } else if apimanager.Spec.Service.Type == "ClusterIP" {
+	// 	dashports = getDashBoardPorts()
+	// 	servType = "ClusterIP"
+	// } else {
+	// 	dashports = getDashBoardPorts()
+	// 	servType = "ClusterIP"
+	// }
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2am-pattern2--am-analytics-dashboard-service",
+			Name:      "wso2-am-analytics-dashboard-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -155,19 +158,19 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     corev1.ServiceType(servType),
-			Ports:    dashports,
+			//Type:     corev1.ServiceType(servType),
+			Ports: dashports,
 		},
 	}
 }
 
-// for handling analytics-worker service
+//WorkerService is for handling analytics-worker service
 func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-1-analytics-worker",
+		"deployment": "wso2am-pattern-2-analytics-worker",
 	}
 	workerports := getWorkerPorts()
-	servType := "ClusterIP"
+	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -179,33 +182,70 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     corev1.ServiceType(servType),
-			Ports:    workerports,
+			//Type:     corev1.ServiceType(servType),
+			Ports: workerports,
 		},
 	}
 }
 
-//for common service
+//WorkerHeadlessService is for...
+func WorkerHeadlessService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
+	labels := map[string]string{
+		"deployment": "wso2am-pattern-2-analytics-worker",
+	}
+
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "wso2am-pattern-2-am-analytics-worker-headless-service",
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector:  labels,
+			ClusterIP: "None",
+			Ports: []corev1.ServicePort{
+				{
+					Name:       "thrift",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       7612,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7612},
+				},
+				{
+					Name:       "thrift-ssl",
+					Protocol:   corev1.ProtocolTCP,
+					Port:       7712,
+					TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7712},
+				},
+			},
+		},
+	}
+}
+
+//PubDevTmCommonService is for common service
 func PubDevTmCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
 	}
 
-	pubdevtmcommonsvsports := []corev1.ServicePort{}
-	servType := ""
-	if apimanager.Spec.Service.Type == "NodePort" {
-		pubdevtmcommonsvsports = getPubDevTmCommonSvcNPorts()
-		servType = "NodePort"
-	} else if apimanager.Spec.Service.Type == "LoadBalancer" {
-		pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
-		servType = "LoadBalancer"
-	} else if apimanager.Spec.Service.Type == "ClusterIP" {
-		pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
-		servType = "ClusterIP"
-	} else {
-		pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
-		servType = "ClusterIP"
-	}
+	pubdevtmcommonsvsports := getPubDevTmCommonSvcPorts()
+
+	//pubdevtmcommonsvsports := []corev1.ServicePort{}
+	//servType := ""
+	// if apimanager.Spec.Service.Type == "NodePort" {
+	// 	pubdevtmcommonsvsports = getPubDevTmCommonSvcNPorts()
+	// 	servType = "NodePort"
+	// } else if apimanager.Spec.Service.Type == "LoadBalancer" {
+	// 	pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
+	// 	servType = "LoadBalancer"
+	// } else if apimanager.Spec.Service.Type == "ClusterIP" {
+	// 	pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
+	// 	servType = "ClusterIP"
+	// } else {
+	// 	pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
+	// 	servType = "ClusterIP"
+	// }
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -217,8 +257,8 @@ func PubDevTmCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service 
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			Type:     corev1.ServiceType(servType),
-			Ports:    pubdevtmcommonsvsports,
+			//Type:     corev1.ServiceType(servType),
+			Ports: pubdevtmcommonsvsports,
 		},
 	}
 }

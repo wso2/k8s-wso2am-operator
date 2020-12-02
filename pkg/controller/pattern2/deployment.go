@@ -24,6 +24,8 @@ import (
 	"strconv"
 	"strings"
 
+	"k8s.io/klog"
+
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -31,10 +33,19 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// apim1Deployment creates a new Deployment for a Apimanager instance 1 resource. It also sets
+// PubDev1Deployment creates a new Deployment for a PubDevTm instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
-// the Apimanager resource that 'owns' it.
+// the Apimanager resource that 'owns' it...
 func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num int) *appsv1.Deployment {
+
+	useMysql := true
+	allowAnalytics := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
+	}
+	if apimanager.Spec.AllowAnalytics != "" {
+		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	}
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
@@ -50,10 +61,17 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 		"nc -z localhost 9443",
 	}
 
-	initContainers := getMysqlInitContainers(apimanager, &pubDevTm1Volume, &pubDevTm1VolumeMount)
-	for _, container := range getInitContainers([]string{"init-am-analytics-worker"}) {
-		initContainers = append(initContainers, container)
+	initContainers := []corev1.Container{}
+
+	if useMysql {
+		initContainers = getMysqlInitContainers(apimanager, &pubDevTm1Volume, &pubDevTm1VolumeMount)
 	}
+
+	if allowAnalytics {
+		getInitContainers([]string{"init-am-analytics-worker"}, &initContainers)
+		klog.Info("PUb-Dev-Tm-1 Containers", initContainers[1])
+	}
+
 	//initContainers = append(initContainers, getInitContainers([]string{"init-am-analytics-worker"}))
 	pubDev1SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
@@ -66,7 +84,7 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 		// 	Kind:       deploymentKind,
 		// },
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: depApiVersion,
+			APIVersion: depAPIVersion,
 			Kind:       deploymentKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -104,7 +122,7 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2-pattern-2-am",
+							Name:  "wso2-pattern-2-am-1",
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -165,8 +183,11 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 									Name:  "JVM_MEM_OPTS",
 									Value: "-Xms" + x.JvmMemOpts,
 								},
+								{
+									Name:  "ALLOW_ANALYTICS",
+									Value: strconv.FormatBool(allowAnalytics),
+								},
 							},
-							/** TODO **/
 							VolumeMounts: pubDevTm1VolumeMount,
 						},
 					},
@@ -186,6 +207,15 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 
 func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.Deployment {
 
+	useMysql := true
+	allowAnalytics := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
+	}
+	if apimanager.Spec.AllowAnalytics != "" {
+		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	}
+
 	pubDevTm2VolumeMount, pubDevTm2Volume := getDevPubTm2Volumes(apimanager, num)
 	pubDevTm2deployports := getPubDevTmContainerPorts()
 
@@ -200,10 +230,17 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		"nc -z localhost 9443",
 	}
 
-	initContainers := getMysqlInitContainers(apimanager, &pubDevTm2Volume, &pubDevTm2VolumeMount)
-	for _, container := range getInitContainers([]string{"init-am-analytics-worker"}) {
-		initContainers = append(initContainers, container)
+	initContainers := []corev1.Container{}
+
+	if useMysql {
+		initContainers = getMysqlInitContainers(apimanager, &pubDevTm2Volume, &pubDevTm2VolumeMount)
 	}
+
+	if allowAnalytics {
+		getInitContainers([]string{"init-am-analytics-worker"}, &initContainers)
+		klog.Info("Pub-Dev-Tm-2 Containers", initContainers[1])
+	}
+
 	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers([]string{"init-am-analytics-worker"}))
 	pubDev2SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
@@ -221,7 +258,7 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: depApiVersion,
+			APIVersion: depAPIVersion,
 			Kind:       deploymentKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -260,7 +297,7 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2-pattern-2-am",
+							Name:  "wso2-pattern-2-am-2",
 							Image: z.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -317,6 +354,14 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 										},
 									},
 								},
+								{
+									Name:  "JVM_MEM_OPTS",
+									Value: z.JvmMemOpts,
+								},
+								{
+									Name:  "ALLOW_ANALYTICS",
+									Value: strconv.FormatBool(allowAnalytics),
+								},
 							},
 							VolumeMounts: pubDevTm2VolumeMount,
 						},
@@ -335,6 +380,15 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 }
 
 func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.Deployment {
+	useMysql := true
+	allowAnalytics := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
+	}
+	if apimanager.Spec.AllowAnalytics != "" {
+		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	}
+
 	gatewayVolumeMount, gatewayVolume := getgatewayVolumes(apimanager, num)
 	gatewaydeployports := getGatewayContainerPorts()
 
@@ -349,11 +403,17 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		"nc -z localhost 9443",
 	}
 
-	initContainers := getMysqlInitContainers(apimanager, &gatewayVolume, &gatewayVolumeMount)
-	for _, container := range getInitContainers([]string{"init-apim-analytics", "init-km", "init-apim-1", "init-apim-2"}) {
-		initContainers = append(initContainers, container)
+	initContainers := []corev1.Container{}
+	if useMysql {
+		initContainers = getMysqlInitContainers(apimanager, &gatewayVolume, &gatewayVolumeMount)
 	}
-	//initContainers = append(initContainers, getInitContainers([]string{"init-apim-analytics", "init-km", "init-apim-1", "init-apim-2"}))
+
+	if allowAnalytics {
+		getInitContainers([]string{"init-apim-analytics", "init-km", "init-apim-1", "init-apim-2"}, &initContainers)
+	} else {
+		getInitContainers([]string{"init-km", "init-apim-1", "init-apim-2"}, &initContainers)
+	}
+
 	gatewaySecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
@@ -370,11 +430,11 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: depApiVersion,
+			APIVersion: depAPIVersion,
 			Kind:       deploymentKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-2-" + apimanager.Name,
+			Name:      "wso2-am-gw-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -409,7 +469,7 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2-pattern-1-am",
+							Name:  "wso2-pattern-2-gw",
 							Image: z.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -459,12 +519,24 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 							Ports:           gatewaydeployports,
 							Env: []corev1.EnvVar{
 								{
+									Name:  "PROFILE_NAME",
+									Value: "gateway-worker",
+								},
+								{
 									Name: "NODE_IP",
 									ValueFrom: &corev1.EnvVarSource{
 										FieldRef: &corev1.ObjectFieldSelector{
 											FieldPath: "status.podIP",
 										},
 									},
+								},
+								{
+									Name:  "JVM_MEM_OPTS",
+									Value: z.JvmMemOpts,
+								},
+								{
+									Name:  "ALLOW_ANALYTICS",
+									Value: strconv.FormatBool(allowAnalytics),
 								},
 							},
 							VolumeMounts: gatewayVolumeMount,
@@ -484,6 +556,11 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 }
 
 func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.StatefulSet {
+	useMysql := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
+	}
+
 	kmVolumeMount, kmVolume := getKeyManagerVolumes(apimanager, num)
 	kmdeployports := getKeyManagerContainerPorts()
 
@@ -498,7 +575,11 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		"nc -z localhost 9443",
 	}
 
-	initContainers := getMysqlInitContainers(apimanager, &kmVolume, &kmVolumeMount)
+	initContainers := []corev1.Container{}
+	if useMysql {
+		initContainers = getMysqlInitContainers(apimanager, &kmVolume, &kmVolumeMount)
+	}
+
 	keyManagerSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
@@ -515,11 +596,11 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: depApiVersion,
-			Kind:       "StatefulSet",
+			APIVersion: depAPIVersion,
+			Kind:       statefulsetKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-2-" + apimanager.Name,
+			Name:      "wso2-am-km-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -554,7 +635,7 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2-pattern-1-am",
+							Name:  "wso2-pattern-2-km",
 							Image: z.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -611,6 +692,10 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 										},
 									},
 								},
+								{
+									Name:  "PROFILE_NAME",
+									Value: "api-key-manager",
+								},
 							},
 							VolumeMounts: kmVolumeMount,
 						},
@@ -630,6 +715,10 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 
 // for handling analytics-dashboard deployment
 func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
+	useMysql := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
+	}
 
 	dashdeployports := getDashContainerPorts()
 
@@ -647,11 +736,13 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
-	initContainers := getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
-	for _, container := range getInitContainers([]string{"init-am"}) {
-		initContainers = append(initContainers, container)
+	initContainers := []corev1.Container{}
+	if useMysql {
+		initContainers = getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
 	}
-	//initContainers = append(initContainers, getInitContainers([]string{"init-am"}))
+
+	getInitContainers([]string{"init-am"}, &initContainers)
+
 	dashboardSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
 
@@ -659,7 +750,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: depApiVersion,
+			APIVersion: depAPIVersion,
 			Kind:       deploymentKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -697,7 +788,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2am-pattern-1-analytics-dashboard",
+							Name:  "wso2am-pattern-2-analytics-dashboard",
 							Image: y.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
@@ -746,7 +837,13 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
 							SecurityContext: dashboardSecurityContext,
 							Ports:           dashdeployports,
-							VolumeMounts:    dashVolumeMount,
+							// Env: []corev1.EnvVar{
+							// 	{
+							// 		Name:  "PROFILE_NAME",
+							// 		Value: "gateway-worker",
+							// 	},
+							// },
+							VolumeMounts: dashVolumeMount,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
@@ -764,7 +861,10 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 
 // for handling analytics-worker deployment
 func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.StatefulSet {
-
+	useMysql := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
+	}
 	workerVolMounts, workerVols := getAnalyticsWorkerVolumes(apimanager, num)
 
 	labels := map[string]string{
@@ -773,8 +873,11 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	//runasuser := int64(802)
 
 	workerContainerPorts := getWorkerContainerPorts()
+	initContainers := []corev1.Container{}
+	if useMysql {
+		initContainers = getMysqlInitContainers(apimanager, &workerVols, &workerVolMounts)
+	}
 
-	initContainers := getMysqlInitContainers(apimanager, &workerVols, &workerVolMounts)
 	workerSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
 
@@ -782,8 +885,8 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: depApiVersion,
-			Kind:       "StaefulSet",
+			APIVersion: depAPIVersion,
+			Kind:       statefulsetKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "wso2-am-analytics-worker-" + apimanager.Name,
@@ -879,7 +982,25 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 							SecurityContext: workerSecurityContext,
 							Ports:           workerContainerPorts,
-							VolumeMounts:    workerVolMounts,
+							Env: []corev1.EnvVar{
+								{
+									Name: "NODE_IP",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											FieldPath: "status.podIP",
+										},
+									},
+								},
+								{
+									Name: "NODE_ID",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											FieldPath: "metadata.name",
+										},
+									},
+								},
+							},
+							VolumeMounts: workerVolMounts,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,

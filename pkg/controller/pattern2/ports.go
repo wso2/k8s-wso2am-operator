@@ -56,38 +56,38 @@ func getGatewaySpecificSvcPorts() []corev1.ServicePort {
 	return gatewayPorts
 }
 
-func getGatewaySpecificSvcNPorts() []corev1.ServicePort {
-	var gatewayNPorts []corev1.ServicePort
-	gatewayNPorts = append(gatewayNPorts, corev1.ServicePort{
-		Name:       "pass-through-http",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       8280,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
-		NodePort:   32004,
-	})
-	gatewayNPorts = append(gatewayNPorts, corev1.ServicePort{
-		Name:       "pass-through-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       8243,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
-		NodePort:   32003,
-	})
-	gatewayNPorts = append(gatewayNPorts, corev1.ServicePort{
-		Name:       "servlet-http",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9763,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
-		NodePort:   32002,
-	})
-	gatewayNPorts = append(gatewayNPorts, corev1.ServicePort{
-		Name:       "servlet-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9443,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-		NodePort:   32001,
-	})
-	return gatewayNPorts
-}
+// func getGatewaySpecificSvcNPorts() []corev1.ServicePort {
+// 	var gatewayNPorts []corev1.ServicePort
+// 	gatewayNPorts = append(gatewayNPorts, corev1.ServicePort{
+// 		Name:       "pass-through-http",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       8280,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8280},
+// 		NodePort:   32004,
+// 	})
+// 	gatewayNPorts = append(gatewayNPorts, corev1.ServicePort{
+// 		Name:       "pass-through-https",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       8243,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+// 		NodePort:   32003,
+// 	})
+// 	gatewayNPorts = append(gatewayNPorts, corev1.ServicePort{
+// 		Name:       "servlet-http",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       9763,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9763},
+// 		NodePort:   32002,
+// 	})
+// 	gatewayNPorts = append(gatewayNPorts, corev1.ServicePort{
+// 		Name:       "servlet-https",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       9443,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+// 		NodePort:   32001,
+// 	})
+// 	return gatewayNPorts
+// }
 
 func getKeyManagerSpecificSvcPorts() []corev1.ServicePort {
 	var keyManagerPorts []corev1.ServicePort
@@ -100,24 +100,24 @@ func getKeyManagerSpecificSvcPorts() []corev1.ServicePort {
 	return keyManagerPorts
 }
 
-func getKeyManagerSpecificSvcNPorts() []corev1.ServicePort {
-	var keyManagerNPorts []corev1.ServicePort
-	keyManagerNPorts = append(keyManagerNPorts, corev1.ServicePort{
-		Name:       "servlet-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9443,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-		NodePort:   32201,
-	})
-	return keyManagerNPorts
-}
+// func getKeyManagerSpecificSvcNPorts() []corev1.ServicePort {
+// 	var keyManagerNPorts []corev1.ServicePort
+// 	keyManagerNPorts = append(keyManagerNPorts, corev1.ServicePort{
+// 		Name:       "servlet-https",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       9443,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+// 		NodePort:   32201,
+// 	})
+// 	return keyManagerNPorts
+// }
 
 func getPubDevTmCommonSvcPorts() []corev1.ServicePort {
 	var pubDevTmPorts []corev1.ServicePort
 	pubDevTmPorts = append(pubDevTmPorts, corev1.ServicePort{
 		Name:       "servlet-http",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       9703,
+		Port:       9763,
 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9703},
 	})
 	pubDevTmPorts = append(pubDevTmPorts, corev1.ServicePort{
@@ -129,24 +129,24 @@ func getPubDevTmCommonSvcPorts() []corev1.ServicePort {
 	return pubDevTmPorts
 }
 
-func getPubDevTmCommonSvcNPorts() []corev1.ServicePort {
-	var pubDevTmNPorts []corev1.ServicePort
-	pubDevTmNPorts = append(pubDevTmNPorts, corev1.ServicePort{
-		Name:       "servlet-http",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9703,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9703},
-		NodePort:   32302,
-	})
-	pubDevTmNPorts = append(pubDevTmNPorts, corev1.ServicePort{
-		Name:       "servlet-https",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9443,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
-		NodePort:   32301,
-	})
-	return pubDevTmNPorts
-}
+// func getPubDevTmCommonSvcNPorts() []corev1.ServicePort {
+// 	var pubDevTmNPorts []corev1.ServicePort
+// 	pubDevTmNPorts = append(pubDevTmNPorts, corev1.ServicePort{
+// 		Name:       "servlet-http",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       9703,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9703},
+// 		NodePort:   32302,
+// 	})
+// 	pubDevTmNPorts = append(pubDevTmNPorts, corev1.ServicePort{
+// 		Name:       "servlet-https",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       9443,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9443},
+// 		NodePort:   32301,
+// 	})
+// 	return pubDevTmNPorts
+// }
 
 func getPubDevTmSpecificSvcPorts() []corev1.ServicePort {
 	var pubDevTmPorts []corev1.ServicePort
@@ -170,30 +170,30 @@ func getPubDevTmSpecificSvcPorts() []corev1.ServicePort {
 	return pubDevTmPorts
 }
 
-func getPubDevTmSpecificSvcNPorts() []corev1.ServicePort {
-	var pubDevTm1Ports []corev1.ServicePort
-	pubDevTm1Ports = append(pubDevTm1Ports, corev1.ServicePort{
-		Name:       "binary",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9611,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
-		NodePort:   32403,
-	})
-	pubDevTm1Ports = append(pubDevTm1Ports, corev1.ServicePort{
-		Name:       "binary-secure",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9711,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
-		NodePort:   32402,
-	})
-	pubDevTm1Ports = append(pubDevTm1Ports, corev1.ServicePort{
-		Name:     "jms-tcp",
-		Protocol: corev1.ProtocolTCP,
-		Port:     5672,
-		NodePort: 32401,
-	})
-	return pubDevTm1Ports
-}
+// func getPubDevTmSpecificSvcNPorts() []corev1.ServicePort {
+// 	var pubDevTm1Ports []corev1.ServicePort
+// 	pubDevTm1Ports = append(pubDevTm1Ports, corev1.ServicePort{
+// 		Name:       "binary",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       9611,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9611},
+// 		NodePort:   32403,
+// 	})
+// 	pubDevTm1Ports = append(pubDevTm1Ports, corev1.ServicePort{
+// 		Name:       "binary-secure",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       9711,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9711},
+// 		NodePort:   32402,
+// 	})
+// 	pubDevTm1Ports = append(pubDevTm1Ports, corev1.ServicePort{
+// 		Name:     "jms-tcp",
+// 		Protocol: corev1.ProtocolTCP,
+// 		Port:     5672,
+// 		NodePort: 32401,
+// 	})
+// 	return pubDevTm1Ports
+// }
 
 // func pubDevTm2SpecificSvcPorts() []corev1.ServicePort {
 // 	var pubDevTm2Ports = []corev1.ServicePort
@@ -242,19 +242,19 @@ func getPubDevTmSpecificSvcNPorts() []corev1.ServicePort {
 // 	return pubDevTm2Ports
 // }
 
-func getDashBoardNPPorts() []corev1.ServicePort {
-	var dashports []corev1.ServicePort
+// func getDashBoardNPPorts() []corev1.ServicePort {
+// 	var dashports []corev1.ServicePort
 
-	dashports = append(dashports, corev1.ServicePort{
-		Name:       "analytics-dashboard",
-		Protocol:   corev1.ProtocolTCP,
-		Port:       9643,
-		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
-		NodePort:   32201,
-	})
+// 	dashports = append(dashports, corev1.ServicePort{
+// 		Name:       "analytics-dashboard",
+// 		Protocol:   corev1.ProtocolTCP,
+// 		Port:       9643,
+// 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 9643},
+// 		NodePort:   32201,
+// 	})
 
-	return dashports
-}
+// 	return dashports
+// }
 
 func getDashBoardPorts() []corev1.ServicePort {
 

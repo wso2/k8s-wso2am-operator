@@ -81,8 +81,8 @@ func getMysqlInitContainers(apimanager *apimv1alpha1.APIManager, vols *[]corev1.
 	return initContainers
 }
 
-func getInitContainers(containerNames []string) []corev1.Container {
-	var initContainers []corev1.Container
+func getInitContainers(containerNames []string, initContainers *[]corev1.Container) {
+	//var initContainers []corev1.Container
 
 	// length := len(containerNames)
 
@@ -110,7 +110,7 @@ func getInitContainers(containerNames []string) []corev1.Container {
 		} else if containerName == "init-am" {
 			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of API Manager deployment"; while ! nc -z  {{ template "am-pattern-2.resource.prefix" . }}-am-service 9443; do sleep 1; printf "-"; done; echo -e "  >> API Manager service has started";`}
 		}
-		initContainers = append(initContainers, container)
+		*initContainers = append(*initContainers, container)
 	}
 
 	// analyticsWorkerContainer := corev1.Container{}
@@ -119,5 +119,5 @@ func getInitContainers(containerNames []string) []corev1.Container {
 	// analyticsWorkerContainer.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2am-pattern2-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "`}
 	// initContainers = append(initContainers, analyticsWorkerContainer)
 
-	return initContainers
+	// return initContainers
 }
