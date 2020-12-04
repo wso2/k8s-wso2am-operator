@@ -22,7 +22,7 @@ package pattern2
 
 import (
 	"strconv"
-
+	"k8s.io/klog"
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -73,14 +73,14 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 	reqMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-memory"])
 	limitCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-cpu"])
 	limitMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-memory"])
-	liveDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
-	livePeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livenessProbe-periodSeconds"], 10, 32)
+	liveDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livelinessProbe-initialDelaySeconds"], 10, 32)
+	livePeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livelinessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-failureThreshold"], 10, 32)
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
-	memXmx := ControlConfigData["apim-deployment-env-jvm-heap-memory-xmx"]
-	memXms := ControlConfigData["apim-deployment-env-jvm-heap-memory-xms"]
+	memXmx := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	if totalProfiles > 0 && (apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-1" || apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-2") {
@@ -464,6 +464,7 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
 	ControlConfigData := configMap.Data
+	klog.Info("ConfigMap Data: ", ControlConfigData["image-pull-secret-name"])
 
 	imagePullSecret := ControlConfigData["image-pull-secret-name"]
 	serviceAccountName := ControlConfigData["service-account-name"]
@@ -759,12 +760,13 @@ func AssignMysqlConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *
 
 //MakeConfigMap is to create config-map...
 func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.ConfigMap) *corev1.ConfigMap {
+	// klog.Info("ConfigMap Creating")
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
 	}
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      configMap.Name + "-" + apimanager.Name,
+			Name:      configMap.Name,
 			Namespace: apimanager.Namespace,
 			Labels:    labels,
 			OwnerReferences: []metav1.OwnerReference{

@@ -97,7 +97,7 @@ func getInitContainers(containerNames []string, initContainers *[]corev1.Contain
 
 	for _, containerName := range containerNames {
 		container := corev1.Container{}
-		container.Name = containerNames[0]
+		container.Name = containerName
 		container.Image = "busybox:1.32"
 		if containerName == "init-am-analytics-worker" || containerName == "init-apim-analytics" {
 			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2am-pattern2-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "`}

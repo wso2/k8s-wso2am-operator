@@ -572,4 +572,3 @@ data:
     #      port: 9543
     #      username: admin
     #      password: admin
-  {{- end }}

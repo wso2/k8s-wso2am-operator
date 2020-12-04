@@ -15,12 +15,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2-p2-am-1-conf
+  name: wso2am-p2-am-1-conf
   namespace : wso2-system
 data:
   deployment.toml: |-
     [server]
-    hostname = "{{ .Values.wso2.deployment.am.pubDevPortalTM.ingress.hostname }}"
+    hostname = "am.wso2.com"
     node_ip = "$env{NODE_IP}"
     #offset=0
     mode = "single" #single or ha
@@ -33,19 +33,34 @@ data:
     password = "admin"
     create_admin_account = true
 
+    [apim.sync_runtime_artifacts.publisher]
+    artifact_saver = "DBSaver"
+    publish_directly_to_gateway = "true"
+
+    [apim.sync_runtime_artifacts.gateway]
+    gateway_labels =["Production and Sandbox"]
+    artifact_retriever = "DBRetriever"
+    deployment_retry_duration = 15000
+    data_retrieval_mode = "sync"
+    event_waiting_time = 5000
+
+    [apim.event_hub]
+    enable = true
+    service_url = "https://traffic-manager:9443"  
+
     [user_store]
     type = "database_unique_id"
 
     [database.apim_db]
     type = "mysql"
-    url = "jdbc:mysql://wso2am-mysql-db-service:3306/WSO2AM_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+    url = "jdbc:mysql://mysql-svc:3306/WSO2AM_APIMGT_DB?useSSL=false"
     username = "wso2carbon"
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
 
     [database.shared_db]
     type = "mysql"
-    url = "jdbc:mysql://wso2am-mysql-db-service:3306/WSO2AM_SHARED_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+    url = "jdbc:mysql://mysql-svc:3306/WSO2AM_SHARED_DB?autoReconnect=true&amp;useSSL=false"
     username = "wso2carbon"
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
@@ -77,13 +92,13 @@ data:
     display_in_api_console = true
     description = "This is a hybrid gateway that handles both production and sandbox token traffic."
     show_as_token_endpoint_url = true
-    service_url = "https://{{ template "am-pattern-2.resource.prefix" . }}-am-gateway-service:${mgt.transport.https.port}/services/"
+    service_url = "https://wso2-am-gw-svc:${mgt.transport.https.port}/services/"
     username= "${admin.username}"
     password= "${admin.password}"
     ws_endpoint = "ws://localhost:9099"
     wss_endpoint = "wss://localhost:8099"
-    http_endpoint = "http://{{ .Values.wso2.deployment.am.gateway.ingress.hostname }}"
-    https_endpoint = "https://{{ .Values.wso2.deployment.am.gateway.ingress.hostname }}"
+    http_endpoint = "http://gateway.am.wso2.com"
+    https_endpoint = "https://gateway.am.wso2.com"
 
     #[apim.cache.gateway_token]
     #enable = true
@@ -114,8 +129,8 @@ data:
     #expiry_time = "2m"
 
     [apim.analytics]
-    enable = true
-    store_api_url = "https://{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-service:7444"
+    enable = "$env{ALLOW_ANALYTICS}"
+    store_api_url = "https://wso2-am-analytics-worker-svc:7444"
     #username = "$ref{super_admin.username}"
     #password = "$ref{super_admin.password}"
     #event_publisher_type = "default"
@@ -123,8 +138,8 @@ data:
     #publish_response_size = true
 
     [[apim.analytics.url_group]]
-    analytics_url =["tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-statefulset-0.{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-headless-service:7612","tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-statefulset-1.{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-headless-service:7612"]
-    analytics_auth_url =["ssl://{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-statefulset-0.{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-headless-service:7712","ssl://{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-statefulset-1.{{ template "am-pattern-2.resource.prefix" . }}-am-analytics-worker-headless-service:7712"]
+    analytics_url =["tcp://wso2-am-analytics-worker-statefulset-0.wso2-am-analytics-worker-headless-svc:7612","tcp://wso2-am-analytics-worker-statefulset-1.wso2-am-analytics-worker-headless-svc:7612"]
+    analytics_auth_url =["ssl://wso2-am-analytics-worker-statefulset-0.wso2-am-analytics-worker-headless-svc:7712","ssl://wso2-am-analytics-worker-statefulset-1.wso2-am-analytics-worker-headless-svc:7712"]
     type = "failover"
 
     #[[apim.analytics.url_group]]
@@ -133,7 +148,7 @@ data:
     #type = "failover"
 
     [apim.key_manager]
-    service_url = "https://{{ template "am-pattern-2.resource.prefix" . }}-km-service:${mgt.transport.https.port}/services/"
+    service_url = "https://wso2-am-km-svc:${mgt.transport.https.port}/services/"
     #username = "$ref{super_admin.username}"
     #password = "$ref{super_admin.password}"
     #pool.init_idle_capacity = 50
@@ -162,12 +177,12 @@ data:
     [apim.oauth_config]
     #enable_outbound_auth_header = false
     #auth_header = "Authorization"
-    revoke_endpoint = "https://{{ template "am-pattern-2.resource.prefix" . }}-km-service:${mgt.transport.https.port}/revoke"
+    revoke_endpoint = "https://wso2-am-km-svc:${mgt.transport.https.port}/revoke"
     #enable_token_encryption = false
     #enable_token_hashing = false
 
     [apim.devportal]
-    url = "https://{{ .Values.wso2.deployment.am.pubDevPortalTM.ingress.hostname }}/devportal"
+    url = "https://am.wso2.com/devportal"
     #enable_application_sharing = false
     #if application_sharing_type, application_sharing_impl both defined priority goes to application_sharing_impl
     #application_sharing_type = "default" #changed type, saml, default #todo: check the new config for rest api
@@ -186,13 +201,13 @@ data:
     allow_credentials = false
 
     [apim.throttling]
-    event_duplicate_url = ["tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-2-service:5672"]
-    service_url = "https://{{ template "am-pattern-2.resource.prefix" . }}-am-service:${mgt.transport.https.port}/services/"
+    event_duplicate_url = ["tcp://wso2-am-2-svc:5672"]
+    service_url = "https://wso2-am-svc:${mgt.transport.https.port}/services/"
     #enable_data_publishing = true
     #enable_policy_deploy = true
     #enable_blacklist_condition = true
     #enable_persistence = true
-    throttle_decision_endpoints = ["tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-1-service:5672","tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-2-service:5672"]
+    throttle_decision_endpoints = ["tcp://wso2-am-1-svc:5672","tcp://wso2-am-2-svc:5672"]
 
     #[apim.throttling.blacklist_condition]
     #start_delay = "5m"
@@ -210,13 +225,13 @@ data:
     #port = 10005
 
     [[apim.throttling.url_group]]
-    traffic_manager_urls = ["tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-1-service:9611"]
-    traffic_manager_auth_urls = ["ssl://{{ template "am-pattern-2.resource.prefix" . }}-am-1-service:9711"]
+    traffic_manager_urls = ["tcp://wso2-am-1-svc:9611"]
+    traffic_manager_auth_urls = ["ssl://wso2-am-1-svc:9711"]
     type = "loadbalance"
 
     [[apim.throttling.url_group]]
-    traffic_manager_urls = ["tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-2-service:9611"]
-    traffic_manager_auth_urls = ["ssl://{{ template "am-pattern-2.resource.prefix" . }}-am-2-service:9711"]
+    traffic_manager_urls = ["tcp://wso2-am-2-svc:9611"]
+    traffic_manager_auth_urls = ["ssl://wso2-am-2-svc:9711"]
     type = "loadbalance"
 
     #[apim.workflow]
@@ -285,21 +300,9 @@ data:
     proxyPort = 443
 
     [[apim.event_hub.publish.url_group]]
-    urls = ["tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-1-service:9611"]
-    auth_urls = ["ssl://{{ template "am-pattern-2.resource.prefix" . }}-am-1-service:9711"]
+    urls = ["tcp://{{ wso2-am-1-svc:9611"]
+    auth_urls = ["ssl://wso2-am-1-svc:9711"]
 
     [[apim.event_hub.publish.url_group]]
-    urls = ["tcp://{{ template "am-pattern-2.resource.prefix" . }}-am-2-service:9611"]
-    auth_urls = ["ssl://{{ template "am-pattern-2.resource.prefix" . }}-am-2-service:9711"]
-
-    {{ if .Values.wso2.deployment.persistentRuntimeArtifacts.apacheSolrIndexing.enabled }}
-    [database.local]
-    url = "jdbc:h2:/home/wso2carbon/solr/database/WSO2CARBON_DB;DB_CLOSE_ON_EXIT=FALSE"
-
-    [indexing]
-    location = "/home/wso2carbon/solr/indexed-data"
-    {{ else }}
-    [database.local]
-    url = "jdbc:h2:./repository/database/WSO2CARBON_DB;DB_CLOSE_ON_EXIT=FALSE"
-    {{ end }}
-  {{- end }}
+    urls = ["tcp://wso2-am-2-svc:9611"]
+    auth_urls = ["ssl://wso2-am-2-svc:9711"]

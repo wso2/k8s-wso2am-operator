@@ -36,7 +36,6 @@ import (
 	listers "github.com/wso2/k8s-wso2am-operator/pkg/generated/listers/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -238,6 +237,7 @@ func (c *Controller) runWorker() {
 
 // processNextWorkItem will read a single work item off the workqueue and attempt to process it, by calling the syncHandler.
 func (c *Controller) processNextWorkItem() bool {
+	klog.Info("Starting Process next Work Item....")
 	obj, shutdown := c.workqueue.Get()
 
 	if shutdown {
@@ -297,12 +297,14 @@ func (c *Controller) processNextWorkItem() bool {
 // c is the Controller object type pointer as a parameter
 func (c *Controller) syncHandler(key string) error {
 	// Split the key into a namespace & object name
+	klog.Info("Phase 1 Sucess")
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		utilruntime.HandleError(fmt.Errorf("invalid resource key: %s", key))
 		return nil
 	}
 
+	klog.Info("Phase 2 Sucess")
 	// Get the Apimanager resource with this namespace/name from the lister
 	// Use a Lister to find the object in the API server
 	apimanager, err := c.apimanagerslister.APIManagers(namespace).Get(name)
@@ -316,6 +318,7 @@ func (c *Controller) syncHandler(key string) error {
 		return err
 	}
 
+	klog.Info("Phase 3 Sucess")
 	configMapName := "wso2am-operator-controller-config"
 	configmap, err := c.configMapLister.ConfigMaps("wso2-system").Get(configMapName)
 
@@ -460,7 +463,7 @@ func (c *Controller) syncHandler(key string) error {
 			// If the resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
 				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
+				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager, "Pattern-1"))
 				if err != nil {
 					return err
 				}
@@ -786,7 +789,7 @@ func (c *Controller) syncHandler(key string) error {
 			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
 				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 				klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
-				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
+				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager, "Pattern-1"))
 			}
 		}
 
@@ -836,6 +839,8 @@ func (c *Controller) syncHandler(key string) error {
 		return nil
 
 	}
+
+	klog.Info("Phase 5 Sucess")
 
 	if apimanager.Spec.Pattern == "Pattern-2" {
 		pattern2Execution(apimanager, c, configmap, name)
@@ -1068,7 +1073,7 @@ func (c *Controller) syncHandler(key string) error {
 				// If the resource doesn't exist, we'll create it
 				if errors.IsNotFound(err) {
 					//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
+					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager, "Pattern-2"))
 					if err != nil {
 						return err
 					}
@@ -1102,7 +1107,7 @@ func (c *Controller) syncHandler(key string) error {
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
 					//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 					klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
-					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
+					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager, "Pattern-2"))
 				}
 
 				//for mysql deployment
@@ -1206,16 +1211,19 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 }
 
-func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, configmap *v1.ConfigMap, name string) error {
+func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, configmap *corev1.ConfigMap, name string) error {
 
 	useMysqlPod := true
 	allowAnalytics := true
 	if apimanager.Spec.UseMysql != "" {
 		useMysqlPod, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
 	}
+	klog.Info("Allow Analytics Spec: ", apimanager.Spec.AllowAnalytics)
 	if apimanager.Spec.AllowAnalytics != "" {
 		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
 	}
+
+	klog.Info("Allow-Analytics: ", allowAnalytics)
 
 	pubDevTm1deploymentName := "wso2-am-1-" + apimanager.Name
 	pubDevTm2deploymentName := "wso2-am-2-" + apimanager.Name
@@ -1230,22 +1238,28 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	mysqlserviceName := "mysql-svc"
 	dashboardDeploymentName := "wso2-am-analytics-dashboard-" + apimanager.Name
 	dashboardServiceName := "wso2-am-analytics-dashboard-svc"
-	workerDeploymentName := "wso2-am-analytics-worker-" + apimanager.Name
+	workerDeploymentName := "wso2-am-analytics-worker-statefulset"
 	workerServiceName := "wso2-am-analytics-worker-svc"
 	workerhlServiceName := "wso2-am-analytics-worker-headless-svc"
 
 	//mysqlPVCName := "wso2am-mysql"
 
 	pubDevTmIngressName := "wso2-am-ingress"
-	gatewayIngressName := "wso2am-am-gw-ingress"
+	gatewayIngressName := "wso2-am-gw-ingress"
 	dashIngressName := "wso2-am-analytics-dashboard-ingress"
 
+	klog.Info("Started Config Creating for Pattern-2")
 	// dashboard configurations
-	dashConfName := "wso2am-p2-analytics-dash-conf"
-	dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
-	dashConfUserName := "wso2am-p2-analytics-dash-conf-" + apimanager.Name
-	dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
+
 	if allowAnalytics {
+		dashConfName := "wso2am-p2-analytics-dash-conf"
+		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
+		klog.Info("Config Phase 1: OK")
+		klog.Error("Config Phase 1 Error", err)
+		dashConfUserName := "wso2am-p2-analytics-dash-conf-" + apimanager.Name
+		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
+		klog.Info("Config Phase 2: OK")
+		klog.Error("Config Phase 2 Error", err)
 		if errors.IsNotFound(err) {
 			dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashConfWso2))
 			if err != nil {
@@ -1254,12 +1268,13 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	klog.Info("Worker Config")
 	// worker configurations
-	workerConfName := "wso2am-p2-analytics-worker-conf"
-	workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
-	workerConfUserName := "wso2am-p2-analytics-worker-conf-" + apimanager.Name
-	workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
 	if allowAnalytics {
+		workerConfName := "wso2am-p2-analytics-worker-conf"
+		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
+		workerConfUserName := "wso2am-p2-analytics-worker-conf-" + apimanager.Name
+		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
 		if errors.IsNotFound(err) {
 			workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, workerConfWso2))
 			if err != nil {
@@ -1269,6 +1284,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	klog.Info("MYSQL config")
 	// mysql configurations
 	mysqlDbConfName := "wso2am-p2-mysql-dbscripts"
 	mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
@@ -1283,18 +1299,36 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	// mysql configurations
+	// mysqlDbExecName := "wso2am-p2-mysql-exec"
+	// mysqlDbExecWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbExecName)
+	// klog.Error("MySQL Error: ", err)
+	// mysqlDbExecUserName := "wso2am-p2-mysql-exec-" + apimanager.Name
+	// mysqlDbExecUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbExecUserName)
+	// if useMysqlPod {
+	// 	if errors.IsNotFound(err) {
+	// 		mysqlDbExecUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, mysqlDbExecWso2))
+	// 		if err != nil {
+	// 			fmt.Println("Creating mysql exec configmap in user specified ns", mysqlDbExecUser)
+	// 		}
+	// 	}
+	// }
+
+	klog.Info("Pub-Dev-Tm-1 Config")
 	pubDevTm1ConfName := "wso2am-p2-am-1-conf"
 	pubDevTm1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubDevTm1ConfName)
 	pubDevTm1ConfUserName := "wso2am-p2-am-1-conf-" + apimanager.Name
 	pubDevTm1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pubDevTm1ConfUserName)
 	if errors.IsNotFound(err) {
 		pubDevTm1ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, pubDevTm1ConfWso2))
+		klog.Error("PubDevTm1 Error: ", err)
 		if err != nil {
 			fmt.Println("Creating Pub-Dev-Tm-1 configmap in user specified ns", pubDevTm1ConfUser)
 
 		}
 	}
 
+	klog.Info("Pub-Dev-Tm-2 Config")
 	pubDevTm2ConfName := "wso2am-p2-am-2-conf"
 	pubDevTm2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubDevTm2ConfName)
 	pubDevTm2ConfUserName := "wso2am-p2-am-2-conf-" + apimanager.Name
@@ -1306,6 +1340,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	klog.Info("Gateway Config")
 	gatewayConfName := "wso2am-p2-am-gateway-conf"
 	gatewayConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gatewayConfName)
 	gatewayConfUserName := "wso2am-p2-am-gateway-conf-" + apimanager.Name
@@ -1317,6 +1352,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	klog.Info("KM Config")
 	kmConfName := "wso2am-p2-am-km-conf"
 	kmConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(kmConfName)
 	kmConfUserName := "wso2-p2-am-km-conf" + apimanager.Name
@@ -1328,11 +1364,12 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	dashBinConfName := "wso2am-p2-analytics-dash-bin"
-	dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
-	dashBinConfUserName := "wso2am-p2-analytics-dash-bin-" + apimanager.Name
-	dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
+	klog.Info("Dash Bin Config")
 	if allowAnalytics {
+		dashBinConfName := "wso2am-p2-analytics-dash-bin"
+		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
+		dashBinConfUserName := "wso2am-p2-analytics-dash-bin-" + apimanager.Name
+		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
 		if errors.IsNotFound(err) {
 			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashBinConfWso2))
 			if err != nil {
@@ -1431,6 +1468,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	// 	pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
 	// }
 
+	klog.Info("Mysql Depl")
 	// Get mysql deployment name using hardcoded value
 	mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 
@@ -1438,12 +1476,13 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
-			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager))
+			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager, "Pattern-2"))
 			if err != nil {
 				return err
 			}
 		}
 
+		klog.Info("Mysql Service")
 		// Get mysql service name using hardcoded value
 		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 
@@ -1460,6 +1499,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	klog.Info("Dash Depl")
 	// Get analytics dashboard deployment name using hardcoded value
 	dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
 	if allowAnalytics {
@@ -1473,6 +1513,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			}
 		}
 
+		klog.Info("Dash Service")
 		// Get analytics dashboard service name using hardcoded value
 		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
 		// If the resource doesn't exist, we'll create it
@@ -1482,6 +1523,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Dash Service is already available. [Service name] ,", dashservice)
 		}
 
+		klog.Info("Dash Ingress")
 		// Get ingress name using hardcoded value
 		dashIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
 		// If resource doesn't exist, we'll create it
@@ -1493,6 +1535,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	}
 
+	klog.Info("Worker Depl")
 	// Get analytics worker deployment name using hardcoded value
 
 	// workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
@@ -1509,6 +1552,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			}
 		}
 
+		klog.Info("Worker Service")
 		// Get analytics worker service name using hardcoded value
 		workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
 		// If the resource doesn't exist, we'll create it
@@ -1518,6 +1562,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Worker Service is already available. [Service name] ,", workerservice)
 		}
 
+		klog.Info("Worker HL Service")
 		workerhlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerhlServiceName)
 		if errors.IsNotFound(err) {
 			workerhlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.WorkerHeadlessService(apimanager))
@@ -1533,17 +1578,20 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	// 	workerdeploymentupdated, err = c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
 	// }
 
+	klog.Info("Pub-Dev-Tm-1 Depl")
 	pubDevTm1Deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(pubDevTm1deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		x := pattern2.AssignDevPubTmConfigMapValues(apimanager, configmap, pubDevTm1num)
 
 		pubDevTm1Deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern2.PubDev1Deployment(apimanager, x, pubDevTm1num))
+		klog.Error("Pub-Dev-TM-1 Error: ", err)
 		if err != nil {
 			return err
 		}
 	}
 
+	klog.Info("Pub-Dev-Tm-1 Service")
 	// Get apim instance 1 service name using hardcoded value
 	pubDevTm1Service, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTm1serviceName)
 	// If the resource doesn't exist, we'll create it
@@ -1551,6 +1599,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		pubDevTm1Service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.PubDevTm1Service(apimanager))
 	}
 
+	klog.Info("Pub-Dev-Tm-2 Depl")
 	// Get apim instance 2 deployment name using hardcoded value
 	pubDevTm2Deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(pubDevTm2deploymentName)
 	// If the resource doesn't exist, we'll create it
@@ -1563,6 +1612,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	klog.Info("Pub-Dev-Tm-2 Service")
 	// Get apim instance 2 service name using hardcoded value
 	pubDevTm2Service, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTm2serviceName)
 	// If the resource doesn't exist, we'll create it
@@ -1570,6 +1620,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		pubDevTm2Service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.PubDevTm2Service(apimanager))
 	}
 
+	klog.Info("Common Service")
 	// Get apim common service name using hardcoded value
 	commonservice, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTmcommonserviceName)
 	// If the resource doesn't exist, we'll create it
@@ -1577,6 +1628,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		commonservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.PubDevTmCommonService(apimanager))
 	}
 
+	klog.Info("Pub-Dev-Tm Ingress")
 	// Get ingress name using hardcoded value
 	pubDevTmIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(pubDevTmIngressName)
 	// If resource doesn't exist, we'll create it
@@ -1587,17 +1639,21 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	klog.Info("Gateway Depl")
 	// Get gateway deployment name using hardcoded value
 	gatewayDeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(gwdeploymentName)
+	klog.Error("Gateway Depl Error: ", err)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		z := pattern2.AssignApimGatewayConfigMapValues(apimanager, configmap, gatewaynum)
 		gatewayDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern2.GatewayDeployment(apimanager, z, gatewaynum))
+		klog.Error(err)
 		if err != nil {
 			return err
 		}
 	}
 
+	klog.Info("Gateway Service")
 	// Get keymanager service name using hardcoded value
 	gatewayService, err := c.servicesLister.Services(apimanager.Namespace).Get(gwserviceName)
 	// If resource doesn't exist, we'll create it
@@ -1605,34 +1661,48 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		gatewayService, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.GatewayService(apimanager))
 	}
 
+	klog.Info("Gateway Ingress")
 	// Get ingress name using hardcoded value
 	gatewayIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayIngressName)
+	klog.Error("Gateway Ingress Phase 1 Error: ", err)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern2.GatewayIngress(apimanager))
+		klog.Error("Gateway Ingress Depl Error: ", err)
 		if err != nil {
 			return err
 		}
 	}
 
+	klog.Info("KM Depl")
 	// Get keymanager statefulset name using hardcoded value
 	kmDeployment, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(kmdeploymentName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		z := pattern2.AssignKeyManagerConfigMapValues(apimanager, configmap, kmnum)
 		kmDeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Create(pattern2.KeyManagerDeployment(apimanager, z, kmnum))
+		if err != nil {
+			return err
+		}
 	}
 
+	klog.Info("KM Service")
 	// Get keymanager service name using hardcoded value
 	kmService, err := c.servicesLister.Services(apimanager.Namespace).Get(kmserviceName)
+	klog.Error("KM Service Phase 1 Error: ", err)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		kmService, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern2.KeyManagerService(apimanager))
+		klog.Error("KM Service Error: ", err)
+		if err != nil {
+			return err
+		}
 	}
 
 	// If an error occurs during Get/Create, we'll requeue the item so we can
 	// attempt processing again later. This could have been caused by a
 	// temporary network failure, or any other transient reason.
+	klog.Error("Final Error: ", err)
 	if err != nil {
 		return err
 	}
@@ -1860,16 +1930,16 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if allowAnalytics {
 		//for analytics dashboard deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
-			y := pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
+			y := pattern2.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *dashdeployment.Spec.Replicas)
-			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.DashboardDeployment(apimanager, y, dashnum))
+			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern2.DashboardDeployment(apimanager, y, dashnum))
 		}
 
 		//for analytics worker deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *workerdeployment.Spec.Replicas {
-			y := pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
+			y := pattern2.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *workerdeployment.Spec.Replicas)
-			workerdeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Update(pattern1.WorkerDeployment(apimanager, y, worknum))
+			workerdeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Update(pattern2.WorkerDeployment(apimanager, y, worknum))
 		}
 	}
 
@@ -1878,7 +1948,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
 			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
-			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager))
+			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager, "Pattern-2"))
 		}
 	}
 

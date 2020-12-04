@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"k8s.io/klog"
-
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -37,7 +36,7 @@ import (
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it...
 func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num int) *appsv1.Deployment {
-
+	klog.Info("PubDevTm-1 Depl Starting.........")
 	useMysql := true
 	allowAnalytics := true
 	if apimanager.Spec.UseMysql != "" {
@@ -47,6 +46,8 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
 	}
 
+	klog.Info("PubDevTm-1 AllowAnalytics: ", allowAnalytics)
+
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
 		"node":       "wso2am-pattern-2-am-1",
@@ -55,11 +56,13 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 	pubDevTm1VolumeMount, pubDevTm1Volume := getDevPubTm1Volumes(apimanager, num)
 	pubDevTm1deployports := getPubDevTmContainerPorts()
 
-	cmdstring := []string{
-		"/bin/sh",
-		"-c",
-		"nc -z localhost 9443",
-	}
+	klog.Info(pubDevTm1VolumeMount)
+
+	// cmdstring := []string{
+	// 	"/bin/sh",
+	// 	"-c",
+	// 	"nc -z 9443",
+	// }
 
 	initContainers := []corev1.Container{}
 
@@ -67,17 +70,23 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 		initContainers = getMysqlInitContainers(apimanager, &pubDevTm1Volume, &pubDevTm1VolumeMount)
 	}
 
+	klog.Info("PubDevTm-1 Containers Done")
+
 	if allowAnalytics {
 		getInitContainers([]string{"init-am-analytics-worker"}, &initContainers)
-		klog.Info("PUb-Dev-Tm-1 Containers", initContainers[1])
+		klog.Info("Pub-Dev-Tm-1 Containers", initContainers[1])
 	}
+
+	klog.Info("PubDevTm-1 Container Phase 1 Done")
 
 	//initContainers = append(initContainers, getInitContainers([]string{"init-am-analytics-worker"}))
 	pubDev1SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, pubDev1SecurityContext)
-
+	klog.Info("PubDevTm-1 Security Context Done")
+	klog.Info("Ready Delay", x.Readydelay)
+	klog.Info("Live Delay", x.Livedelay)
 	return &appsv1.Deployment{
 		// TypeMeta: metav1.TypeMeta{
 		// 	APIVersion: depApiVersion,
@@ -124,27 +133,27 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 						{
 							Name:  "wso2-pattern-2-am-1",
 							Image: x.Image,
-							LivenessProbe: &corev1.Probe{
-								Handler: corev1.Handler{
-									Exec: &corev1.ExecAction{
-										Command: cmdstring,
-									},
-								},
-								InitialDelaySeconds: x.Livedelay,
-								PeriodSeconds:       x.Liveperiod,
-								FailureThreshold:    x.Livethres,
-							},
-							ReadinessProbe: &corev1.Probe{
-								Handler: corev1.Handler{
-									Exec: &corev1.ExecAction{
-										Command: cmdstring,
-									},
-								},
+							// LivenessProbe: &corev1.Probe{
+							// 	InitialDelaySeconds: x.Livedelay,
+							// 	Handler: corev1.Handler{
+							// 		Exec: &corev1.ExecAction{
+							// 			Command: cmdstring,
+							// 		},
+							// 	},
+							// 	PeriodSeconds:       x.Liveperiod,
+							// 	FailureThreshold:    x.Livethres,
+							// },
+							// ReadinessProbe: &corev1.Probe{
+							// 	InitialDelaySeconds: x.Readydelay,
+							// 	Handler: corev1.Handler{
+							// 		Exec: &corev1.ExecAction{
+							// 			Command: cmdstring,
+							// 		},
+							// 	},
 
-								InitialDelaySeconds: x.Readydelay,
-								PeriodSeconds:       x.Readyperiod,
-								FailureThreshold:    x.Readythres,
-							},
+							// 	PeriodSeconds:       x.Readyperiod,
+							// 	FailureThreshold:    x.Readythres,
+							// },
 
 							Lifecycle: &corev1.Lifecycle{
 								PreStop: &corev1.Handler{
@@ -181,11 +190,11 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 								},
 								{
 									Name:  "JVM_MEM_OPTS",
-									Value: "-Xms" + x.JvmMemOpts,
+									Value:  x.JvmMemOpts,
 								},
 								{
 									Name:  "ALLOW_ANALYTICS",
-									Value: strconv.FormatBool(allowAnalytics),
+									Value: apimanager.Spec.AllowAnalytics,
 								},
 							},
 							VolumeMounts: pubDevTm1VolumeMount,
@@ -224,11 +233,11 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		"node":       "wso2am-pattern-2-am-2",
 	}
 
-	cmdstring := []string{
-		"/bin/sh",
-		"-c",
-		"nc -z localhost 9443",
-	}
+	// cmdstring := []string{
+	// 	"/bin/sh",
+	// 	"-c",
+	// 	"nc -z localhost 9443",
+	// }
 
 	initContainers := []corev1.Container{}
 
@@ -299,26 +308,26 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 						{
 							Name:  "wso2-pattern-2-am-2",
 							Image: z.Image,
-							LivenessProbe: &corev1.Probe{
-								Handler: corev1.Handler{
-									Exec: &corev1.ExecAction{
-										Command: cmdstring,
-									},
-								},
-								InitialDelaySeconds: z.Livedelay,
-								PeriodSeconds:       z.Liveperiod,
-								FailureThreshold:    z.Livethres,
-							},
-							ReadinessProbe: &corev1.Probe{
-								Handler: corev1.Handler{
-									Exec: &corev1.ExecAction{
-										Command: cmdstring,
-									},
-								},
-								InitialDelaySeconds: z.Readydelay,
-								PeriodSeconds:       z.Readyperiod,
-								FailureThreshold:    z.Readythres,
-							},
+							// LivenessProbe: &corev1.Probe{
+							// 	Handler: corev1.Handler{
+							// 		Exec: &corev1.ExecAction{
+							// 			Command: cmdstring,
+							// 		},
+							// 	},
+							// 	InitialDelaySeconds: z.Livedelay,
+							// 	PeriodSeconds:       z.Liveperiod,
+							// 	FailureThreshold:    z.Livethres,
+							// },
+							// ReadinessProbe: &corev1.Probe{
+							// 	Handler: corev1.Handler{
+							// 		Exec: &corev1.ExecAction{
+							// 			Command: cmdstring,
+							// 		},
+							// 	},
+							// 	InitialDelaySeconds: z.Readydelay,
+							// 	PeriodSeconds:       z.Readyperiod,
+							// 	FailureThreshold:    z.Readythres,
+							// },
 
 							Lifecycle: &corev1.Lifecycle{
 								PreStop: &corev1.Handler{
@@ -360,7 +369,7 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 								},
 								{
 									Name:  "ALLOW_ANALYTICS",
-									Value: strconv.FormatBool(allowAnalytics),
+									Value: apimanager.Spec.AllowAnalytics,
 								},
 							},
 							VolumeMounts: pubDevTm2VolumeMount,
@@ -397,11 +406,11 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		"node":       "wso2am-pattern-2-am-2",
 	}
 
-	cmdstring := []string{
-		"/bin/sh",
-		"-c",
-		"nc -z localhost 9443",
-	}
+	// cmdstring := []string{
+	// 	"/bin/sh",
+	// 	"-c",
+	// 	"nc -z localhost 9443",
+	// }
 
 	initContainers := []corev1.Container{}
 	if useMysql {
@@ -471,26 +480,26 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 						{
 							Name:  "wso2-pattern-2-gw",
 							Image: z.Image,
-							LivenessProbe: &corev1.Probe{
-								Handler: corev1.Handler{
-									Exec: &corev1.ExecAction{
-										Command: cmdstring,
-									},
-								},
-								InitialDelaySeconds: z.Livedelay,
-								PeriodSeconds:       z.Liveperiod,
-								FailureThreshold:    z.Livethres,
-							},
-							ReadinessProbe: &corev1.Probe{
-								Handler: corev1.Handler{
-									Exec: &corev1.ExecAction{
-										Command: cmdstring,
-									},
-								},
-								InitialDelaySeconds: z.Readydelay,
-								PeriodSeconds:       z.Readyperiod,
-								FailureThreshold:    z.Readythres,
-							},
+							// LivenessProbe: &corev1.Probe{
+							// 	Handler: corev1.Handler{
+							// 		Exec: &corev1.ExecAction{
+							// 			Command: cmdstring,
+							// 		},
+							// 	},
+							// 	InitialDelaySeconds: z.Livedelay,
+							// 	PeriodSeconds:       z.Liveperiod,
+							// 	FailureThreshold:    z.Livethres,
+							// },
+							// ReadinessProbe: &corev1.Probe{
+							// 	Handler: corev1.Handler{
+							// 		Exec: &corev1.ExecAction{
+							// 			Command: cmdstring,
+							// 		},
+							// 	},
+							// 	InitialDelaySeconds: z.Readydelay,
+							// 	PeriodSeconds:       z.Readyperiod,
+							// 	FailureThreshold:    z.Readythres,
+							// },
 
 							Lifecycle: &corev1.Lifecycle{
 								PreStop: &corev1.Handler{
@@ -890,7 +899,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 			Kind:       statefulsetKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-analytics-worker-" + apimanager.Name,
+			Name:      "wso2-am-analytics-worker-statefulset",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
