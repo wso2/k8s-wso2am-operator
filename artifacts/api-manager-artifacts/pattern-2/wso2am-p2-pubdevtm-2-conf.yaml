@@ -114,7 +114,7 @@ data:
     #expiry_time = "2m"
 
     [apim.analytics]
-    enable = "$env{ALLOW_ANALYTICS}"
+    enable = "$env{Enable_ANALYTICS}"
     store_api_url = "https://wso2-am-analytics-worker-svc:7444"
     #username = "$ref{super_admin.username}"
     #password = "$ref{super_admin.password}"

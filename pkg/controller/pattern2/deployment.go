@@ -24,12 +24,12 @@ import (
 	"strconv"
 	"strings"
 
-	"k8s.io/klog"
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/klog"
 )
 
 // PubDev1Deployment creates a new Deployment for a PubDevTm instance 1 resource. It also sets
@@ -38,15 +38,15 @@ import (
 func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num int) *appsv1.Deployment {
 	klog.Info("PubDevTm-1 Depl Starting.........")
 	useMysql := true
-	allowAnalytics := true
+	enableAnalytics := true
 	if apimanager.Spec.UseMysql != "" {
 		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
 	}
-	if apimanager.Spec.AllowAnalytics != "" {
-		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	klog.Info("PubDevTm-1 AllowAnalytics: ", allowAnalytics)
+	klog.Info("PubDevTm-1 EnableAnalytics: ", enableAnalytics)
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
@@ -72,7 +72,7 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 
 	klog.Info("PubDevTm-1 Containers Done")
 
-	if allowAnalytics {
+	if enableAnalytics {
 		getInitContainers([]string{"init-am-analytics-worker"}, &initContainers)
 		klog.Info("Pub-Dev-Tm-1 Containers", initContainers[1])
 	}
@@ -190,11 +190,11 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 								},
 								{
 									Name:  "JVM_MEM_OPTS",
-									Value:  x.JvmMemOpts,
+									Value: x.JvmMemOpts,
 								},
 								{
-									Name:  "ALLOW_ANALYTICS",
-									Value: apimanager.Spec.AllowAnalytics,
+									Name:  "Enable_ANALYTICS",
+									Value: apimanager.Spec.EnableAnalytics,
 								},
 							},
 							VolumeMounts: pubDevTm1VolumeMount,
@@ -217,12 +217,12 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.Deployment {
 
 	useMysql := true
-	allowAnalytics := true
+	enableAnalytics := true
 	if apimanager.Spec.UseMysql != "" {
 		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
 	}
-	if apimanager.Spec.AllowAnalytics != "" {
-		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
 	pubDevTm2VolumeMount, pubDevTm2Volume := getDevPubTm2Volumes(apimanager, num)
@@ -245,7 +245,7 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		initContainers = getMysqlInitContainers(apimanager, &pubDevTm2Volume, &pubDevTm2VolumeMount)
 	}
 
-	if allowAnalytics {
+	if enableAnalytics {
 		getInitContainers([]string{"init-am-analytics-worker"}, &initContainers)
 		klog.Info("Pub-Dev-Tm-2 Containers", initContainers[1])
 	}
@@ -368,8 +368,8 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 									Value: z.JvmMemOpts,
 								},
 								{
-									Name:  "ALLOW_ANALYTICS",
-									Value: apimanager.Spec.AllowAnalytics,
+									Name:  "Enable_ANALYTICS",
+									Value: apimanager.Spec.EnableAnalytics,
 								},
 							},
 							VolumeMounts: pubDevTm2VolumeMount,
@@ -390,12 +390,12 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 
 func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.Deployment {
 	useMysql := true
-	allowAnalytics := true
+	enableAnalytics := true
 	if apimanager.Spec.UseMysql != "" {
 		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
 	}
-	if apimanager.Spec.AllowAnalytics != "" {
-		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
 	gatewayVolumeMount, gatewayVolume := getgatewayVolumes(apimanager, num)
@@ -417,7 +417,7 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		initContainers = getMysqlInitContainers(apimanager, &gatewayVolume, &gatewayVolumeMount)
 	}
 
-	if allowAnalytics {
+	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km", "init-apim-1", "init-apim-2"}, &initContainers)
 	} else {
 		getInitContainers([]string{"init-km", "init-apim-1", "init-apim-2"}, &initContainers)
@@ -544,8 +544,8 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 									Value: z.JvmMemOpts,
 								},
 								{
-									Name:  "ALLOW_ANALYTICS",
-									Value: strconv.FormatBool(allowAnalytics),
+									Name:  "Enable_ANALYTICS",
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 							},
 							VolumeMounts: gatewayVolumeMount,

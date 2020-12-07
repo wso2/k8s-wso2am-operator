@@ -20,4 +20,4 @@ metadata:
   name: apim-pattern-2
 spec:
   pattern: Pattern-2
-  allowAnalytics: 'false'
+  enableAnalytics: 'false'

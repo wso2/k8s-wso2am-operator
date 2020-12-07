@@ -1214,16 +1214,16 @@ func (c *Controller) handleObject(obj interface{}) {
 func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, configmap *corev1.ConfigMap, name string) error {
 
 	useMysqlPod := true
-	allowAnalytics := true
+	enableAnalytics := true
 	if apimanager.Spec.UseMysql != "" {
 		useMysqlPod, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
 	}
-	klog.Info("Allow Analytics Spec: ", apimanager.Spec.AllowAnalytics)
-	if apimanager.Spec.AllowAnalytics != "" {
-		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	klog.Info("Allow Analytics Spec: ", apimanager.Spec.EnableAnalytics)
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	klog.Info("Allow-Analytics: ", allowAnalytics)
+	klog.Info("Allow-Analytics: ", enableAnalytics)
 
 	pubDevTm1deploymentName := "wso2-am-1-" + apimanager.Name
 	pubDevTm2deploymentName := "wso2-am-2-" + apimanager.Name
@@ -1251,7 +1251,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	klog.Info("Started Config Creating for Pattern-2")
 	// dashboard configurations
 
-	if allowAnalytics {
+	if enableAnalytics {
 		dashConfName := "wso2am-p2-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
 		klog.Info("Config Phase 1: OK")
@@ -1270,7 +1270,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	klog.Info("Worker Config")
 	// worker configurations
-	if allowAnalytics {
+	if enableAnalytics {
 		workerConfName := "wso2am-p2-analytics-worker-conf"
 		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
 		workerConfUserName := "wso2am-p2-analytics-worker-conf-" + apimanager.Name
@@ -1365,7 +1365,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	klog.Info("Dash Bin Config")
-	if allowAnalytics {
+	if enableAnalytics {
 		dashBinConfName := "wso2am-p2-analytics-dash-bin"
 		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
 		dashBinConfUserName := "wso2am-p2-analytics-dash-bin-" + apimanager.Name
@@ -1502,7 +1502,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	klog.Info("Dash Depl")
 	// Get analytics dashboard deployment name using hardcoded value
 	dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
-	if allowAnalytics {
+	if enableAnalytics {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern2.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
@@ -1540,7 +1540,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	// workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
 	workerdeployment, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
-	if allowAnalytics {
+	if enableAnalytics {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern2.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
@@ -1735,7 +1735,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 	}
 
-	if allowAnalytics {
+	if enableAnalytics {
 		// If the analytics dashboard Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 		if !metav1.IsControlledBy(dashdeployment, apimanager) {
 			msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by APIManager", dashdeployment.Name)
@@ -1790,7 +1790,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		return fmt.Errorf(msg)
 	}
 
-	if allowAnalytics {
+	if enableAnalytics {
 		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
 		if err != nil {
 			return err
@@ -1857,7 +1857,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		return fmt.Errorf(msg)
 	}
 
-	if allowAnalytics {
+	if enableAnalytics {
 		// Get ingress name using hardcoded value
 		dashIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
 		if err != nil {
@@ -1927,7 +1927,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		kmDeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Update(pattern2.KeyManagerDeployment(apimanager, z, kmnum))
 	}
 
-	if allowAnalytics {
+	if enableAnalytics {
 		//for analytics dashboard deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
 			y := pattern2.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
@@ -1984,7 +1984,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		return nil
 	}
 
-	if allowAnalytics {
+	if enableAnalytics {
 		//for analytics dashboard deployment
 		err = c.updateApimanagerStatus(apimanager, dashdeployment)
 		if err != nil {
