@@ -43,6 +43,16 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		"node":       "wso2am-pattern-1-am-1",
 	}
 
+	enableAnalytics := true
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
+	}
+
+	useMysql := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
+	}
+
 	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager, num)
 	klog.Info("APIM1-Volunme Mount:", apim1VolumeMount)
 	klog.Info("APIM1-Volunmes: ", apim1Volume)
@@ -59,10 +69,15 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 
 	AssignSecurityContext(securityContextString, apim1SecurityContext)
 
-	initContainers := getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
+	initContainers := []corev1.Container{}
 
-	// appending the analytics-worker init container
-	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
+	if useMysql {
+		initContainers = getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
+	}
+
+	if enableAnalytics {
+		initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -154,6 +169,10 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 									Name:  "JVM_MEM_OPTS",
 									Value: x.JvmMemOpts,
 								},
+								{
+									Name:  "ENABLE_ANALYTICS",
+									Value: strconv.FormatBool(enableAnalytics),
+								},
 							},
 							VolumeMounts: apim1VolumeMount,
 						},
@@ -176,6 +195,15 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 
 	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager, num)
 	apim2deployports := getApimContainerPorts()
+	enableAnalytics := true
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
+	}
+
+	useMysql := true
+	if apimanager.Spec.UseMysql != "" {
+		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
+	}
 
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-1-am",
@@ -188,7 +216,11 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 		"nc -z localhost 9443",
 	}
 
-	initContainers := getMysqlInitContainers(apimanager, &apim2Volume, &apim2VolumeMount)
+	initContainers := []corev1.Container{}
+
+	if useMysql {
+		initContainers = getMysqlInitContainers(apimanager, &apim2Volume, &apim2VolumeMount)
+	}
 
 	// Checking for the availability of API Manager Server 1 deployment
 	apim1InitContainer := corev1.Container{}
@@ -199,7 +231,9 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 	initContainers = append(initContainers, apim1InitContainer)
 
 	// appending the analytics-worker init container
-	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
+	if enableAnalytics {
+		initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
+	}
 
 	apim2SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
@@ -296,6 +330,10 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 								{
 									Name:  "JVM_MEM_OPTS",
 									Value: z.JvmMemOpts,
+								},
+								{
+									Name:  "ENABLE_ANALYTICS",
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 							},
 							VolumeMounts: apim2VolumeMount,
@@ -478,6 +516,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
+			ServiceName: "wso2-am-analytics-worker-headless-svc",
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: labels,

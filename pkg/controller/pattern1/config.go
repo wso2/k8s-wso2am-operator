@@ -52,6 +52,7 @@ type configvalues struct {
 	ServiceAccountName string
 	SecurityContext    string
 	JvmMemOpts         string
+	Enablenalytics     string
 }
 
 func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {

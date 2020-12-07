@@ -316,10 +316,6 @@ func GetMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		Name:      "wso2am-p1-mysql-dbscripts",
 		MountPath: "/docker-entrypoint-initdb.d",
 	})
-	mysqlvolumemounts = append(mysqlvolumemounts, corev1.VolumeMount{
-		Name:      "apim-rdbms-persistent-storage",
-		MountPath: "/var/lib/mysql",
-	})
 
 	var mysqlvolume []corev1.Volume
 
@@ -330,15 +326,6 @@ func GetMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 				LocalObjectReference: corev1.LocalObjectReference{
 					Name: "wso2am-p1-mysql-dbscripts-" + apimanager.Name,
 				},
-			},
-		},
-	})
-
-	mysqlvolume = append(mysqlvolume, corev1.Volume{
-		Name: "apim-rdbms-persistent-storage",
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: "wso2am-mysql",
 			},
 		},
 	})
