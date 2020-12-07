@@ -43,9 +43,9 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		"node":       "wso2am-pattern-1-am-1",
 	}
 
-	allowAnalytics := true
-	if apimanager.Spec.AllowAnalytics != "" {
-		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	enableAnalytics := true
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
 	useMysql := true
@@ -75,7 +75,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 		initContainers = getMysqlInitContainers(apimanager, &apim1Volume, &apim1VolumeMount)
 	}
 
-	if allowAnalytics {
+	if enableAnalytics {
 		initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
 	}
 
@@ -171,7 +171,7 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 								},
 								{
 									Name:  "ENABLE_ANALYTICS",
-									Value: strconv.FormatBool(allowAnalytics),
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 							},
 							VolumeMounts: apim1VolumeMount,
@@ -195,9 +195,9 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 
 	apim2VolumeMount, apim2Volume := getApim2Volumes(apimanager, num)
 	apim2deployports := getApimContainerPorts()
-	allowAnalytics := true
-	if apimanager.Spec.AllowAnalytics != "" {
-		allowAnalytics, _ = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	enableAnalytics := true
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
 	useMysql := true
@@ -231,7 +231,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 	initContainers = append(initContainers, apim1InitContainer)
 
 	// appending the analytics-worker init container
-	if allowAnalytics {
+	if enableAnalytics {
 		initContainers = append(initContainers, getAnalyticsWorkerInitContainers())
 	}
 
@@ -333,7 +333,7 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 								},
 								{
 									Name:  "ENABLE_ANALYTICS",
-									Value: strconv.FormatBool(allowAnalytics),
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 							},
 							VolumeMounts: apim2VolumeMount,

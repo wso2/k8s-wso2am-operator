@@ -326,10 +326,10 @@ func (c *Controller) syncHandler(key string) error {
 		}
 	}
 
-	// AllowAnalytics - default to true
-	allowAnalytics := true
-	if apimanager.Spec.AllowAnalytics != "" {
-		allowAnalytics, err = strconv.ParseBool(apimanager.Spec.AllowAnalytics)
+	// Enablenalytics - default to true
+	enableAnalytics := true
+	if apimanager.Spec.EnableAnalytics != "" {
+		enableAnalytics, err = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 		if err != nil {
 			return err
 		}
@@ -360,7 +360,7 @@ func (c *Controller) syncHandler(key string) error {
 		workerConfUserName := "wso2am-p1-analytics-worker-conf-" + apimanager.Name
 		workerConfUser, err1 := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
 
-		if allowAnalytics {
+		if enableAnalytics {
 			if errors.IsNotFound(err) {
 				dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashConfWso2))
 				if err != nil {
@@ -483,7 +483,7 @@ func (c *Controller) syncHandler(key string) error {
 
 		// Get analytics dashboard deployment name using hardcoded value
 		dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
-		if allowAnalytics {
+		if enableAnalytics {
 			// If the dash resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
 				y := pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
@@ -512,7 +512,7 @@ func (c *Controller) syncHandler(key string) error {
 
 		// Get analytics worker deployment name using hardcoded value
 		workerdeployment, err1 := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
-		if allowAnalytics {
+		if enableAnalytics {
 
 			if errors.IsNotFound(err) {
 				workerhlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerHeadlessService(apimanager))
@@ -618,7 +618,7 @@ func (c *Controller) syncHandler(key string) error {
 			dashingressname := "wso2-am-analytics-dashboard-p1-ingress"
 			dashingress, err1 := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashingressname)
 
-			if allowAnalytics {
+			if enableAnalytics {
 				// If the resource doesn't exist, we'll create it
 				if errors.IsNotFound(err1) {
 					dashingress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.DashboardIngress(apimanager))
@@ -641,7 +641,7 @@ func (c *Controller) syncHandler(key string) error {
 				return fmt.Errorf(msg)
 			}
 
-			if allowAnalytics {
+			if enableAnalytics {
 				// If the apim ingress is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 				if !metav1.IsControlledBy(dashingress, apimanager) {
 					msg := fmt.Sprintf("dashboard ingress %q already exists and is not managed by APIManager", dashingress.Name)
@@ -667,7 +667,7 @@ func (c *Controller) syncHandler(key string) error {
 			return fmt.Errorf(msg)
 		}
 
-		if allowAnalytics {
+		if enableAnalytics {
 			// If the analytics dashboard Deployment is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(dashdeployment, apimanager) {
 				msg := fmt.Sprintf("Analytics Dashboard Deployment %q already exists and is not managed by APIManager", dashdeployment.Name)
@@ -706,7 +706,7 @@ func (c *Controller) syncHandler(key string) error {
 			return fmt.Errorf(msg)
 		}
 
-		if allowAnalytics {
+		if enableAnalytics {
 
 			dashservice, _ := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
 			// If the analytics dashboard Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
@@ -768,7 +768,7 @@ func (c *Controller) syncHandler(key string) error {
 			deployment2, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern1.Apim2Deployment(apimanager, z, am2num))
 		}
 
-		if allowAnalytics {
+		if enableAnalytics {
 			//for analytics dashboard deployment
 			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *dashdeployment.Spec.Replicas {
 				y := pattern1.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
@@ -813,7 +813,7 @@ func (c *Controller) syncHandler(key string) error {
 			return err
 		}
 
-		if allowAnalytics {
+		if enableAnalytics {
 			//for analytics dashboard deployment
 			err = c.updateApimanagerStatus(apimanager, dashdeployment)
 			if err != nil {
