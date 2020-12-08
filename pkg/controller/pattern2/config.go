@@ -22,12 +22,13 @@ package pattern2
 
 import (
 	"strconv"
-	"k8s.io/klog"
+
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog"
 )
 
 type configvalues struct {
@@ -209,8 +210,8 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
-	memXmx := ControlConfigData["apim-deployment-env-jvm-heap-memory-xmx"]
-	memXms := ControlConfigData["apim-deployment-env-jvm-heap-memory-xms"]
+	memXmx := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	totalProfiles := len(apimanager.Spec.Profiles)
@@ -352,8 +353,8 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-km-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-km-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
-	memXmx := ControlConfigData["apim-deployment-env-jvm-heap-memory-xmx"]
-	memXms := ControlConfigData["apim-deployment-env-jvm-heap-memory-xms"]
+	memXmx := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	totalProfiles := len(apimanager.Spec.Profiles)

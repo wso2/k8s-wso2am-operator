@@ -55,6 +55,14 @@ func getMysqlInitContainers(apimanager *apimv1alpha1.APIManager, vols *[]corev1.
 			},
 		}
 		initContainers = append(initContainers, mysqlConnectorContainer)
+
+		mysqlInitDbContainer := corev1.Container{}
+		mysqlInitDbContainer.Name = "init-mysql-db"
+		mysqlInitDbContainer.Image = "busybox:1.32"
+		initCmdStr := "echo -e \"Checking for the availability of DBMS service\"; while ! nc -z \"mysql-svc\" 3306; do sleep 1; printf \"-\"; done; echo -e \"  >> MySQL Server has started\""
+		mysqlInitDbContainer.Command = []string{"/bin/sh", "-c", initCmdStr}
+		initContainers = append(initContainers, mysqlInitDbContainer)
+
 		// volume for downloaded mysql connector
 		*vols = append(*vols, corev1.Volume{
 			Name: "mysql-connector-jar",
@@ -100,15 +108,15 @@ func getInitContainers(containerNames []string, initContainers *[]corev1.Contain
 		container.Name = containerName
 		container.Image = "busybox:1.32"
 		if containerName == "init-am-analytics-worker" || containerName == "init-apim-analytics" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2am-pattern2-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "`}
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2-am-analytics-worker-svc 7712; do sleep 1; printf "-"; done; echo -e "`}
 		} else if containerName == "init-km" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z wso2am-pattern2-km-service 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";`}
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z wso2-am-km-svc 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";`}
 		} else if containerName == "init-apim-1" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of API Manager instance one deployment"; while ! nc -z wso2am-pattern2-am-1-service 9611; do sleep 1; printf "-"; done; echo -e "  >> API Manager instance one has started";`}
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of API Manager instance one deployment"; while ! nc -z wso2-am-1-svc 9611; do sleep 1; printf "-"; done; echo -e "  >> API Manager instance one has started";`}
 		} else if containerName == "init-apim-2" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of API Manager instance two deployment"; while ! nc -z wso2am-pattern2-am-2-service 9611; do sleep 1; printf "-"; done; echo -e "  >> API Manager instance two has started";`}
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of API Manager instance two deployment"; while ! nc -z wso2-am-2-svc 9611; do sleep 1; printf "-"; done; echo -e "  >> API Manager instance two has started";`}
 		} else if containerName == "init-am" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of API Manager deployment"; while ! nc -z  {{ template "am-pattern-2.resource.prefix" . }}-am-service 9443; do sleep 1; printf "-"; done; echo -e "  >> API Manager service has started";`}
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of API Manager deployment"; while ! nc -z  wso2-am-svc 9443; do sleep 1; printf "-"; done; echo -e "  >> API Manager service has started";`}
 		}
 		*initContainers = append(*initContainers, container)
 	}

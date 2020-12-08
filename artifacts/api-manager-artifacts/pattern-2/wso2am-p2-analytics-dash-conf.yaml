@@ -241,7 +241,7 @@ data:
         definition:
           type: RDBMS
           configuration:
-            jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_DASHBOARD_DB?useSSL=false'
+            jdbcUrl: 'jdbc:mysql://mysql-svc:3306/DASHBOARD_DB?useSSL=false'
             username: wso2carbon
             password: wso2carbon
             driverClassName: com.mysql.cj.jdbc.Driver
@@ -258,7 +258,7 @@ data:
         definition:
           type: RDBMS
           configuration:
-            jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_BUSINESS_RULES_DB?useSSL=false'
+            jdbcUrl: 'jdbc:mysql://mysql-svc:3306/BUSINESS_RULES_DB?useSSL=false'
             username: wso2carbon
             password: wso2carbon
             driverClassName: com.mysql.cj.jdbc.Driver
@@ -294,7 +294,7 @@ data:
         definition:
           type: RDBMS
           configuration:
-            jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_PERMISSIONS_DB?useSSL=false'
+            jdbcUrl: 'jdbc:mysql://mysql-svc:3306/PERMISSION_DB?useSSL=false'
             username: wso2carbon
             password: wso2carbon
             driverClassName: com.mysql.cj.jdbc.Driver
@@ -312,7 +312,7 @@ data:
         definition:
           type: RDBMS
           configuration:
-            jdbcUrl: 'jdbc:mysql://mysql-svc:3306/WSO2AM_STATS_DB?useSSL=false'
+            jdbcUrl: 'jdbc:mysql://mysql-svc:3306/APIM_ANALYTICS_DB?useSSL=false'
             username: wso2carbon
             password: wso2carbon
             driverClassName: com.mysql.cj.jdbc.Driver

@@ -85,9 +85,9 @@ data:
   p2-apim-pubdevtm-deployment-readinessProbe-periodSeconds: "100"
 
   # pattern specific configs for key manager instances
-  p2-apim-km-deployment-livelinessProbe-periodSeconds: "10"
+  p2-apim-km-deployment-livelinessProbe-periodSeconds: "100"
   p2-apim-km-deployment-livelinessProbe-initialDelaySeconds: "60"
-  p2-apim-km-deployment-readinessProbe-periodSeconds: "10"
+  p2-apim-km-deployment-readinessProbe-periodSeconds: "100"
   p2-apim-km-deployment-readinessProbe-initialDelaySeconds: "60"
   p2-apim-km-deployment-replicas: "2"
 

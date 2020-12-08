@@ -193,7 +193,7 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 									Value: x.JvmMemOpts,
 								},
 								{
-									Name:  "Enable_ANALYTICS",
+									Name:  "ENABLE_ANALYTICS",
 									Value: apimanager.Spec.EnableAnalytics,
 								},
 							},
@@ -368,7 +368,7 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 									Value: z.JvmMemOpts,
 								},
 								{
-									Name:  "Enable_ANALYTICS",
+									Name:  "ENABLE_ANALYTICS",
 									Value: apimanager.Spec.EnableAnalytics,
 								},
 							},
@@ -402,15 +402,14 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 	gatewaydeployports := getGatewayContainerPorts()
 
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-2-am",
-		"node":       "wso2am-pattern-2-am-2",
+		"deployment": "wso2-gateway",
 	}
 
-	// cmdstring := []string{
-	// 	"/bin/sh",
-	// 	"-c",
-	// 	"nc -z localhost 9443",
-	// }
+	cmdstring := []string{
+		"/bin/sh",
+		"-c",
+		"nc -z localhost 9443",
+	}
 
 	initContainers := []corev1.Container{}
 	if useMysql {
@@ -427,15 +426,6 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, gatewaySecurityContext)
-
-	// Checking for the availability of API Manager Server 1 deployment
-
-	// apim1InitContainer := corev1.Container{}
-	// apim1InitContainer.Name = "init-apim-1"
-	// apim1InitContainer.Image = "busybox:1.32"
-	// executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
-	// apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
-	// initContainers = append(initContainers, apim1InitContainer)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -480,26 +470,26 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 						{
 							Name:  "wso2-pattern-2-gw",
 							Image: z.Image,
-							// LivenessProbe: &corev1.Probe{
-							// 	Handler: corev1.Handler{
-							// 		Exec: &corev1.ExecAction{
-							// 			Command: cmdstring,
-							// 		},
-							// 	},
-							// 	InitialDelaySeconds: z.Livedelay,
-							// 	PeriodSeconds:       z.Liveperiod,
-							// 	FailureThreshold:    z.Livethres,
-							// },
-							// ReadinessProbe: &corev1.Probe{
-							// 	Handler: corev1.Handler{
-							// 		Exec: &corev1.ExecAction{
-							// 			Command: cmdstring,
-							// 		},
-							// 	},
-							// 	InitialDelaySeconds: z.Readydelay,
-							// 	PeriodSeconds:       z.Readyperiod,
-							// 	FailureThreshold:    z.Readythres,
-							// },
+							LivenessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
+									},
+								},
+								InitialDelaySeconds: z.Livedelay,
+								PeriodSeconds:       z.Liveperiod,
+								FailureThreshold:    z.Livethres,
+							},
+							ReadinessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
+									},
+								},
+								InitialDelaySeconds: z.Readydelay,
+								PeriodSeconds:       z.Readyperiod,
+								FailureThreshold:    z.Readythres,
+							},
 
 							Lifecycle: &corev1.Lifecycle{
 								PreStop: &corev1.Handler{
@@ -544,7 +534,7 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 									Value: z.JvmMemOpts,
 								},
 								{
-									Name:  "Enable_ANALYTICS",
+									Name:  "ENABLE_ANALYTICS",
 									Value: strconv.FormatBool(enableAnalytics),
 								},
 							},
@@ -565,17 +555,12 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 }
 
 func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.StatefulSet {
-	useMysql := true
-	if apimanager.Spec.UseMysql != "" {
-		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
-	}
 
 	kmVolumeMount, kmVolume := getKeyManagerVolumes(apimanager, num)
 	kmdeployports := getKeyManagerContainerPorts()
 
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-2-am",
-		"node":       "wso2am-pattern-2-am-2",
+		"deployment": "wso2-km",
 	}
 
 	cmdstring := []string{
@@ -584,24 +569,12 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		"nc -z localhost 9443",
 	}
 
-	initContainers := []corev1.Container{}
-	if useMysql {
-		initContainers = getMysqlInitContainers(apimanager, &kmVolume, &kmVolumeMount)
-	}
+	initContainers := getMysqlInitContainers(apimanager, &kmVolume, &kmVolumeMount)
 
 	keyManagerSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, keyManagerSecurityContext)
-
-	// Checking for the availability of API Manager Server 1 deployment
-
-	// apim1InitContainer := corev1.Container{}
-	// apim1InitContainer.Name = "init-apim-1"
-	// apim1InitContainer.Image = "busybox:1.32"
-	// executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
-	// apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
-	// initContainers = append(initContainers, apim1InitContainer)
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -619,21 +592,6 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		Spec: appsv1.StatefulSetSpec{
 			Replicas:    apimanager.Spec.Replicas,
 			ServiceName: "wso2-am-km-svc",
-			// MinReadySeconds: z.Minreadysec,
-			// Strategy: appsv1.DeploymentStrategy{
-			// 	Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
-			// 	RollingUpdate: &appsv1.RollingUpdateDeployment{
-			// 		MaxSurge: &intstr.IntOrString{
-			// 			Type:   intstr.Int,
-			// 			IntVal: z.Maxsurge,
-			// 		},
-			// 		MaxUnavailable: &intstr.IntOrString{
-			// 			Type:   intstr.Int,
-			// 			IntVal: z.Maxunavail,
-			// 		},
-			// 	},
-			// },
-
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
@@ -703,6 +661,10 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 									},
 								},
 								{
+									Name:  "JVM_MEM_OPTS",
+									Value: z.JvmMemOpts,
+								},
+								{
 									Name:  "PROFILE_NAME",
 									Value: "api-key-manager",
 								},
@@ -739,7 +701,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	}
 
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-1-analytics-dashboard",
+		"deployment": "wso2-analytics-dashboard",
 	}
 	//runasuser := int64(802)
 	//defaultMode := int32(0407)
@@ -751,7 +713,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 		initContainers = getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
 	}
 
-	getInitContainers([]string{"init-am"}, &initContainers)
+	// getInitContainers([]string{"init-am"}, &initContainers)
 
 	dashboardSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
@@ -878,7 +840,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	workerVolMounts, workerVols := getAnalyticsWorkerVolumes(apimanager, num)
 
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-1-analytics-worker",
+		"deployment": "wso2-analytics-worker",
 	}
 	//runasuser := int64(802)
 

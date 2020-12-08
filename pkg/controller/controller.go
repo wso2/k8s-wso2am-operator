@@ -1364,7 +1364,7 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Dash Bin Config")
+	klog.Info("Dash Bin Config &Worker Bin Config")
 	if enableAnalytics {
 		dashBinConfName := "wso2am-p2-analytics-dash-bin"
 		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
@@ -1374,6 +1374,17 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashBinConfWso2))
 			if err != nil {
 				fmt.Println("Creating dashboard bin configmap in user specified ns", dashBinConfUser)
+			}
+		}
+
+		workerBinConfName := "wso2am-p2-analytics-worker-bin"
+		workerBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerBinConfName)
+		workerBinConfUserName := "wso2am-p2-analytics-worker-bin-" + apimanager.Name
+		workerBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerBinConfUserName)
+		if errors.IsNotFound(err) {
+			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, workerBinConfWso2))
+			if err != nil {
+				fmt.Println("Creating worker bin configmap in user specified ns", workerBinConfUser)
 			}
 		}
 	}

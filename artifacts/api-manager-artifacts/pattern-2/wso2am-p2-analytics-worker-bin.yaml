@@ -15,7 +15,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2am-p2-analytics-dash-bin
+  name: wso2am-p2-analytics-worker-bin
   namespace : wso2-system
 data:
   carbon.sh: |-
@@ -304,7 +304,7 @@ data:
     do
         $JAVACMD \
         -Xbootclasspath/a:"$CARBON_XBOOTCLASSPATH" \
-        -Xms2048m -Xmx2048m \
+        -Xms2048m -Xmx2048 \
         -XX:+HeapDumpOnOutOfMemoryError \
         -XX:HeapDumpPath="$RUNTIME_HOME/logs/heap-dump.hprof" \
         $JAVA_OPTS \

@@ -81,7 +81,7 @@ func PubDevTm2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 //GatewayService is for handling gateway-sevice...
 func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-2-am-gateway",
+		"deployment": "wso2-gateway",
 	}
 	gatewayports := getGatewaySpecificSvcPorts()
 	//servType := "ClusterIP"
@@ -105,7 +105,7 @@ func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 //KeyManagerService is for handling key manager service...
 func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-2-km",
+		"deployment": "wso2-km",
 	}
 	keymanagerports := getKeyManagerSpecificSvcPorts()
 	///servType := "ClusterIP"
@@ -129,7 +129,7 @@ func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 // DashboardService for handling analytics-dashboard service...
 func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-2-am-analytics-dashboard",
+		"deployment": "wso2-analytics-dashboard",
 	}
 	//servType := ""
 	//dashports := []corev1.ServicePort{}
@@ -167,7 +167,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 //WorkerService is for handling analytics-worker service
 func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-2-analytics-worker",
+		"deployment": "wso2-analytics-worker",
 	}
 	workerports := getWorkerPorts()
 	//servType := "ClusterIP"

@@ -89,7 +89,7 @@ data:
     type = "loadbalance"
 
     [apim.analytics]
-    enable = "$env{ALLOW_ANALYTICS}"
+    enable = "$env{ENABLE_ANALYTICS}"
     username= "$ref{super_admin.username}"
     password= "$ref{super_admin.password}"
     store_api_url = "https://wso2-am-analytics-worker-svc:7444"
