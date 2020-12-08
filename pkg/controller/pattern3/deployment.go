@@ -356,8 +356,8 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 								},
 								{
 									Name:  "PROFILE_NAME",
-									Value: "api-publisher"
-								}
+									Value: "api-publisher",
+								},
 							},
 							VolumeMounts: pub2VolumeMount,
 						},
@@ -524,8 +524,8 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 								},
 								{
 									Name:  "PROFILE_NAME",
-									Value: "api-devportal"
-								}
+									Value: "api-devportal",
+								},
 							},
 							VolumeMounts: dev1VolumeMount,
 						},
@@ -692,8 +692,8 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 								},
 								{
 									Name:  "PROFILE_NAME",
-									Value: "api-devportal"
-								}
+									Value: "api-devportal",
+								},
 							},
 							VolumeMounts: dev2VolumeMount,
 						},
@@ -1263,7 +1263,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
 							SecurityContext: dashboardSecurityContext,
 							Ports:           dashdeployports,
-							VolumeMounts: dashVolumeMount,
+							VolumeMounts:    dashVolumeMount,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
