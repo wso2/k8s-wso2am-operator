@@ -595,6 +595,130 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 
 }
 
+// AssignApimTrafficManagerConfigMapValues is to assign config-map values...
+func AssignApimTrafficManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
+
+	ControlConfigData := configMap.Data
+
+	imagePullSecret := ControlConfigData["image-pull-secret-name"]
+	serviceAccountName := ControlConfigData["service-account-name"]
+
+	apimVersion := ControlConfigData["api-manager-version"]
+	securityContext := ControlConfigData["apim-deployment-securityContext"]
+	replicas, _ := strconv.ParseInt(ControlConfigData["p3-apim-tm-deployment-replicas"], 10, 32)
+	amImages := ControlConfigData["p3-apim-deployment-image"]
+	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
+	reqCPU := resource.MustParse(ControlConfigData["p3-apim-deployment-resources-requests-cpu"])
+	reqMem := resource.MustParse(ControlConfigData["p3-apim-deployment-resources-requests-memory"])
+	limitCPU := resource.MustParse(ControlConfigData["p3-apim-deployment-resources-limits-cpu"])
+	limitMem := resource.MustParse(ControlConfigData["p3-apim-deployment-resources-limits-memory"])
+	liveDelay, _ := strconv.ParseInt(ControlConfigData["p3-apim-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
+	livePeriod, _ := strconv.ParseInt(ControlConfigData["p3-apim-deployment-livenessProbe-periodSeconds"], 10, 32)
+	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-failureThreshold"], 10, 32)
+	readyDelay, _ := strconv.ParseInt(ControlConfigData["p3-apim-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
+	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p3-apim-deployment-readinessProbe-periodSeconds"], 10, 32)
+	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
+	memXmx := ControlConfigData["p3-apim-deployment-resources-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["p3-apim-deployment-resources-jvm-heap-memory-xms"]
+	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
+
+	totalProfiles := len(apimanager.Spec.Profiles)
+
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "traffic-manager" {
+
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if *replicasFromYaml != 0 {
+			replicas = int64(*replicasFromYaml)
+		}
+
+		imagePullFromYaml := apimanager.Spec.Profiles[num].Deployment.ImagePullPolicy
+		if imagePullFromYaml != "" {
+			imagePull = imagePullFromYaml
+		}
+
+		reqCPUFromYaml, _ := resource.ParseQuantity(apimanager.Spec.Profiles[num].Deployment.Resources.Requests.CPU)
+		lenreqcpu, _ := len(apimanager.Spec.Profiles[num].Deployment.Resources.Requests.CPU), ""
+		if lenreqcpu != 0 {
+			reqCPU = reqCPUFromYaml
+		}
+
+		reqMemFromYaml, _ := resource.ParseQuantity(apimanager.Spec.Profiles[num].Deployment.Resources.Requests.Memory)
+		lenreqmem, _ := len(apimanager.Spec.Profiles[num].Deployment.Resources.Requests.Memory), ""
+		if lenreqmem != 0 {
+			reqMem = reqMemFromYaml
+		}
+
+		limitCPUFromYaml, _ := resource.ParseQuantity(apimanager.Spec.Profiles[num].Deployment.Resources.Limits.CPU)
+		lenlimcpu, _ := len(apimanager.Spec.Profiles[num].Deployment.Resources.Limits.CPU), ""
+		if lenlimcpu != 0 {
+			limitCPU = limitCPUFromYaml
+		}
+
+		limitMemFromYaml, _ := resource.ParseQuantity(apimanager.Spec.Profiles[num].Deployment.Resources.Limits.Memory)
+		lenlimmem, _ := len(apimanager.Spec.Profiles[num].Deployment.Resources.Limits.Memory), ""
+		if lenlimmem != 0 {
+			limitMem = limitMemFromYaml
+		}
+
+		liveDelayFromYaml := apimanager.Spec.Profiles[num].Deployment.LivenessProbe.InitialDelaySeconds
+		if liveDelayFromYaml != 0 {
+			liveDelay = int64(liveDelayFromYaml)
+		}
+		livePeriodFromYaml := apimanager.Spec.Profiles[num].Deployment.LivenessProbe.PeriodSeconds
+		if livePeriodFromYaml != 0 {
+			livePeriod = int64(livePeriodFromYaml)
+		}
+
+		liveThresFromYaml := apimanager.Spec.Profiles[num].Deployment.LivenessProbe.FailureThreshold
+		if liveThresFromYaml != 0 {
+			liveThres = int64(liveThresFromYaml)
+		}
+
+		readyDelayFromYaml := apimanager.Spec.Profiles[num].Deployment.ReadinessProbe.InitialDelaySeconds
+		if readyDelayFromYaml != 0 {
+			readyDelay = int64(readyDelayFromYaml)
+		}
+
+		readyPeriodFromYaml := apimanager.Spec.Profiles[num].Deployment.ReadinessProbe.PeriodSeconds
+		if readyPeriodFromYaml != 0 {
+			readyPeriod = int64(readyPeriodFromYaml)
+		}
+
+		readyThresFromYaml := apimanager.Spec.Profiles[num].Deployment.ReadinessProbe.FailureThreshold
+		if readyThresFromYaml != 0 {
+			readyThres = int64(readyThresFromYaml)
+		}
+
+		securityContextFromYaml := apimanager.Spec.Profiles[num].Deployment.SecurityContext
+		if securityContextFromYaml != "" {
+			securityContext = securityContextFromYaml
+		}
+	}
+
+	cmvalues := &configvalues{
+		Livedelay:          int32(liveDelay),
+		Liveperiod:         int32(livePeriod),
+		Livethres:          int32(liveThres),
+		Readydelay:         int32(readyDelay),
+		Readyperiod:        int32(readyPeriod),
+		Readythres:         int32(readyThres),
+		Imagepull:          imagePull,
+		Image:              amImages,
+		Reqcpu:             reqCPU,
+		Reqmem:             reqMem,
+		Limitcpu:           limitCPU,
+		Limitmem:           limitMem,
+		APIMVersion:        apimVersion,
+		Replicas:           int32(replicas),
+		ImagePullSecret:    imagePullSecret,
+		ServiceAccountName: serviceAccountName,
+		SecurityContext:    securityContext,
+		JvmMemOpts:         memOpts,
+	}
+	return cmvalues
+
+}
+
 func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
 	ControlConfigData := configMap.Data
