@@ -58,11 +58,11 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 
 	klog.Info(pubDevTm1VolumeMount)
 
-	// cmdstring := []string{
-	// 	"/bin/sh",
-	// 	"-c",
-	// 	"nc -z 9443",
-	// }
+	cmdstring := []string{
+		"/bin/sh",
+		"-c",
+		"nc -z 9443",
+	}
 
 	initContainers := []corev1.Container{}
 
@@ -108,16 +108,6 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 			MinReadySeconds: x.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RecreateDeploymentStrategyType),
-				// RollingUpdate: &appsv1.RollingUpdateDeployment{
-				// 	MaxSurge: &intstr.IntOrString{
-				// 		Type:   intstr.Int,
-				// 		IntVal: x.Maxsurge,
-				// 	},
-				// 	MaxUnavailable: &intstr.IntOrString{
-				// 		Type:   intstr.Int,
-				// 		IntVal: x.Maxunavail,
-				// 	},
-				// },
 			},
 
 			Selector: &metav1.LabelSelector{
@@ -133,27 +123,27 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 						{
 							Name:  "wso2-pattern-2-am-1",
 							Image: x.Image,
-							// LivenessProbe: &corev1.Probe{
-							// 	InitialDelaySeconds: x.Livedelay,
-							// 	Handler: corev1.Handler{
-							// 		Exec: &corev1.ExecAction{
-							// 			Command: cmdstring,
-							// 		},
-							// 	},
-							// 	PeriodSeconds:       x.Liveperiod,
-							// 	FailureThreshold:    x.Livethres,
-							// },
-							// ReadinessProbe: &corev1.Probe{
-							// 	InitialDelaySeconds: x.Readydelay,
-							// 	Handler: corev1.Handler{
-							// 		Exec: &corev1.ExecAction{
-							// 			Command: cmdstring,
-							// 		},
-							// 	},
+							LivenessProbe: &corev1.Probe{
+								InitialDelaySeconds: x.Livedelay,
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
+									},
+								},
+								PeriodSeconds:    x.Liveperiod,
+								FailureThreshold: x.Livethres,
+							},
+							ReadinessProbe: &corev1.Probe{
+								InitialDelaySeconds: x.Readydelay,
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
+									},
+								},
 
-							// 	PeriodSeconds:       x.Readyperiod,
-							// 	FailureThreshold:    x.Readythres,
-							// },
+								PeriodSeconds:    x.Readyperiod,
+								FailureThreshold: x.Readythres,
+							},
 
 							Lifecycle: &corev1.Lifecycle{
 								PreStop: &corev1.Handler{
@@ -233,11 +223,11 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		"node":       "wso2am-pattern-2-am-2",
 	}
 
-	// cmdstring := []string{
-	// 	"/bin/sh",
-	// 	"-c",
-	// 	"nc -z localhost 9443",
-	// }
+	cmdstring := []string{
+		"/bin/sh",
+		"-c",
+		"nc -z localhost 9443",
+	}
 
 	initContainers := []corev1.Container{}
 
@@ -283,16 +273,6 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 			MinReadySeconds: z.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RecreateDeploymentStrategyType),
-				// RollingUpdate: &appsv1.RollingUpdateDeployment{
-				// 	MaxSurge: &intstr.IntOrString{
-				// 		Type:   intstr.Int,
-				// 		IntVal: z.Maxsurge,
-				// 	},
-				// 	MaxUnavailable: &intstr.IntOrString{
-				// 		Type:   intstr.Int,
-				// 		IntVal: z.Maxunavail,
-				// 	},
-				// },
 			},
 
 			Selector: &metav1.LabelSelector{
@@ -308,26 +288,26 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 						{
 							Name:  "wso2-pattern-2-am-2",
 							Image: z.Image,
-							// LivenessProbe: &corev1.Probe{
-							// 	Handler: corev1.Handler{
-							// 		Exec: &corev1.ExecAction{
-							// 			Command: cmdstring,
-							// 		},
-							// 	},
-							// 	InitialDelaySeconds: z.Livedelay,
-							// 	PeriodSeconds:       z.Liveperiod,
-							// 	FailureThreshold:    z.Livethres,
-							// },
-							// ReadinessProbe: &corev1.Probe{
-							// 	Handler: corev1.Handler{
-							// 		Exec: &corev1.ExecAction{
-							// 			Command: cmdstring,
-							// 		},
-							// 	},
-							// 	InitialDelaySeconds: z.Readydelay,
-							// 	PeriodSeconds:       z.Readyperiod,
-							// 	FailureThreshold:    z.Readythres,
-							// },
+							LivenessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
+									},
+								},
+								InitialDelaySeconds: z.Livedelay,
+								PeriodSeconds:       z.Liveperiod,
+								FailureThreshold:    z.Livethres,
+							},
+							ReadinessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: cmdstring,
+									},
+								},
+								InitialDelaySeconds: z.Readydelay,
+								PeriodSeconds:       z.Readyperiod,
+								FailureThreshold:    z.Readythres,
+							},
 
 							Lifecycle: &corev1.Lifecycle{
 								PreStop: &corev1.Handler{
