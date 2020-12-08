@@ -22,6 +22,6 @@ package pattern3
 
 const (
 	deploymentKind  = "Deployment"
-	depApiVersion   = "apps/v1"
+	depAPIVersion   = "apps/v1"
 	statefulsetKind = "StatefulSet"
 )

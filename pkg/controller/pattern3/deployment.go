@@ -52,8 +52,8 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 		"deployment": "wso2-am-pubisher",
 	}
 
-	pub1VolumeMount, pub1Volume := getDevPubTm1Volumes(apimanager, num)
-	pub1deployports := getPubDevTmContainerPorts()
+	pub1VolumeMount, pub1Volume := getPub1Volumes(apimanager, num)
+	pub1deployports := getPubContainerPorts()
 
 	klog.Info(pub1VolumeMount)
 
@@ -165,7 +165,7 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 									corev1.ResourceMemory: x.Limitmem,
 								},
 							},
-							SecurityContext: pubDev1SecurityContext,
+							SecurityContext: pub1SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 							Ports:           pub1deployports,
 							Env: []corev1.EnvVar{
@@ -219,8 +219,8 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	pub2VolumeMount, pub2Volume := getDevPubTm2Volumes(apimanager, num)
-	pub2deployports := getPubDevTmContainerPorts()
+	pub2VolumeMount, pub2Volume := getPub2Volumes(apimanager, num)
+	pub2deployports := getPubContainerPorts()
 
 	labels := map[string]string{
 		"deployment": "wso2-am-publisher",
@@ -235,7 +235,7 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 	initContainers := []corev1.Container{}
 
 	if useMysql {
-		initContainers = getMysqlInitContainers(apimanager, &pubDevTm2Volume, &pubDevTm2VolumeMount)
+		initContainers = getMysqlInitContainers(apimanager, &pub2Volume, &pub2VolumeMount)
 	}
 
 	if enableAnalytics {
@@ -387,8 +387,8 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	dev1VolumeMount, dev1Volume := getDevPubTm2Volumes(apimanager, num)
-	dev1deployports := getPubDevTmContainerPorts()
+	dev1VolumeMount, dev1Volume := getDev1Volumes(apimanager, num)
+	dev1deployports := getDevportalContainerPorts()
 
 	labels := map[string]string{
 		"deployment": "wso2-am-devportal",
@@ -403,7 +403,7 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	initContainers := []corev1.Container{}
 
 	if useMysql {
-		initContainers = getMysqlInitContainers(apimanager, &pubDevTm2Volume, &pubDevTm2VolumeMount)
+		initContainers = getMysqlInitContainers(apimanager, &dev1Volume, &dev1VolumeMount)
 	}
 
 	if enableAnalytics {
@@ -415,16 +415,7 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	dev1SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
-	AssignSecurityContext(securityContextString, pub2SecurityContext)
-
-	// Checking for the availability of API Manager Server 1 deployment
-
-	// apim1InitContainer := corev1.Container{}
-	// apim1InitContainer.Name = "init-apim-1"
-	// apim1InitContainer.Image = "busybox:1.32"
-	// executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
-	// apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
-	//initContainers = append(initContainers, apim1InitContainer)
+	AssignSecurityContext(securityContextString, dev1SecurityContext)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -555,8 +546,8 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	dev2VolumeMount, dev2Volume := getDevPubTm2Volumes(apimanager, num)
-	dev2deployports := getPubDevTmContainerPorts()
+	dev2VolumeMount, dev2Volume := getDev2Volumes(apimanager, num)
+	dev2deployports := getDevportalContainerPorts()
 
 	labels := map[string]string{
 		"deployment": "wso2-am-devportal",
@@ -571,7 +562,7 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	initContainers := []corev1.Container{}
 
 	if useMysql {
-		initContainers = getMysqlInitContainers(apimanager, &pubDevTm2Volume, &pubDevTm2VolumeMount)
+		initContainers = getMysqlInitContainers(apimanager, &dev2Volume, &dev2VolumeMount)
 	}
 
 	if enableAnalytics {
@@ -713,16 +704,12 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 
 //gateway deployment
 func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.Deployment {
-	useMysql := true
 	enableAnalytics := true
-	if apimanager.Spec.UseMysql != "" {
-		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
-	}
 	if apimanager.Spec.EnableAnalytics != "" {
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	gatewayVolumeMount, gatewayVolume := getgatewayVolumes(apimanager, num)
+	gatewayVolumeMount, gatewayVolume := getGatewayVolumes(apimanager, num)
 	gatewaydeployports := getGatewayContainerPorts()
 
 	labels := map[string]string{
@@ -1023,12 +1010,12 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 		"nc -z localhost 9443",
 	}
 
-	initContainers := getMysqlInitContainers(apimanager, &kmVolume, &kmVolumeMount)
+	initContainers := getMysqlInitContainers(apimanager, &tmVolume, &tmVolumeMount)
 
 	tmSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
-	AssignSecurityContext(securityContextString, keyManagerSecurityContext)
+	AssignSecurityContext(securityContextString, tmSecurityContext)
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -1036,7 +1023,7 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 			Kind:       statefulsetKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-km-statefulset-" + apimanager.Name,
+			Name:      "wso2-am-tm-statefulset",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -1045,7 +1032,7 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 
 		Spec: appsv1.StatefulSetSpec{
 			Replicas:    apimanager.Spec.Replicas,
-			ServiceName: "wso2-am-km-svc",
+			ServiceName: "wso2-am-tm-svc",
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},

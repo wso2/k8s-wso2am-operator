@@ -107,7 +107,7 @@ func TrafficManagerHeadlessService(apimanager *apimv1alpha1.APIManager) *corev1.
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-tm-headless-sc",
+			Name:      "wso2-am-tm-headless-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),

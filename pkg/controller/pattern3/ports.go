@@ -79,7 +79,7 @@ func getTrafficManagerSpecificSvcPorts() []corev1.ServicePort {
 }
 
 func getPubCommonSvcPorts() []corev1.ServicePort {
-	var puborts []corev1.ServicePort
+	var pubPorts []corev1.ServicePort
 	pubPorts = append(pubPorts, corev1.ServicePort{
 		Name:       "servlet-https",
 		Protocol:   corev1.ProtocolTCP,
@@ -122,9 +122,9 @@ func getWorkerPorts() []corev1.ServicePort {
 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7612},
 	})
 	workerPorts = append(workerPorts, corev1.ServicePort{
-		Name:       "thrift",
+		Name:       "rest-api-port-1",
 		Protocol:   corev1.ProtocolTCP,
-		Port:       7612,
+		Port:       7444,
 		TargetPort: intstr.IntOrString{Type: intstr.Int, IntVal: 7612},
 	})
 	return workerPorts
@@ -181,7 +181,7 @@ func getPubContainerPorts() []corev1.ContainerPort {
 	return pubdeployports
 }
 
-func getDevContainerPorts() []corev1.ContainerPort {
+func getDevportalContainerPorts() []corev1.ContainerPort {
 	var devdeployports []corev1.ContainerPort
 	devdeployports = append(devdeployports, corev1.ContainerPort{
 		ContainerPort: 9763,

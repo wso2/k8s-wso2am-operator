@@ -88,7 +88,8 @@ data:
   p3-apim-km-deployment-replicas: "2"
 
   # pattern specific configs for apim-keymanager
-  p3-apim-tm-deployment-config: "2"
+  p3-apim-tm-deployment-config: ""
+  p3-apim-tm-deployment-replicas: "2"
 
   # custom pattern specific configs for apim-instances
   pX-apim-deployment-image: "wso2/wso2am:3.2.0"

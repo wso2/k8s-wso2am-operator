@@ -103,6 +103,7 @@ func getInitContainers(containerNames []string, initContainers *[]corev1.Contain
 			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of TM instance one deployment"; while ! nc -z wso2-am-tm-statefulset-0.wso2-am-tm-headless-service 9611; do sleep 1; printf "-"; done; echo -e "  >> TM instance one has started";`}
 		} else if containerName == "init-tm-2" {
 			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of TM instance two deployment"; while ! nc -z wso2-am-tm-statefulset-0.wso2-am-tm-headless-service 9611; do sleep 1; printf "-"; done; echo -e "  >> TM instance two has started";`}
-		*initContainers = append(*initContainers, container)
+			*initContainers = append(*initContainers, container)
+		}
 	}
 }
