@@ -1,0 +1,87 @@
+# Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2-am-tm-conf
+  namespace : wso2-system
+data:
+  deployment.toml: |-
+    [server]
+    #hostname = "wso2-tm"
+    node_ip = "$env{NODE_IP}"
+    server_role = "traffic-manager"
+
+    [user_store]
+    type = "database_unique_id"
+
+    [super_admin]
+    username = "admin"
+    password = "admin"
+    create_admin_account = true
+
+    [database.apim_db]
+    type = "mysql"
+    url = "jdbc:mysql://mysql-svc:3306/WSO2AM_APIMGT_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+    username = "wso2carbon"
+    password = "wso2carbon"
+    driver = "com.mysql.cj.jdbc.Driver"
+
+    [database.shared_db]
+    type = "mysql"
+    url = "jdbc:mysql://mysql-svc:3306/WSO2AM_SHARED_DB?useSSL=false&amp;autoReconnect=true&amp;requireSSL=false&amp;verifyServerCertificate=false"
+    username = "wso2carbon"
+    password = "wso2carbon"
+    driver = "com.mysql.cj.jdbc.Driver"
+
+    [apim.sync_runtime_artifacts.publisher]
+    artifact_saver = "DBSaver"
+    publish_directly_to_gateway = "true"
+
+    [apim.sync_runtime_artifacts.gateway]
+    gateway_labels =["Production and Sandbox","Label1","Label2"]
+    artifact_retriever = "DBRetriever"
+    deployment_retry_duration = 15000
+    data_retrieval_mode = "sync"
+    event_waiting_time = 5000
+
+    [apim.event_hub]
+    enable = true
+    service_url = "https://traffic-manager:9443" 
+
+    [keystore.tls]
+    file_name =  "wso2carbon.jks"
+    type =  "JKS"
+    password =  "wso2carbon"
+    alias =  "wso2carbon"
+    key_password =  "wso2carbon"
+
+    [truststore]
+    file_name = "client-truststore.jks"
+    type = "JKS"
+    password = "wso2carbon"
+
+    # key manager implementation
+    [apim.key_manager]
+    service_url = "https://wso2-km-svc:9443/services/"
+
+    [apim.oauth_config]
+    revoke_endpoint = "https://wso2-km-svc:9443/oauth2/revoke"
+    enable_token_encryption = false
+    enable_token_hashing = false
+
+    [apim.throttling]
+    event_duplicate_url = ["tcp://wso2-am-tm-statefulset-TM_INDEX.wso2-am-tm-headless-svc:5672"]
+ 
