@@ -17,7 +17,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2am-p2-mysql-dbscripts
+  name: wso2am-p1-mysql-dbscripts
   namespace: wso2-system
 data:
   init.sql: |
@@ -43,15 +43,15 @@ data:
 
     CREATE USER IF NOT EXISTS 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
 
-    GRANT ALL ON DASHBOARD_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
-    GRANT ALL ON WSO2AM_APIMGT_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
-    GRANT ALL ON APIM_ANALYTICS_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
-    GRANT ALL ON PERMISSION_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
-    GRANT ALL ON GEO_LOCATION_DATA.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
-    GRANT ALL ON BUSINESS_RULES_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
-    GRANT ALL ON WSO2AM_SHARED_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
-    GRANT ALL ON WSO2_CLUSTER_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
-    GRANT ALL ON PERSISTENCE_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON DASHBOARD_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON WSO2AM_APIMGT_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON APIM_ANALYTICS_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON PERMISSION_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON GEO_LOCATION_DATA.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON BUSINESS_RULES_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON WSO2AM_SHARED_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON WSO2_CLUSTER_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
+    GRANT ALL PRIVILEGES ON PERSISTENCE_DB.* TO 'wso2carbon'@'%' IDENTIFIED BY 'wso2carbon';
 
     USE APIM_ANALYTICS_DB;
 
