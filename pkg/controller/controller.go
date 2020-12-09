@@ -2291,7 +2291,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Pub Ingress")
+	klog.Info("Dev Ingress")
 	// Get ingress name using hardcoded value
 	devIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(devIngressName)
 	// If resource doesn't exist, we'll create it
