@@ -69,7 +69,7 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 		initContainers = getMysqlInitContainers(apimanager, &pub1Volume, &pub1VolumeMount)
 	}
 
-	klog.Info("PubDevTm-1 Containers Done")
+	klog.Info("Pub-1 Containers Done")
 
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
@@ -891,7 +891,7 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 			Kind:       statefulsetKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-km-statefulset-" + apimanager.Name,
+			Name:      "wso2-am-km-statefulset",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),

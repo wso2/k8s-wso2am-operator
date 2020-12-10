@@ -1893,7 +1893,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	//pubserviceName := "wso2-am-publisher-svc"
 	// pubDevTm2serviceName := "wso2-am-2-svc"
 	pubcommonserviceName := "wso2-am-publisher-svc"
-	kmdeploymentName := "wso2-am-km-statefulset-" + apimanager.Name
+	kmdeploymentName := "wso2-am-km-statefulset"
 	kmserviceName := "wso2-am-km-svc"
 	gwdeploymentName := "wso2-am-gateway-deployment-" + apimanager.Name
 	gwserviceName := "wso2-am-gw-svc"
@@ -1978,7 +1978,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		pubConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, pubConfWso2))
 		klog.Error("Pub Error: ", err)
 		if err != nil {
-			fmt.Println("Creating Pub-Dev-Tm-1 configmap in user specified ns", pubConfUser)
+			fmt.Println("Creating Pub-1 configmap in user specified ns", pubConfUser)
 
 		}
 	}
