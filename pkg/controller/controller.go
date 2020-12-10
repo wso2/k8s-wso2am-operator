@@ -1956,9 +1956,9 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	klog.Info("MYSQL config")
 	// mysql configurations
-	mysqlDbConfName := "wso2am-p2-mysql-dbscripts"
+	mysqlDbConfName := "wso2am-p3-mysql-dbscripts"
 	mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
-	mysqlDbConfUserName := "wso2am-p2-mysql-dbscripts-" + apimanager.Name
+	mysqlDbConfUserName := "wso2am-p3-mysql-dbscripts-" + apimanager.Name
 	mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfUserName)
 	if useMysqlPod {
 		if errors.IsNotFound(err) {

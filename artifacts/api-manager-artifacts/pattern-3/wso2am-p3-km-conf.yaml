@@ -46,21 +46,6 @@ data:
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
 
-    [apim.sync_runtime_artifacts.publisher]
-    artifact_saver = "DBSaver"
-    publish_directly_to_gateway = "true"
-
-    [apim.sync_runtime_artifacts.gateway]
-    gateway_labels =["Production and Sandbox","Label1","Label2"]
-    artifact_retriever = "DBRetriever"
-    deployment_retry_duration = 15000
-    data_retrieval_mode = "sync"
-    event_waiting_time = 5000
-
-    [apim.event_hub]
-    enable = true
-    service_url = "https://traffic-manager:9443" 
-
     [keystore.tls]
     file_name =  "wso2carbon.jks"
     type =  "JKS"
@@ -114,4 +99,3 @@ data:
     [[apim.event_hub.publish.url_group]]
     urls = ["tcp://wso2-am-tm-statefulset-1.wso2-am-tm-headless-svc:9611"]
     auth_urls = ["ssl://wso2-am-tm-statefulset-1.wso2-am-tm-headless-svc:9711"]
-  {{- end }}

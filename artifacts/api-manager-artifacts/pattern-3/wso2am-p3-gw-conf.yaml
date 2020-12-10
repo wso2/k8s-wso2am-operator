@@ -16,7 +16,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: wso2-am-gateway-conf
-  namespace : {wso2-system
+  namespace : wso2-system
 data:
   deployment.toml: |-
     [server]
@@ -38,20 +38,12 @@ data:
     username = "wso2carbon"
     password = "wso2carbon"
 
-    [apim.sync_runtime_artifacts.publisher]
-    artifact_saver = "DBSaver"
-    publish_directly_to_gateway = "true"
-
     [apim.sync_runtime_artifacts.gateway]
     gateway_labels =["Production and Sandbox","Label1","Label2"]
     artifact_retriever = "DBRetriever"
     deployment_retry_duration = 15000
     data_retrieval_mode = "sync"
     event_waiting_time = 5000
-
-    [apim.event_hub]
-    enable = true
-    service_url = "https://traffic-manager:9443" 
 
     [keystore.tls]
     file_name =  "wso2carbon.jks"

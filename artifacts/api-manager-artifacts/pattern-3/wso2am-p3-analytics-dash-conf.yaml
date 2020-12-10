@@ -16,7 +16,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: wso2-am-analytics-dashboard-conf
-  namespace : {wso2-system
+  namespace : wso2-system
 data:
   deployment.yaml: |-
     ################################################################################
@@ -294,7 +294,7 @@ data:
         definition:
           type: RDBMS
           configuration:
-            jdbcUrl: 'jdbc:mysql://wso2am-mysql-svc:3306/PERMISSIONS_DB?useSSL=false'
+            jdbcUrl: 'jdbc:mysql://wso2am-mysql-svc:3306/PERMISSION_DB?useSSL=false'
             username: wso2carbon
             password: wso2carbon
             driverClassName: com.mysql.cj.jdbc.Driver
