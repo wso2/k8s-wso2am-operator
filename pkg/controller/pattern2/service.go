@@ -35,7 +35,6 @@ func PubDevTm1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 
 	pubdevtm1ports := getPubDevTmSpecificSvcPorts()
-	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -47,8 +46,7 @@ func PubDevTm1Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			// Type:     corev1.ServiceType(servType),
-			Ports: pubdevtm1ports,
+			Ports:    pubdevtm1ports,
 		},
 	}
 }
@@ -60,7 +58,6 @@ func PubDevTm2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"node":       "wso2am-pattern-2-am-2",
 	}
 	pubdevtm2ports := getPubDevTmSpecificSvcPorts()
-	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -72,8 +69,7 @@ func PubDevTm2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			// Type:     corev1.ServiceType(servType),
-			Ports: pubdevtm2ports,
+			Ports:    pubdevtm2ports,
 		},
 	}
 }
@@ -84,7 +80,6 @@ func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2-gateway",
 	}
 	gatewayports := getGatewaySpecificSvcPorts()
-	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -96,8 +91,7 @@ func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			// Type:     corev1.ServiceType(servType),
-			Ports: gatewayports,
+			Ports:    gatewayports,
 		},
 	}
 }
@@ -108,7 +102,6 @@ func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2-km",
 	}
 	keymanagerports := getKeyManagerSpecificSvcPorts()
-	///servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -120,8 +113,7 @@ func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			// Type:     corev1.ServiceType(servType),
-			Ports: keymanagerports,
+			Ports:    keymanagerports,
 		},
 	}
 }
@@ -131,22 +123,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2-analytics-dashboard",
 	}
-	//servType := ""
-	//dashports := []corev1.ServicePort{}
 	dashports := getDashBoardPorts()
-	// if apimanager.Spec.Service.Type == "NodePort" {
-	// 	dashports = getDashBoardNPPorts()
-	// 	servType = "NodePort"
-	// } else if apimanager.Spec.Service.Type == "LoadBalancer" {
-	// 	dashports = getDashBoardPorts()
-	// 	servType = "LoadBalancer"
-	// } else if apimanager.Spec.Service.Type == "ClusterIP" {
-	// 	dashports = getDashBoardPorts()
-	// 	servType = "ClusterIP"
-	// } else {
-	// 	dashports = getDashBoardPorts()
-	// 	servType = "ClusterIP"
-	// }
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -158,8 +135,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			//Type:     corev1.ServiceType(servType),
-			Ports: dashports,
+			Ports:    dashports,
 		},
 	}
 }
@@ -170,7 +146,6 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2-analytics-worker",
 	}
 	workerports := getWorkerPorts()
-	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -182,8 +157,7 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			//Type:     corev1.ServiceType(servType),
-			Ports: workerports,
+			Ports:    workerports,
 		},
 	}
 }
@@ -231,22 +205,6 @@ func PubDevTmCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service 
 
 	pubdevtmcommonsvsports := getPubDevTmCommonSvcPorts()
 
-	//pubdevtmcommonsvsports := []corev1.ServicePort{}
-	//servType := ""
-	// if apimanager.Spec.Service.Type == "NodePort" {
-	// 	pubdevtmcommonsvsports = getPubDevTmCommonSvcNPorts()
-	// 	servType = "NodePort"
-	// } else if apimanager.Spec.Service.Type == "LoadBalancer" {
-	// 	pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
-	// 	servType = "LoadBalancer"
-	// } else if apimanager.Spec.Service.Type == "ClusterIP" {
-	// 	pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
-	// 	servType = "ClusterIP"
-	// } else {
-	// 	pubdevtmcommonsvsports = getPubDevTmCommonSvcPorts()
-	// 	servType = "ClusterIP"
-	// }
-
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "wso2-am-svc",
@@ -257,8 +215,7 @@ func PubDevTmCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service 
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			//Type:     corev1.ServiceType(servType),
-			Ports: pubdevtmcommonsvsports,
+			Ports:    pubdevtmcommonsvsports,
 		},
 	}
 }

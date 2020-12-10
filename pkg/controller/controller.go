@@ -1242,13 +1242,12 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	workerServiceName := "wso2-am-analytics-worker-svc"
 	workerhlServiceName := "wso2-am-analytics-worker-headless-svc"
 
-	//mysqlPVCName := "wso2am-mysql"
-
 	pubDevTmIngressName := "wso2-am-ingress"
 	gatewayIngressName := "wso2-am-gw-ingress"
 	dashIngressName := "wso2-am-analytics-dashboard-ingress"
 
 	klog.Info("Started Config Creating for Pattern-2")
+
 	// dashboard configurations
 
 	if enableAnalytics {
@@ -1259,9 +1258,10 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		dashConfUserName := "wso2am-p2-analytics-dash-conf-" + apimanager.Name
 		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
 		klog.Info("Config Phase 2: OK")
-		klog.Error("Config Phase 2 Error", err)
+		klog.Error("Config Phase 2 Error: ", err)
 		if errors.IsNotFound(err) {
 			dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashConfWso2))
+			klog.Error("Dash Conf Error: ", err)
 			if err != nil {
 				fmt.Println("Creating dashboard configmap in user specified ns", dashConfUser)
 			}
@@ -1298,21 +1298,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			}
 		}
 	}
-
-	// mysql configurations
-	// mysqlDbExecName := "wso2am-p2-mysql-exec"
-	// mysqlDbExecWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbExecName)
-	// klog.Error("MySQL Error: ", err)
-	// mysqlDbExecUserName := "wso2am-p2-mysql-exec-" + apimanager.Name
-	// mysqlDbExecUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbExecUserName)
-	// if useMysqlPod {
-	// 	if errors.IsNotFound(err) {
-	// 		mysqlDbExecUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, mysqlDbExecWso2))
-	// 		if err != nil {
-	// 			fmt.Println("Creating mysql exec configmap in user specified ns", mysqlDbExecUser)
-	// 		}
-	// 	}
-	// }
 
 	klog.Info("Pub-Dev-Tm-1 Config")
 	pubDevTm1ConfName := "wso2am-p2-am-1-conf"
@@ -1389,18 +1374,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	//pvcConfName := "pvc-config"
-	//pvcConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pvcConfName)
-
-	// Get mysql-pvc name using hardcoded value
-	//pvc3, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(mysqlPVCName)
-
-	// // If the resource doesn't exist, we'll create it
-	// if errors.IsNotFound(err) && useMysqlPod {
-	// 	sqlconf := mysql.AssignConfigMapValuesForMysqlPvc(apimanager, pvcConfWso2)
-	// 	pvc3, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(mysql.MakeMysqlPvc(apimanager, sqlconf))
-	// }
-
 	// Parse the object and look for it’s deployment
 	// Use a Lister to find the deployment object referred to in the Apimanager resource
 	// Get apim instance 1 deployment name using hardcoded value
@@ -1438,46 +1411,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			}
 		}
 	}
-
-	// if totalProfiles > 0 && apimanager.Spec.Profiles[pubDevTm1num].Name == "api-pub-dev-tm-1" {
-	// 	synapseConfFromYaml := apimanager.Spec.Profiles[pubDevTm1num].Deployment.PersistentVolumeClaim.SynapseConfigs
-	// 	if synapseConfFromYaml != "" {
-	// 		synapseConfigsPVCName = synapseConfFromYaml
-	// 	}
-	// 	execPlanFromYaml := apimanager.Spec.Profiles[pubDevTm1num].Deployment.PersistentVolumeClaim.ExecutionPlans
-	// 	if execPlanFromYaml != "" {
-	// 		executionPlanPVCName = execPlanFromYaml
-	// 	}
-	// }
-
-	// if totalProfiles > 0 && apimanager.Spec.Profiles[pubDevTm2num].Name == "api-pub-dev-tm-2" {
-	// 	synapseConfFromYaml := apimanager.Spec.Profiles[pubDevTm2num].Deployment.PersistentVolumeClaim.SynapseConfigs
-	// 	if synapseConfFromYaml != "" {
-	// 		synapseConfigsPVCName = synapseConfFromYaml
-	// 	}
-	// 	execPlanFromYaml := apimanager.Spec.Profiles[pubDevTm2num].Deployment.PersistentVolumeClaim.ExecutionPlans
-	// 	if execPlanFromYaml != "" {
-	// 		executionPlanPVCName = execPlanFromYaml
-	// 	}
-	// }
-
-	// Get synapse-configs-pvc name using hardcoded value
-	//pvc1, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(synapseConfigsPVCName)
-
-	// If the resource doesn't exist, we'll create it
-	// if errors.IsNotFound(err) {
-	// 	sconf := pattern1.AssignConfigMapValuesForSynapseConfigsPvc(apimanager, pvcConfWso2)
-	// 	pvc1, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeSynapseConfigsPvc(apimanager, sconf))
-	// }
-
-	// Get execution-plans-pvc name using hardcoded value
-	//pvc2, err := c.persistentVolumeClaimsLister.PersistentVolumeClaims(apimanager.Namespace).Get(executionPlanPVCName)
-
-	// If the resource doesn't exist, we'll create it
-	// if errors.IsNotFound(err) {
-	// 	epconf := pattern1.AssignConfigMapValuesForExecutionPlansPvc(apimanager, pvcConfWso2)
-	// 	pvc2, err = c.kubeclientset.CoreV1().PersistentVolumeClaims(apimanager.Namespace).Create(pattern1.MakeExecutionPlansPvc(apimanager, epconf))
-	// }
 
 	klog.Info("Mysql Depl")
 	// Get mysql deployment name using hardcoded value
@@ -1581,13 +1514,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Worker Headless Service is already available. [Service name] ,", workerhlservice)
 		}
 	}
-
-	// Waiting for Analytics worker nodes
-	// workerdeploymentupdated, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
-	// for workerdeploymentupdated.Status.ReadyReplicas == 0 {
-	// 	time.Sleep(5 * time.Second)
-	// 	workerdeploymentupdated, err = c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
-	// }
 
 	klog.Info("Pub-Dev-Tm-1 Depl")
 	pubDevTm1Deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(pubDevTm1deploymentName)
@@ -1880,31 +1806,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			return fmt.Errorf(msg)
 		}
 	}
-
-	//////// pvc checking
-
-	// If the synapse-config pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	// if !metav1.IsControlledBy(pvc1, apimanager) {
-	// 	msg := fmt.Sprintf("sysnapse-configs pvc %q already exists and is not managed by APIManager", pvc1.Name)
-	// 	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-	// 	return fmt.Errorf(msg)
-	// }
-
-	// If the execution-plan pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	// if !metav1.IsControlledBy(pvc2, apimanager) {
-	// 	msg := fmt.Sprintf("execution-plans pvc %q already exists and is not managed by APIManager", pvc2.Name)
-	// 	c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-	// 	return fmt.Errorf(msg)
-	// }
-
-	// if useMysqlPod {
-	// 	// If the mysql pvc is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-	// 	if !metav1.IsControlledBy(pvc3, apimanager) {
-	// 		msg := fmt.Sprintf("mysql pvc %q already exists and is not managed by APIManager", pvc3.Name)
-	// 		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
-	// 		return fmt.Errorf(msg)
-	// 	}
-	// }
 
 	///////////check replicas are same as defined for deployments
 

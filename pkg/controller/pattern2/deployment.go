@@ -61,7 +61,7 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 	cmdstring := []string{
 		"/bin/sh",
 		"-c",
-		"nc -z 9443",
+		"nc -z localhost 9443",
 	}
 
 	initContainers := []corev1.Container{}
@@ -79,7 +79,6 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 
 	klog.Info("PubDevTm-1 Container Phase 1 Done")
 
-	//initContainers = append(initContainers, getInitContainers([]string{"init-am-analytics-worker"}))
 	pubDev1SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
 
@@ -88,10 +87,6 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 	klog.Info("Ready Delay", x.Readydelay)
 	klog.Info("Live Delay", x.Livedelay)
 	return &appsv1.Deployment{
-		// TypeMeta: metav1.TypeMeta{
-		// 	APIVersion: depApiVersion,
-		// 	Kind:       deploymentKind,
-		// },
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depAPIVersion,
 			Kind:       deploymentKind,
@@ -240,20 +235,10 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		klog.Info("Pub-Dev-Tm-2 Containers", initContainers[1])
 	}
 
-	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers([]string{"init-am-analytics-worker"}))
 	pubDev2SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, pubDev2SecurityContext)
-
-	// Checking for the availability of API Manager Server 1 deployment
-
-	// apim1InitContainer := corev1.Container{}
-	// apim1InitContainer.Name = "init-apim-1"
-	// apim1InitContainer.Image = "busybox:1.32"
-	// executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
-	// apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
-	//initContainers = append(initContainers, apim1InitContainer)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -683,8 +668,6 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	labels := map[string]string{
 		"deployment": "wso2-analytics-dashboard",
 	}
-	//runasuser := int64(802)
-	//defaultMode := int32(0407)
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
@@ -692,8 +675,6 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	if useMysql {
 		initContainers = getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
 	}
-
-	// getInitContainers([]string{"init-am"}, &initContainers)
 
 	dashboardSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
@@ -789,13 +770,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 							ImagePullPolicy: corev1.PullPolicy(y.Imagepull),
 							SecurityContext: dashboardSecurityContext,
 							Ports:           dashdeployports,
-							// Env: []corev1.EnvVar{
-							// 	{
-							// 		Name:  "PROFILE_NAME",
-							// 		Value: "gateway-worker",
-							// 	},
-							// },
-							VolumeMounts: dashVolumeMount,
+							VolumeMounts:    dashVolumeMount,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
@@ -822,7 +797,6 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	labels := map[string]string{
 		"deployment": "wso2-analytics-worker",
 	}
-	//runasuser := int64(802)
 
 	workerContainerPorts := getWorkerContainerPorts()
 	initContainers := []corev1.Container{}
@@ -850,21 +824,6 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 		Spec: appsv1.StatefulSetSpec{
 			Replicas:    apimanager.Spec.Replicas,
 			ServiceName: "wso2-am-analytics-worker-headless-svc",
-			// MinReadySeconds: y.Minreadysec,
-			// Strategy: appsv1.DeploymentStrategy{
-			// 	Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
-			// 	RollingUpdate: &appsv1.RollingUpdateDeployment{
-			// 		MaxSurge: &intstr.IntOrString{
-			// 			Type:   intstr.Int,
-			// 			IntVal: y.Maxsurge,
-			// 		},
-			// 		MaxUnavailable: &intstr.IntOrString{
-			// 			Type:   intstr.Int,
-			// 			IntVal: y.Maxunavail,
-			// 		},
-			// 	},
-			// },
-
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
@@ -876,7 +835,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2am-pattern-1-analytics-worker",
+							Name:  "wso2am-pattern-2-analytics-worker",
 							Image: y.Image,
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{

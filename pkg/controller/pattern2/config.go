@@ -74,8 +74,8 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 	reqMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-memory"])
 	limitCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-cpu"])
 	limitMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-memory"])
-	liveDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livelinessProbe-initialDelaySeconds"], 10, 32)
-	livePeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livelinessProbe-periodSeconds"], 10, 32)
+	liveDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
+	livePeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livenessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-failureThreshold"], 10, 32)
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-readinessProbe-periodSeconds"], 10, 32)
@@ -761,7 +761,7 @@ func AssignMysqlConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *
 
 //MakeConfigMap is to create config-map...
 func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.ConfigMap) *corev1.ConfigMap {
-	// klog.Info("ConfigMap Creating")
+
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
 	}

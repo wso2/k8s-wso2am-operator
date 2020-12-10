@@ -129,7 +129,7 @@ data:
     #expiry_time = "2m"
 
     [apim.analytics]
-    enable = "$env{Enable_ANALYTICS}"
+    enable = "$env{ENABLE_ANALYTICS}"
     store_api_url = "https://wso2-am-analytics-worker-svc:7444"
     #username = "$ref{super_admin.username}"
     #password = "$ref{super_admin.password}"
@@ -300,7 +300,7 @@ data:
     proxyPort = 443
 
     [[apim.event_hub.publish.url_group]]
-    urls = ["tcp://{{ wso2-am-1-svc:9611"]
+    urls = ["tcp://wso2-am-1-svc:9611"]
     auth_urls = ["ssl://wso2-am-1-svc:9711"]
 
     [[apim.event_hub.publish.url_group]]

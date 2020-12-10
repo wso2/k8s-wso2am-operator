@@ -55,7 +55,7 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager, pattern string) *appsv
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2apim-with-analytics-mysql",
-							Image: "benura123/mysql-dock:v5.7",
+							Image: "mysql:5.7",
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec: &corev1.ExecAction{

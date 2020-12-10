@@ -443,7 +443,7 @@ data:
               driverClassName: com.mysql.cj.jdbc.Driver
               idleTimeout: 60000
               isAutoCommit: false
-              jdbcUrl: "jdbc:mysql://mysql-svc:3306/WSO2_PERSISTENCE_DB?useSSL=false"
+              jdbcUrl: "jdbc:mysql://mysql-svc:3306/PERSISTENCE_DB?useSSL=false"
               maxPoolSize: 50
               password: wso2carbon
               username: wso2carbon

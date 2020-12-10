@@ -304,7 +304,7 @@ data:
     do
         $JAVACMD \
         -Xbootclasspath/a:"$CARBON_XBOOTCLASSPATH" \
-        -Xms2048m -Xmx2048 \
+        -Xms2048m -Xmx2048m \
         -XX:+HeapDumpOnOutOfMemoryError \
         -XX:HeapDumpPath="$RUNTIME_HOME/logs/heap-dump.hprof" \
         $JAVA_OPTS \

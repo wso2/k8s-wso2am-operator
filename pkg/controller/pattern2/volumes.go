@@ -28,8 +28,6 @@ import (
 func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
 	deployconfigmap := "wso2am-p2-am-1-conf"
-	//synapseConf := "wso2am-p2-am-synapse-configs"
-	//execPlan := "wso2am-p2-am-execution-plans"
 
 	var devpubtm1volumemounts []corev1.VolumeMount
 	var devpubtm1volume []corev1.Volume
@@ -42,16 +40,6 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 		if deployConfFromYaml != "" {
 			deployconfigmap = deployConfFromYaml
 		}
-
-		// synapseConfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
-		// if synapseConfFromYaml != "" {
-		// 	synapseConf = synapseConfFromYaml
-		// }
-
-		// execPlanFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.ExecutionPlans
-		// if execPlanFromYaml != "" {
-		// 	execPlan = execPlanFromYaml
-		// }
 
 		//for newly created set of configmaps by user
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
@@ -100,18 +88,6 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 		SubPath:   "deployment.toml",
 	})
 
-	//adding default synapseConfigs pvc
-	// devpubtm1volumemounts = append(devpubtm1volumemounts, corev1.VolumeMount{
-	// 	Name:      synapseConf,
-	// 	MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/synapse-configs",
-	// })
-
-	//adding default executionPlans pvc
-	// devpubtm1volumemounts = append(devpubtm1volumemounts, corev1.VolumeMount{
-	// 	Name:      "wso2am-executionplans-storage",
-	// 	MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/executionplans",
-	// })
-
 	devpubtm1volume = append(devpubtm1volume, corev1.Volume{
 		Name: "wso2am-conf",
 		VolumeSource: corev1.VolumeSource{
@@ -123,24 +99,6 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 		},
 	})
 
-	// devpubtm1volume = append(devpubtm1volume, corev1.Volume{
-	// 	Name: synapseConf,
-	// 	VolumeSource: corev1.VolumeSource{
-	// 		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-	// 			ClaimName: synapseConf,
-	// 		},
-	// 	},
-	// })
-
-	// devpubtm1volume = append(devpubtm1volume, corev1.Volume{
-	// 	Name: "wso2am-executionplans-storage",
-	// 	VolumeSource: corev1.VolumeSource{
-	// 		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-	// 			ClaimName: execPlan,
-	// 		},
-	// 	},
-	// })
-
 	return devpubtm1volumemounts, devpubtm1volume
 
 }
@@ -148,9 +106,6 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
 	deployconfigmap := "wso2am-p2-am-2-conf"
-	//synapseConf := "wso2am-p2-am-synapse-configs"
-	///execPlan := "wso2am-p2-am-execution-plans"
-
 	var devpubtm2volumemounts []corev1.VolumeMount
 	var devpubtm2volume []corev1.Volume
 
@@ -162,16 +117,6 @@ func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 		if deployConfFromYaml != "" {
 			deployconfigmap = deployConfFromYaml
 		}
-
-		// synapseConfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
-		// if synapseConfFromYaml != "" {
-		// 	synapseConf = synapseConfFromYaml
-		// }
-
-		// execPlanFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.ExecutionPlans
-		// if execPlanFromYaml != "" {
-		// 	execPlan = execPlanFromYaml
-		// }
 
 		//for newly created set of configmaps by user
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
@@ -219,18 +164,6 @@ func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 		SubPath:   "deployment.toml",
 	})
 
-	//adding default synapseConfigs pvc
-	// am2volumemounts = append(am2volumemounts, corev1.VolumeMount{
-	// 	Name:      synapseConf,
-	// 	MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/synapse-configs",
-	// })
-
-	//adding default executionPlans pvc
-	// devpubtm2volumemounts = append(devpubtm2volumemounts, corev1.VolumeMount{
-	// 	Name:      "wso2am-executionplans-storage",
-	// 	MountPath: "/home/wso2carbon/wso2am-3.1.0/repository/deployment/server/executionplans",
-	// })
-
 	devpubtm2volume = append(devpubtm2volume, corev1.Volume{
 		Name: "wso2am-conf",
 		VolumeSource: corev1.VolumeSource{
@@ -241,24 +174,6 @@ func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 			},
 		},
 	})
-
-	// devpubtm2volume = append(devpubtm2volume, corev1.Volume{
-	// 	Name: synapseConf,
-	// 	VolumeSource: corev1.VolumeSource{
-	// 		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-	// 			ClaimName: synapseConf,
-	// 		},
-	// 	},
-	// })
-
-	// devpubtm2volume = append(devpubtm2volume, corev1.Volume{
-	// 	Name: "wso2am-executionplans-storage",
-	// 	VolumeSource: corev1.VolumeSource{
-	// 		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-	// 			ClaimName: execPlan,
-	// 		},
-	// 	},
-	// })
 
 	return devpubtm2volumemounts, devpubtm2volume
 
@@ -342,7 +257,6 @@ func getKeyManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev
 func getgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
 	deployconfigmap := "wso2am-p2-am-gateway-conf"
-	//synapseConf := "wso2am-p2-gw-synapse-configs"
 
 	var gwvolumemounts []corev1.VolumeMount
 	var gwvolume []corev1.Volume
@@ -355,11 +269,6 @@ func getgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.V
 		if gwconfFromYaml != "" {
 			deployconfigmap = gwconfFromYaml
 		}
-
-		// synapseconfFromYaml := apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.SynapseConfigs
-		// if synapseconfFromYaml != "" {
-		// 	synapseConf = synapseconfFromYaml
-		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
@@ -400,25 +309,11 @@ func getgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.V
 		}
 	}
 
-	// gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
-	// 	Name:      "wso2am-gateway-storage-volume",
-	// 	MountPath: "/home/wso2carbon/wso2am-3.2.0/repository/deployment/server/synapse-configs",
-	// })
-
 	gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
 		Name:      "wso2am-gateway-conf",
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 		SubPath:   "deployment.toml",
 	})
-
-	// gwvolume = append(gwvolume, corev1.Volume{
-	// 	Name: "wso2am-gateway-storage-volume",
-	// 	VolumeSource: corev1.VolumeSource{
-	// 		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-	// 			ClaimName: synapseConf,
-	// 		},
-	// 	},
-	// })
 
 	gwvolume = append(gwvolume, corev1.Volume{
 		Name: "wso2am-gateway-conf",
@@ -639,16 +534,6 @@ func GetMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 		MountPath: "/docker-entrypoint-initdb.d",
 	})
 
-	// mysqlvolumemounts = append(mysqlvolumemounts, corev1.VolumeMount{
-	// 	Name:      "wso2am-p2-mysql-exec",
-	// 	MountPath: "/entrypoint.sh",
-	// 	SubPath:   "entrypoint.sh",
-	// })
-	// mysqlvolumemounts = append(mysqlvolumemounts, corev1.VolumeMount{
-	// 	Name:      "apim-rdbms-persistent-storage",
-	// 	MountPath: "/var/lib/mysql",
-	// })
-
 	var mysqlvolume []corev1.Volume
 
 	mysqlvolume = append(mysqlvolume, corev1.Volume{
@@ -661,25 +546,6 @@ func GetMysqlVolumes(apimanager *apimv1alpha1.APIManager) ([]corev1.VolumeMount,
 			},
 		},
 	})
-	// mysqlvolume = append(mysqlvolume, corev1.Volume{
-	// 	Name: "wso2am-p2-mysql-exec",
-	// 	VolumeSource: corev1.VolumeSource{
-	// 		ConfigMap: &corev1.ConfigMapVolumeSource{
-	// 			LocalObjectReference: corev1.LocalObjectReference{
-	// 				Name: "wso2am-p2-mysql-exec",
-	// 			},
-	// 		},
-	// 	},
-	// })
-
-	// mysqlvolume = append(mysqlvolume, corev1.Volume{
-	// 	Name: "apim-rdbms-persistent-storage",
-	// 	VolumeSource: corev1.VolumeSource{
-	// 		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-	// 			ClaimName: "wso2am-mysql",
-	// 		},
-	// 	},
-	// })
 
 	return mysqlvolumemounts, mysqlvolume
 

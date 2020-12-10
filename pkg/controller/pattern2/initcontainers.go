@@ -34,13 +34,10 @@ func getMysqlInitContainers(apimanager *apimv1alpha1.APIManager, vols *[]corev1.
 	// UseMysql - default to true
 	useMysqlPod := true
 	if apimanager.Spec.UseMysql != "" {
-		// the error has already
 		useMysqlPod, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
 	}
 
 	if useMysqlPod {
-		// Downloading mysql connector
-		// init container
 		mysqlConnectorContainer := corev1.Container{}
 		mysqlConnectorContainer.Name = "init-mysql-connector-download"
 		mysqlConnectorContainer.Image = "busybox:1.32"
@@ -90,25 +87,13 @@ func getMysqlInitContainers(apimanager *apimv1alpha1.APIManager, vols *[]corev1.
 }
 
 func getInitContainers(containerNames []string, initContainers *[]corev1.Container) {
-	//var initContainers []corev1.Container
-
-	// length := len(containerNames)
-
-	// if length == 1 {
-	// 	container := corev1.Container{}
-	// 	container.Name = containerNames[0]
-	// 	container.Image = "busybox:1.32"
-	// 	if containerNames[0] == "init-am-analytics-worker" || containerNames[0] == "init-apim-analytics" {
-	// 		container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2am-pattern2-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "`}
-	// 	}
-	// }
 
 	for _, containerName := range containerNames {
 		container := corev1.Container{}
 		container.Name = containerName
 		container.Image = "busybox:1.32"
 		if containerName == "init-am-analytics-worker" || containerName == "init-apim-analytics" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2-am-analytics-worker-svc 7712; do sleep 1; printf "-"; done; echo -e "`}
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2-am-analytics-worker-svc 7712; do sleep 1; printf "-"; done; echo -e " >> WSO2 API Manager Analytics Worker has started";`}
 		} else if containerName == "init-km" {
 			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z wso2-am-km-svc 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";`}
 		} else if containerName == "init-apim-1" {
@@ -120,12 +105,4 @@ func getInitContainers(containerNames []string, initContainers *[]corev1.Contain
 		}
 		*initContainers = append(*initContainers, container)
 	}
-
-	// analyticsWorkerContainer := corev1.Container{}
-	// analyticsWorkerContainer.Name = "init-am-analytics-worker"
-	// analyticsWorkerContainer.Image = "busybox:1.32"
-	// analyticsWorkerContainer.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2am-pattern2-am-analytics-worker-service 7712; do sleep 1; printf "-"; done; echo -e "`}
-	// initContainers = append(initContainers, analyticsWorkerContainer)
-
-	// return initContainers
 }
