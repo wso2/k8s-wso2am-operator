@@ -48,7 +48,7 @@ data:
     
     [apim.sync_runtime_artifacts.publisher]
     artifact_saver = "DBSaver"
-    publish_directly_to_gateway = "true"
+    publish_directly_to_gateway = "false"
 
     [keystore.tls]
     file_name =  "wso2carbon.jks"
@@ -76,7 +76,7 @@ data:
 
     # key manager implementation
     [apim.key_manager]
-    service_url = "https://wso2-km-service:${mgt.transport.https.port}/services/"
+    service_url = "https://wso2-am-km-service:${mgt.transport.https.port}/services/"
     username= "$ref{super_admin.username}"
     password= "$ref{super_admin.password}"
 
