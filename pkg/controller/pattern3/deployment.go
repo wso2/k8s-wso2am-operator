@@ -1310,7 +1310,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 			},
 		},
 		Spec: appsv1.StatefulSetSpec{
-			Replicas:    apimanager.Spec.Replicas,
+			Replicas:    &y.Replicas,
 			ServiceName: "wso2-am-analytics-worker-headless-svc",
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
