@@ -96,14 +96,14 @@ func getInitContainers(containerNames []string, initContainers *[]corev1.Contain
 		container.Name = containerName
 		container.Image = "busybox:1.32"
 		if containerName == "init-am-analytics-worker" || containerName == "init-apim-analytics" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2-am-analytics-worker-svc 7712; do sleep 1; printf "-"; done; echo -e "`}
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of WSO2 API Manager Analytics Worker deployment"; while ! nc -z wso2-am-analytics-worker-svc 7712; do sleep 1; printf "-"; done; echo -e " >> WSO2 API Manager Analytics Worker has started";`}
 		} else if containerName == "init-km" {
 			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of Key Manager deployment"; while ! nc -z wso2-am-km-svc 9443; do sleep 1; printf "-"; done; echo -e "  >> Key Manager has started";`}
 		} else if containerName == "init-tm-1" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of TM instance one deployment"; while ! nc -z wso2-am-tm-statefulset-0.wso2-am-tm-headless-service 9611; do sleep 1; printf "-"; done; echo -e "  >> TM instance one has started";`}
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of TM instance one deployment"; while ! nc -z wso2-am-tm-statefulset-0.wso2-am-tm-headless-svc 9611; do sleep 1; printf "-"; done; echo -e "  >> TM instance one has started";`}
 		} else if containerName == "init-tm-2" {
-			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of TM instance two deployment"; while ! nc -z wso2-am-tm-statefulset-0.wso2-am-tm-headless-service 9611; do sleep 1; printf "-"; done; echo -e "  >> TM instance two has started";`}
-			*initContainers = append(*initContainers, container)
+			container.Command = []string{"sh", "-c", `echo -e "Checking for the availability of TM instance two deployment"; while ! nc -z wso2-am-tm-statefulset-1.wso2-am-tm-headless-svc 9611; do sleep 1; printf "-"; done; echo -e "  >> TM instance two has started";`}
 		}
+		*initContainers = append(*initContainers, container)
 	}
 }

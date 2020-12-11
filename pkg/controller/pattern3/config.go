@@ -464,7 +464,7 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["p3-apim-gw-deployment-maxSurge"], 10, 32)
 	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p3-apim-gw-deployment-maxUnavailable"], 10, 32)
-	amImages := ControlConfigData["p2-apim-deployment-image"]
+	amImages := ControlConfigData["p3-apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["p3-apim-deployment-resources-requests-cpu"])
 	reqMem := resource.MustParse(ControlConfigData["p3-apim-deployment-resources-requests-memory"])
@@ -731,7 +731,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
 	maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxUnavailable"], 10, 32)
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	amImages := ControlConfigData["p3-apim-analytics-deployment-dashboard-image:"]
+	amImages := ControlConfigData["p3-apim-analytics-deployment-dashboard-image"]
 	imagePull, _ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["p3-apim-analytics-deployment-resources-requests-cpu"])
 	reqMem := resource.MustParse(ControlConfigData["p3-apim-analytics-deployment-resources-requests-memory"])
@@ -1011,7 +1011,7 @@ func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.Config
 	}
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      configMap.Name + "-" + apimanager.Name,
+			Name:      configMap.Name,
 			Namespace: apimanager.Namespace,
 			Labels:    labels,
 			OwnerReferences: []metav1.OwnerReference{

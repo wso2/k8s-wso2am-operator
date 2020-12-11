@@ -1905,7 +1905,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	tmhlServiceName := "wso2-am-tm-headless-svc"
 	mysqldeploymentName := "mysql-" + apimanager.Name
 	mysqlserviceName := "mysql-svc"
-	dashboardDeploymentName := "wso2-am-analytics-dashboard-deployment" + apimanager.Name
+	dashboardDeploymentName := "wso2-am-analytics-dashboard-deployment-" + apimanager.Name
 	dashboardServiceName := "wso2-am-analytics-dashboard-svc"
 	workerDeploymentName := "wso2-am-analytics-worker-statefulset"
 	workerServiceName := "wso2-am-analytics-worker-svc"
@@ -2011,19 +2011,19 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("TM Entrypoint Config")
-	tmEPConfName := "wso2-am-tm-conf-entrypoint"
-	tmEPConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(tmEPConfName)
-	tmEPConfUserName := "wso2-am-tm-conf-entrypoint-" + apimanager.Name
-	tmEPConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(tmEPConfUserName)
-	if errors.IsNotFound(err) {
-		tmEPConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, tmEPConfWso2))
-		klog.Error("Dev Error: ", err)
-		if err != nil {
-			fmt.Println("Creating TM entrypoint configmap in user specified ns", tmEPConfUser)
+	// klog.Info("TM Entrypoint Config")
+	// tmEPConfName := "wso2-am-tm-conf-entrypoint"
+	// tmEPConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(tmEPConfName)
+	// tmEPConfUserName := "wso2-am-tm-conf-entrypoint-" + apimanager.Name
+	// tmEPConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(tmEPConfUserName)
+	// if errors.IsNotFound(err) {
+	// 	tmEPConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, tmEPConfWso2))
+	// 	klog.Error("Dev Error: ", err)
+	// 	if err != nil {
+	// 		fmt.Println("Creating TM entrypoint configmap in user specified ns", tmEPConfUser)
 
-		}
-	}
+	// 	}
+	// }
 
 	klog.Info("Gateway Config")
 	gatewayConfName := "wso2-am-gateway-conf"
@@ -2139,10 +2139,13 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 		// Get mysql service name using hardcoded value
 		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
+		klog.Info("MYSQL Service Creating")
+		klog.Error("MYSQL-1 Error: ", err)
 
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			mysqlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(mysql.MysqlService(apimanager))
+			klog.Error("MYSQL Error: ", err)
 		} else {
 			fmt.Println("Mysql Service is already available. [Service name] ,", mysqlservice)
 		}
@@ -2155,11 +2158,13 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	// Get analytics dashboard deployment name using hardcoded value
 	dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
+	klog.Error("Dash Error: ", err)
 	if enableAnalytics {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern3.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
 			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern3.DashboardDeployment(apimanager, y, dashnum))
+			klog.Error("Dash Error2: ", err)
 			if err != nil {
 				return err
 			}
@@ -2167,9 +2172,11 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 		// Get analytics dashboard service name using hardcoded value
 		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
+		klog.Error("Dash Serive Error: ", err)
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern3.DashboardService(apimanager))
+			klog.Error("Dash Serive1 Error: ", err)
 		} else {
 			fmt.Println("Dash Service is already available. [Service name] ,", dashservice)
 		}
@@ -2263,7 +2270,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	dev1Deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dev1deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		x := pattern3.AssignPubConfigMapValues(apimanager, configmap, dev1num)
+		x := pattern3.AssignDevConfigMapValues(apimanager, configmap, dev1num)
 		dev1Deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern3.Devportal1Deployment(apimanager, x, dev1num))
 		klog.Error("Dev-1 Error: ", err)
 		if err != nil {
@@ -2284,7 +2291,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	dev2Deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dev2deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		z := pattern3.AssignPubConfigMapValues(apimanager, configmap, dev2num)
+		z := pattern3.AssignDevConfigMapValues(apimanager, configmap, dev2num)
 		dev2Deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern3.Devportal2Deployment(apimanager, z, dev2num))
 		if err != nil {
 			return err
@@ -2306,8 +2313,9 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	tmDeployment, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(tmdeploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		x := pattern3.AssignPubConfigMapValues(apimanager, configmap, tmnum)
+		x := pattern3.AssignApimTrafficManagerConfigMapValues(apimanager, configmap, tmnum)
 		tmDeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Create(pattern3.TrafficManagerDeployment(apimanager, x, tmnum))
+		klog.Info("TM Deployment: ", tmDeployment)
 		klog.Error("TM Error: ", err)
 		if err != nil {
 			return err
@@ -2370,6 +2378,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if errors.IsNotFound(err) {
 		z := pattern3.AssignKeyManagerConfigMapValues(apimanager, configmap, kmnum)
 		kmDeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Create(pattern3.KeyManagerDeployment(apimanager, z, kmnum))
+		klog.Info("KM DeploymentL: ", kmDeployment)
 		if err != nil {
 			return err
 		}
@@ -2623,7 +2632,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		dev2Deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern3.Devportal2Deployment(apimanager, z, dev2num))
 	}
 
-	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *pub1Deployment.Spec.Replicas {
+	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *tmDeployment.Spec.Replicas {
 		z := pattern3.AssignApimTrafficManagerConfigMapValues(apimanager, configmap, kmnum)
 		klog.V(4).Infof("Traffic Manager %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *tmDeployment.Spec.Replicas)
 		tmDeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Update(pattern3.TrafficManagerDeployment(apimanager, z, tmnum))

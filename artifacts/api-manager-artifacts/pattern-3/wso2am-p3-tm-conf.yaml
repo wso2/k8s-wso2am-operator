@@ -68,5 +68,5 @@ data:
     enable_token_hashing = false
 
     [apim.throttling]
-    event_duplicate_url = ["tcp://wso2-am-tm-statefulset.wso2-am-tm-headless-svc:5672"]
+    event_duplicate_url = ["tcp://wso2-am-tm-statefulset-TM_INDEX.wso2-am-tm-headless-svc:5672"]
  

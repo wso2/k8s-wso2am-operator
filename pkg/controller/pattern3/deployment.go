@@ -60,7 +60,7 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 	cmdstring := []string{
 		"/bin/sh",
 		"-c",
-		"nc -z 9443",
+		"nc -z localhost 9443",
 	}
 
 	initContainers := []corev1.Container{}
@@ -719,7 +719,7 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 	cmdstring := []string{
 		"/bin/sh",
 		"-c",
-		"nc -z localhost 9443",
+		"nc -z localhost 8243",
 	}
 
 	initContainers := []corev1.Container{}
@@ -749,7 +749,7 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 		},
 
 		Spec: appsv1.DeploymentSpec{
-			Replicas:        apimanager.Spec.Replicas,
+			Replicas:        &z.Replicas,
 			MinReadySeconds: z.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RollingUpdateDaemonSetStrategyType),
@@ -867,6 +867,7 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 
 	kmVolumeMount, kmVolume := getKeyManagerVolumes(apimanager, num)
 	kmdeployports := getKeyManagerContainerPorts()
+	klog.Info("Key Manager Vol: ", kmVolumeMount)
 
 	labels := map[string]string{
 		"deployment": "wso2-km",
@@ -899,7 +900,7 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		},
 
 		Spec: appsv1.StatefulSetSpec{
-			Replicas:    apimanager.Spec.Replicas,
+			Replicas:    &z.Replicas,
 			ServiceName: "wso2-am-km-svc",
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
@@ -997,8 +998,9 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 //tm deployment
 func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num int) *appsv1.StatefulSet {
 
-	tmVolumeMount, tmVolume := getKeyManagerVolumes(apimanager, num)
-	tmdeployports := getKeyManagerContainerPorts()
+	tmVolumeMount, tmVolume := getTrafficManagerVolumes(apimanager, num)
+	tmdeployports := getTmContainerPorts()
+	klog.Info("TM Volumes: ", tmVolumeMount)
 
 	labels := map[string]string{
 		"deployment": "wso2-tm",
@@ -1007,15 +1009,19 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 	cmdstring := []string{
 		"/bin/sh",
 		"-c",
-		"nc -z localhost 9443",
+		"nc -z localhost 9611",
 	}
 
+	klog.Info("TM Replicas: ", z.Replicas)
+
 	initContainers := getMysqlInitContainers(apimanager, &tmVolume, &tmVolumeMount)
+	klog.Info("TM Volume Done ")
 
 	tmSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, tmSecurityContext)
+	klog.Info("TM Volume Done 1")
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -1031,8 +1037,8 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 		},
 
 		Spec: appsv1.StatefulSetSpec{
-			Replicas:    apimanager.Spec.Replicas,
-			ServiceName: "wso2-am-tm-svc",
+			Replicas:    &z.Replicas,
+			ServiceName: "wso2-am-tm-headless-svc",
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels,
 			},
@@ -1128,6 +1134,7 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 
 // for handling analytics-dashboard deployment
 func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
+	klog.Info("Dash Image: ", y.Image)
 	useMysql := true
 	if apimanager.Spec.UseMysql != "" {
 		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
@@ -1167,7 +1174,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 			Kind:       deploymentKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-analytics-dashboard-deployment" + apimanager.Name,
+			Name:      "wso2-am-analytics-dashboard-deployment-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
