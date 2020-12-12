@@ -79,7 +79,7 @@ func ExternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-gw-ingress",
+			Name:      "wso2-am-external-gw-ingress",
 			Namespace: apimanager.Namespace,
 			Annotations: map[string]string{
 				"kubernetes.io/ingress.class":                  "nginx",
@@ -92,14 +92,14 @@ func ExternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 		Spec: v1beta1.IngressSpec{
 			Rules: []networkv1.IngressRule{
 				{
-					Host: "gateway.am.wso2.com",
+					Host: "external.gateway.am.wso2.com",
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []networkv1.HTTPIngressPath{
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2-am-gw-svc",
+										ServiceName: "wso2-am-external-gw-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
 									},
 								},
@@ -111,7 +111,7 @@ func ExternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						"gateway.am.wso2.com",
+						"external.gateway.am.wso2.com",
 					},
 				},
 			},
@@ -120,49 +120,49 @@ func ExternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 }
 
 //Internal Gateway
-// func InternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
+func InternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 
-// 	return &v1beta1.Ingress{
-// 		ObjectMeta: metav1.ObjectMeta{
-// 			Name:      "wso2-am-gw-ingress",
-// 			Namespace: apimanager.Namespace,
-// 			Annotations: map[string]string{
-// 				"kubernetes.io/ingress.class":                  "nginx",
-// 				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
-// 			},
-// 			OwnerReferences: []metav1.OwnerReference{
-// 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
-// 			},
-// 		},
-// 		Spec: v1beta1.IngressSpec{
-// 			Rules: []networkv1.IngressRule{
-// 				{
-// 					Host: "gateway.am.wso2.com",
-// 					IngressRuleValue: v1beta1.IngressRuleValue{
-// 						HTTP: &v1beta1.HTTPIngressRuleValue{
-// 							Paths: []networkv1.HTTPIngressPath{
-// 								{
-// 									Path: "/",
-// 									Backend: networkv1.IngressBackend{
-// 										ServiceName: "wso2-am-gw-svc",
-// 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
-// 									},
-// 								},
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			TLS: []v1beta1.IngressTLS{
-// 				{
-// 					Hosts: []string{
-// 						"gateway.am.wso2.com",
-// 					},
-// 				},
-// 			},
-// 		},
-// 	}
-// }
+	return &v1beta1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "wso2-am-internal-gw-ingress",
+			Namespace: apimanager.Namespace,
+			Annotations: map[string]string{
+				"kubernetes.io/ingress.class":                  "nginx",
+				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
+			},
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
+			},
+		},
+		Spec: v1beta1.IngressSpec{
+			Rules: []networkv1.IngressRule{
+				{
+					Host: "internal.gateway.am.wso2.com",
+					IngressRuleValue: v1beta1.IngressRuleValue{
+						HTTP: &v1beta1.HTTPIngressRuleValue{
+							Paths: []networkv1.HTTPIngressPath{
+								{
+									Path: "/",
+									Backend: networkv1.IngressBackend{
+										ServiceName: "wso2-am-internal-gw-svc",
+										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			TLS: []v1beta1.IngressTLS{
+				{
+					Hosts: []string{
+						"internal.gateway.am.wso2.com",
+					},
+				},
+			},
+		},
+	}
+}
 
 func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 

@@ -194,29 +194,29 @@ func AssignApimExternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 
 	apimVersion := ControlConfigData["api-manager-version"]
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	replicas, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-replicas"], 10, 32)
+	replicas, _ := strconv.ParseInt(ControlConfigData["p4-apim-external-gw-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
-	maxSurges, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-maxSurge"], 10, 32)
-	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-maxUnavailable"], 10, 32)
-	amImages := ControlConfigData["p2-apim-deployment-image"]
+	maxSurges, _ := strconv.ParseInt(ControlConfigData["p4-apim-external-gw-deployment-maxSurge"], 10, 32)
+	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p4-apim-external-gw-deployment-maxUnavailable"], 10, 32)
+	amImages := ControlConfigData["p4-apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
-	reqCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-cpu"])
-	reqMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-memory"])
-	limitCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-cpu"])
-	limitMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-memory"])
-	liveDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
-	livePeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-livenessProbe-periodSeconds"], 10, 32)
+	reqCPU := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-requests-cpu"])
+	reqMem := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-requests-memory"])
+	limitCPU := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-limits-cpu"])
+	limitMem := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-limits-memory"])
+	liveDelay, _ := strconv.ParseInt(ControlConfigData["p4-apim-external-gw-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
+	livePeriod, _ := strconv.ParseInt(ControlConfigData["p4-apim-externalgw-deployment-livenessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-failureThreshold"], 10, 32)
-	readyDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
-	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-readinessProbe-periodSeconds"], 10, 32)
+	readyDelay, _ := strconv.ParseInt(ControlConfigData["p4-apim-external-gw-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
+	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p4-apim-external-gw-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
-	memXmx := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xmx"]
-	memXms := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xms"]
+	memXmx := ControlConfigData["p4-apim-deployment-resources-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["p4-apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-gateway" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-external-gateway" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
 		if *replicasFromYaml != 0 {
@@ -339,29 +339,29 @@ func AssignApimInternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 
 	apimVersion := ControlConfigData["api-manager-version"]
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	replicas, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-replicas"], 10, 32)
+	replicas, _ := strconv.ParseInt(ControlConfigData["p4-apim-internal-gw-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
-	maxSurges, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-maxSurge"], 10, 32)
-	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-maxUnavailable"], 10, 32)
-	amImages := ControlConfigData["p2-apim-deployment-image"]
+	maxSurges, _ := strconv.ParseInt(ControlConfigData["p4-apim-internal-gw-deployment-maxSurge"], 10, 32)
+	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p4-apim-internal-gw-deployment-maxUnavailable"], 10, 32)
+	amImages := ControlConfigData["p4-apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
-	reqCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-cpu"])
-	reqMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-memory"])
-	limitCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-cpu"])
-	limitMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-memory"])
-	liveDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
-	livePeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-livenessProbe-periodSeconds"], 10, 32)
+	reqCPU := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-requests-cpu"])
+	reqMem := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-requests-memory"])
+	limitCPU := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-limits-cpu"])
+	limitMem := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-limits-memory"])
+	liveDelay, _ := strconv.ParseInt(ControlConfigData["p4-apim-internal-gw-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
+	livePeriod, _ := strconv.ParseInt(ControlConfigData["p-apim-internal-gw-deployment-livenessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-failureThreshold"], 10, 32)
-	readyDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
-	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-gw-deployment-readinessProbe-periodSeconds"], 10, 32)
+	readyDelay, _ := strconv.ParseInt(ControlConfigData["p4-apim-internal-gw-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
+	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p4-apim-internal-gw-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
-	memXmx := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xmx"]
-	memXms := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xms"]
+	memXmx := ControlConfigData["p4-apim-deployment-resources-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["p4-apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-gateway" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-internal-gateway" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
 		if *replicasFromYaml != 0 {

@@ -62,12 +62,12 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 		}
 
 		//for newly created set of PVCs by user
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			devpubtm1volumemounts = append(devpubtm1volumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	devpubtm1volumemounts = append(devpubtm1volumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			devpubtm1volume = append(devpubtm1volume, corev1.Volume{
@@ -81,16 +81,16 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 				},
 			})
 		}
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			devpubtm1volume = append(devpubtm1volume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-						ClaimName: c.Name,
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	devpubtm1volume = append(devpubtm1volume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+		// 				ClaimName: c.Name,
+		// 			},
+		// 		},
+		// 	})
+		// }
 	}
 
 	//adding default deploymentConfigmap
@@ -181,12 +181,12 @@ func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 			})
 		}
 		//for newly created set of PVCs by user
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			devpubtm2volumemounts = append(devpubtm2volumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	devpubtm2volumemounts = append(devpubtm2volumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			devpubtm2volume = append(devpubtm2volume, corev1.Volume{
@@ -200,16 +200,16 @@ func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 				},
 			})
 		}
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			devpubtm2volume = append(devpubtm2volume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-						ClaimName: c.Name,
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	devpubtm2volume = append(devpubtm2volume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+		// 				ClaimName: c.Name,
+		// 			},
+		// 		},
+		// 	})
+		// }
 	}
 
 	//adding default deploymentConfigmap
@@ -286,12 +286,12 @@ func getKeyManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev
 			})
 		}
 
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			kmvolumemounts = append(kmvolumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	kmvolumemounts = append(kmvolumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			kmvolume = append(kmvolume, corev1.Volume{
@@ -306,16 +306,16 @@ func getKeyManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev
 			})
 		}
 
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			kmvolume = append(kmvolume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-						ClaimName: c.Name,
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	kmvolume = append(kmvolume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+		// 				ClaimName: c.Name,
+		// 			},
+		// 		},
+		// 	})
+		// }
 	}
 
 	kmvolumemounts = append(kmvolumemounts, corev1.VolumeMount{
@@ -362,12 +362,12 @@ func getexternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 			})
 		}
 
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			gwvolume = append(gwvolume, corev1.Volume{
@@ -382,16 +382,16 @@ func getexternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 			})
 		}
 
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			gwvolume = append(gwvolume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-						ClaimName: c.Name,
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	gwvolume = append(gwvolume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+		// 				ClaimName: c.Name,
+		// 			},
+		// 		},
+		// 	})
+		// }
 	}
 
 	gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
@@ -438,12 +438,12 @@ func getinternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 			})
 		}
 
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			gwvolume = append(gwvolume, corev1.Volume{
@@ -458,16 +458,16 @@ func getinternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 			})
 		}
 
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			gwvolume = append(gwvolume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-						ClaimName: c.Name,
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	gwvolume = append(gwvolume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+		// 				ClaimName: c.Name,
+		// 			},
+		// 		},
+		// 	})
+		// }
 	}
 
 	gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
@@ -515,12 +515,12 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 			})
 		}
 		//for newly created set of PVCs by user
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			dashvolumemounts = append(dashvolumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	dashvolumemounts = append(dashvolumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 		//adding default deploymentConfigmap
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
@@ -535,18 +535,18 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 				},
 			})
 		}
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			dashvolume = append(dashvolume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					ConfigMap: &corev1.ConfigMapVolumeSource{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: c.Name,
-						},
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	dashvolume = append(dashvolume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			ConfigMap: &corev1.ConfigMapVolumeSource{
+		// 				LocalObjectReference: corev1.LocalObjectReference{
+		// 					Name: c.Name,
+		// 				},
+		// 			},
+		// 		},
+		// 	})
+		// }
 
 	}
 
@@ -611,12 +611,12 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 			})
 		}
 		//for newly created set of PVCs by user
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			workervolumemounts = append(workervolumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	workervolumemounts = append(workervolumemounts, corev1.VolumeMount{
+		// 		Name:      c.Name,
+		// 		MountPath: c.MountPath,
+		// 	})
+		// }
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
 			workervolume = append(workervolume, corev1.Volume{
@@ -630,18 +630,18 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 				},
 			})
 		}
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			workervolume = append(workervolume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					ConfigMap: &corev1.ConfigMapVolumeSource{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: c.Name,
-						},
-					},
-				},
-			})
-		}
+		// for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
+		// 	workervolume = append(workervolume, corev1.Volume{
+		// 		Name: c.Name,
+		// 		VolumeSource: corev1.VolumeSource{
+		// 			ConfigMap: &corev1.ConfigMapVolumeSource{
+		// 				LocalObjectReference: corev1.LocalObjectReference{
+		// 					Name: c.Name,
+		// 				},
+		// 			},
+		// 		},
+		// 	})
+		// }
 
 	}
 

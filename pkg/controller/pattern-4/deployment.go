@@ -378,11 +378,11 @@ func ExternalGatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configval
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	gatewayVolumeMount, gatewayVolume := getgatewayVolumes(apimanager, num)
+	gatewayVolumeMount, gatewayVolume := getexternalgatewayVolumes(apimanager, num)
 	gatewaydeployports := getGatewayContainerPorts()
 
 	labels := map[string]string{
-		"deployment": "wso2-gateway",
+		"deployment": "wso2-external-gateway",
 	}
 
 	cmdstring := []string{
@@ -544,11 +544,11 @@ func InternalGatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configval
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	gatewayVolumeMount, gatewayVolume := getgatewayVolumes(apimanager, num)
+	gatewayVolumeMount, gatewayVolume := getinternalgatewayVolumes(apimanager, num)
 	gatewaydeployports := getGatewayContainerPorts()
 
 	labels := map[string]string{
-		"deployment": "wso2-gateway",
+		"deployment": "wso2-internal-gateway",
 	}
 
 	cmdstring := []string{
