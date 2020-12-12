@@ -15,14 +15,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2am-p4-am-external-gateway-conf
+  name: wso2am-p4-am-internal-gateway-conf
   namespace : wso2-system
 data:
   deployment.toml: |-
     [server]
-    hostname = "external.gateway.am.wso2.com"
+    hostname = "internal.gateway.am.wso2.com"
     node_ip = "$env{NODE_IP}"
-    server_role = "external-gateway-worker"
+    server_role = "internal-gateway-worker"
 
     [user_store]
     type = "database_unique_id"
