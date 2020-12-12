@@ -197,23 +197,23 @@ func getPubDevTmContainerPorts() []corev1.ContainerPort {
 	var pubdevtmdeployports []corev1.ContainerPort
 	pubdevtmdeployports = append(pubdevtmdeployports, corev1.ContainerPort{
 		ContainerPort: 9763,
-		Protocol:      corev1.ProtocolTCP,
+		Protocol:      "TCP",
 	})
 	pubdevtmdeployports = append(pubdevtmdeployports, corev1.ContainerPort{
 		ContainerPort: 9443,
-		Protocol:      corev1.ProtocolTCP,
+		Protocol:      "TCP",
 	})
 	pubdevtmdeployports = append(pubdevtmdeployports, corev1.ContainerPort{
 		ContainerPort: 9711,
-		Protocol:      corev1.ProtocolTCP,
+		Protocol:      "TCP",
 	})
 	pubdevtmdeployports = append(pubdevtmdeployports, corev1.ContainerPort{
 		ContainerPort: 9611,
-		Protocol:      corev1.ProtocolTCP,
+		Protocol:      "TCP",
 	})
 	pubdevtmdeployports = append(pubdevtmdeployports, corev1.ContainerPort{
 		ContainerPort: 5672,
-		Protocol:      corev1.ProtocolTCP,
+		Protocol:      "TCP",
 	})
 	return pubdevtmdeployports
 }
