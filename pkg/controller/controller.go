@@ -1383,7 +1383,8 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	pubDevTm1num := 0
 	pubDevTm2num := 0
-	gatewaynum := 0
+	gatewayinternalnum := 0
+	gatewayexternalnum := 0
 	kmnum := 0
 	dashnum := 0
 	worknum := 0
@@ -1409,8 +1410,11 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			if apimanager.Spec.Profiles[i].Name == "api-keymanager" {
 				kmnum = i
 			}
-			if apimanager.Spec.Profiles[i].Name == "api-gateway" {
-				gatewaynum = i
+			if apimanager.Spec.Profiles[i].Name == "api-internal-gateway" {
+				gatewayinternalnum = i
+			}
+			if apimanager.Spec.Profiles[i].Name == "api-external-gateway" {
+				gatewayexternalnum = i
 			}
 		}
 	}
@@ -1585,8 +1589,8 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	klog.Error("External Gateway Depl Error: ", err)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		z := pattern4.AssignApimExternalGatewayConfigMapValues(apimanager, configmap, gatewaynum)
-		gatewayDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.ExternalGatewayDeployment(apimanager, z, gatewaynum))
+		z := pattern4.AssignApimExternalGatewayConfigMapValues(apimanager, configmap, gatewayexternalnum)
+		gatewayDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.ExternalGatewayDeployment(apimanager, z, gatewayexternalnum))
 		klog.Error(err)
 		if err != nil {
 			return err
@@ -1599,8 +1603,8 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	klog.Error("Internal Gateway Depl Error: ", err)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		z := pattern4.AssignApimInternalGatewayConfigMapValues(apimanager, configmap, gatewaynum)
-		gatewayInternalDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.InternalGatewayDeployment(apimanager, z, gatewaynum))
+		z := pattern4.AssignApimInternalGatewayConfigMapValues(apimanager, configmap, gatewayinternalnum)
+		gatewayInternalDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.InternalGatewayDeployment(apimanager, z, gatewayinternalnum))
 		klog.Error(err)
 		if err != nil {
 			return err
@@ -1863,16 +1867,16 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	//for external gateway also
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *gatewayDeployment.Spec.Replicas {
-		z := pattern4.AssignApimExternalGatewayConfigMapValues(apimanager, configmap, gatewaynum)
+		z := pattern4.AssignApimExternalGatewayConfigMapValues(apimanager, configmap, gatewayexternalnum)
 		klog.V(4).Infof("Gateway %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *gatewayDeployment.Spec.Replicas)
-		gatewayDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern4.ExternalGatewayDeployment(apimanager, z, gatewaynum))
+		gatewayDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern4.ExternalGatewayDeployment(apimanager, z, gatewayexternalnum))
 	}
 
 	//for internal gateway also
 	if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *gatewayInternalDeployment.Spec.Replicas {
-		z := pattern4.AssignApimInternalGatewayConfigMapValues(apimanager, configmap, gatewaynum)
-		klog.V(4).Infof("Internal Gateway %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *gatewayDeployment.Spec.Replicas)
-		gatewayInternalDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern4.InternalGatewayDeployment(apimanager, z, gatewaynum))
+		z := pattern4.AssignApimInternalGatewayConfigMapValues(apimanager, configmap, gatewayinternalnum)
+		klog.V(4).Infof("Internal Gateway %s replicas: %d, deployment replicas: %d", name, *apimanager.Spec.Replicas, *gatewayInternalDeployment.Spec.Replicas)
+		gatewayInternalDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(pattern4.InternalGatewayDeployment(apimanager, z, gatewayinternalnum))
 	}
 
 	//for keymanager also
