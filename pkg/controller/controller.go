@@ -1316,15 +1316,27 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Gateway Config")
-	gatewayConfName := "wso2am-p2-am-gateway-conf"
+	klog.Info("External Gateway Config")
+	gatewayConfName := "wso2am-p2-am-external-gateway-conf"
 	gatewayConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gatewayConfName)
-	gatewayConfUserName := "wso2am-p2-am-gateway-conf-" + apimanager.Name
+	gatewayConfUserName := "wso2am-p2-am-external-gateway-conf-" + apimanager.Name
 	gatewayConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gatewayConfUserName)
 	if errors.IsNotFound(err) {
 		gatewayConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, gatewayConfWso2))
 		if err != nil {
-			fmt.Println("Creating Gateway configmap in user specific ns", gatewayConfUser)
+			fmt.Println("Creating External Gateway configmap in user specific ns", gatewayConfUser)
+		}
+	}
+
+	klog.Info("Internal Gateway Config")
+	gatewayInternalConfName := "wso2am-p2-am-internal-gateway-conf"
+	gatewayInternalConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gatewayInternalConfName)
+	gatewayInternalConfUserName := "wso2am-p2-am-internal-gateway-conf-" + apimanager.Name
+	gatewayInternalConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gatewayInternalConfUserName)
+	if errors.IsNotFound(err) {
+		gatewayConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, gatewayInternalConfWso2))
+		if err != nil {
+			fmt.Println("Creating Internal Gateway configmap in user specific ns", gatewayInternalConfUser)
 		}
 	}
 
