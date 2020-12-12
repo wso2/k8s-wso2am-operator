@@ -78,17 +78,17 @@ func PubDevTm2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 }
 
-//ExternalGatewayService is for handling gateway-sevice...
-func ExternalGatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
+//External & Internal GatewayService is for handling gateway-sevice...
+func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
-		"deployment": "wso2-external-gateway",
+		"deployment": "wso2-gateway",
 	}
 	gatewayports := getGatewaySpecificSvcPorts()
 	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-external-gw-svc",
+			Name:      "wso2-am-gw-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -103,28 +103,28 @@ func ExternalGatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service
 }
 
 //InternalGatewayService is for handling gateway-sevice...
-func InternalGatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
-	labels := map[string]string{
-		"deployment": "wso2-internal-gateway",
-	}
-	gatewayports := getGatewaySpecificSvcPorts()
-	//servType := "ClusterIP"
+// func InternalGatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
+// 	labels := map[string]string{
+// 		"deployment": "wso2-internal-gateway",
+// 	}
+// 	gatewayports := getGatewaySpecificSvcPorts()
+// 	//servType := "ClusterIP"
 
-	return &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-internal-gw-svc",
-			Namespace: apimanager.Namespace,
-			OwnerReferences: []metav1.OwnerReference{
-				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
-			},
-		},
-		Spec: corev1.ServiceSpec{
-			Selector: labels,
-			// Type:     corev1.ServiceType(servType),
-			Ports: gatewayports,
-		},
-	}
-}
+// 	return &corev1.Service{
+// 		ObjectMeta: metav1.ObjectMeta{
+// 			Name:      "wso2-am-internal-gw-svc",
+// 			Namespace: apimanager.Namespace,
+// 			OwnerReferences: []metav1.OwnerReference{
+// 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
+// 			},
+// 		},
+// 		Spec: corev1.ServiceSpec{
+// 			Selector: labels,
+// 			// Type:     corev1.ServiceType(servType),
+// 			Ports: gatewayports,
+// 		},
+// 	}
+// }
 
 //KeyManagerService is for handling key manager service...
 func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
