@@ -341,14 +341,14 @@ func getKeyManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev
 
 func getexternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	deployconfigmap := "wso2am-p2-am-gateway-conf"
+	deployconfigmap := "wso2am-p2-am-external-gateway-conf"
 
 	var gwvolumemounts []corev1.VolumeMount
 	var gwvolume []corev1.Volume
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-gateway" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-external-gateway" {
 
 		gwconfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if gwconfFromYaml != "" {
@@ -395,13 +395,13 @@ func getexternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 	}
 
 	gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
-		Name:      "wso2am-gateway-conf",
+		Name:      "wso2am-external-gateway-conf",
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 		SubPath:   "deployment.toml",
 	})
 
 	gwvolume = append(gwvolume, corev1.Volume{
-		Name: "wso2am-gateway-conf",
+		Name: "wso2am-external-gateway-conf",
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
@@ -417,14 +417,14 @@ func getexternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 
 func getinternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	deployconfigmap := "wso2am-p2-am-gateway-conf"
+	deployconfigmap := "wso2am-p2-am-internal-gateway-conf"
 
 	var gwvolumemounts []corev1.VolumeMount
 	var gwvolume []corev1.Volume
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-gateway" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-inernal-gateway" {
 
 		gwconfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if gwconfFromYaml != "" {
@@ -471,13 +471,13 @@ func getinternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 	}
 
 	gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
-		Name:      "wso2am-gateway-conf",
+		Name:      "wso2am-internal-gateway-conf",
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 		SubPath:   "deployment.toml",
 	})
 
 	gwvolume = append(gwvolume, corev1.Volume{
-		Name: "wso2am-gateway-conf",
+		Name: "wso2am-internal-gateway-conf",
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
