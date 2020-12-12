@@ -305,12 +305,6 @@ func getTrafficManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]c
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf",
 	})
 
-	// tmvolumemounts = append(tmvolumemounts, corev1.VolumeMount{
-	// 	Name:      "wso2-am-tm-conf-entrypoint",
-	// 	MountPath: "/home/wso2carbon/docker-entrypoint.sh",
-	// 	SubPath:   "docker-entrypoint.sh",
-	// })
-
 	tmvolume = append(tmvolume, corev1.Volume{
 		Name: "wso2-am-tm-conf",
 		VolumeSource: corev1.VolumeSource{
@@ -322,20 +316,6 @@ func getTrafficManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]c
 		},
 	})
 
-	// defaultMode := int32(0407)
-	// tmvolume = append(tmvolume, corev1.Volume{
-	// 	Name: "wwso2-am-tm-conf-entrypoint",
-	// 	VolumeSource: corev1.VolumeSource{
-	// 		ConfigMap: &corev1.ConfigMapVolumeSource{
-	// 			DefaultMode: &defaultMode,
-	// 			LocalObjectReference: corev1.LocalObjectReference{
-	// 				Name: "wso2-am-tm-conf-entrypoint",
-	// 			},
-	// 		},
-	// 	},
-	// })
-
-	klog.Info("TM Volume Done 2")
 	return tmvolumemounts, tmvolume
 }
 
