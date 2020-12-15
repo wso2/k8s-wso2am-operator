@@ -168,28 +168,10 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 				MountPath: c.MountPath,
 			})
 		}
-		//for newly created set of PVCs by user
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			dashvolumemounts = append(dashvolumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
+
 		//adding default deploymentConfigmap
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
-			dashvolume = append(dashvolume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					ConfigMap: &corev1.ConfigMapVolumeSource{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: c.Name,
-						},
-					},
-				},
-			})
-		}
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
 			dashvolume = append(dashvolume, corev1.Volume{
 				Name: c.Name,
 				VolumeSource: corev1.VolumeSource{
@@ -248,27 +230,8 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 				MountPath: c.MountPath,
 			})
 		}
-		//for newly created set of PVCs by user
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
-			workervolumemounts = append(workervolumemounts, corev1.VolumeMount{
-				Name:      c.Name,
-				MountPath: c.MountPath,
-			})
-		}
 
 		for _, c := range apimanager.Spec.Profiles[num].Deployment.Configmaps.NewConfigmap {
-			workervolume = append(workervolume, corev1.Volume{
-				Name: c.Name,
-				VolumeSource: corev1.VolumeSource{
-					ConfigMap: &corev1.ConfigMapVolumeSource{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: c.Name,
-						},
-					},
-				},
-			})
-		}
-		for _, c := range apimanager.Spec.Profiles[num].Deployment.PersistentVolumeClaim.NewClaim {
 			workervolume = append(workervolume, corev1.Volume{
 				Name: c.Name,
 				VolumeSource: corev1.VolumeSource{
