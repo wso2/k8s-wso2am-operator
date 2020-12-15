@@ -84,7 +84,7 @@ func AssignDevConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1
 	memXms := ControlConfigData["p3-apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
-	if totalProfiles > 0 {
+	if totalProfiles > 0 && (apimanager.Spec.Profiles[num].Name == "api-devportal-1" || apimanager.Spec.Profiles[num].Name == "api-devportal-2") {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
 		if *replicasFromYaml != 0 {
 			replicas = int64(*replicasFromYaml)
@@ -216,7 +216,7 @@ func AssignPubConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1
 	memXms := ControlConfigData["p3-apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
-	if totalProfiles > 0 {
+	if totalProfiles > 0 && (apimanager.Spec.Profiles[num].Name == "api-publisher-1" || apimanager.Spec.Profiles[num].Name == "api-publisher-2") {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
 		if *replicasFromYaml != 0 {
 			replicas = int64(*replicasFromYaml)

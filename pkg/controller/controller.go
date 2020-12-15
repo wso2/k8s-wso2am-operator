@@ -2094,16 +2094,16 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	if totalProfiles > 0 {
 		for i = 0; i < totalProfiles; i++ {
-			if apimanager.Spec.Profiles[i].Name == "apim-publisher-1" {
+			if apimanager.Spec.Profiles[i].Name == "api-publisher-1" {
 				pub1num = i
 			}
-			if apimanager.Spec.Profiles[i].Name == "apim-publisher-2" {
+			if apimanager.Spec.Profiles[i].Name == "api-publisher-2" {
 				pub2num = i
 			}
-			if apimanager.Spec.Profiles[i].Name == "apim-devportal-2" {
+			if apimanager.Spec.Profiles[i].Name == "api-devportal-1" {
 				dev1num = i
 			}
-			if apimanager.Spec.Profiles[i].Name == "apim-devportal-2" {
+			if apimanager.Spec.Profiles[i].Name == "api-devportal-2" {
 				dev2num = i
 			}
 			if apimanager.Spec.Profiles[i].Name == "traffic-manager" {
