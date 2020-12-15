@@ -179,7 +179,7 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 								},
 								{
 									Name:  "ENABLE_ANALYTICS",
-									Value: apimanager.Spec.EnableAnalytics,
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 							},
 							VolumeMounts: pubDevTm1VolumeMount,
@@ -334,7 +334,7 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 								},
 								{
 									Name:  "ENABLE_ANALYTICS",
-									Value: apimanager.Spec.EnableAnalytics,
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 							},
 							VolumeMounts: pubDevTm2VolumeMount,
