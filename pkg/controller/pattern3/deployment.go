@@ -103,7 +103,7 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas:        apimanager.Spec.Replicas,
+			Replicas:        &x.Replicas,
 			MinReadySeconds: x.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RecreateDeploymentStrategyType),
@@ -272,7 +272,7 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 		},
 
 		Spec: appsv1.DeploymentSpec{
-			Replicas:        apimanager.Spec.Replicas,
+			Replicas:        &z.Replicas,
 			MinReadySeconds: z.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RecreateDeploymentStrategyType),
@@ -431,7 +431,7 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		},
 
 		Spec: appsv1.DeploymentSpec{
-			Replicas:        apimanager.Spec.Replicas,
+			Replicas:        &z.Replicas,
 			MinReadySeconds: z.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RecreateDeploymentStrategyType),
@@ -599,7 +599,7 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 		},
 
 		Spec: appsv1.DeploymentSpec{
-			Replicas:        apimanager.Spec.Replicas,
+			Replicas:        &z.Replicas,
 			MinReadySeconds: z.Minreadysec,
 			Strategy: appsv1.DeploymentStrategy{
 				Type: appsv1.DeploymentStrategyType(appsv1.RecreateDeploymentStrategyType),
