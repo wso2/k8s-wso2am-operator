@@ -83,13 +83,13 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 
 	//adding default deploymentConfigmap
 	devpubtm1volumemounts = append(devpubtm1volumemounts, corev1.VolumeMount{
-		Name:      "wso2am-conf",
+		Name:      deployconfigmap,
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 		SubPath:   "deployment.toml",
 	})
 
 	devpubtm1volume = append(devpubtm1volume, corev1.Volume{
-		Name: "wso2am-conf",
+		Name: deployconfigmap,
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
