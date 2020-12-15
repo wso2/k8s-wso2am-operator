@@ -183,7 +183,7 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 								},
 								{
 									Name:  "ENABLE_ANALYTICS",
-									Value: apimanager.Spec.EnableAnalytics,
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 								{
 									Name:  "PROFILE_NAME",
@@ -352,7 +352,7 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 								},
 								{
 									Name:  "ENABLE_ANALYTICS",
-									Value: apimanager.Spec.EnableAnalytics,
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 								{
 									Name:  "PROFILE_NAME",
@@ -511,7 +511,7 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 								},
 								{
 									Name:  "ENABLE_ANALYTICS",
-									Value: apimanager.Spec.EnableAnalytics,
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 								{
 									Name:  "PROFILE_NAME",
@@ -679,7 +679,7 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 								},
 								{
 									Name:  "ENABLE_ANALYTICS",
-									Value: apimanager.Spec.EnableAnalytics,
+									Value: strconv.FormatBool(enableAnalytics),
 								},
 								{
 									Name:  "PROFILE_NAME",
