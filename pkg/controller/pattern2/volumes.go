@@ -34,7 +34,7 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-pub-dev-tm-1" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-1" {
 
 		deployConfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployConfFromYaml != "" {
@@ -111,7 +111,7 @@ func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-pub-dev-tm-2" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-2" {
 
 		deployConfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployConfFromYaml != "" {
@@ -159,13 +159,13 @@ func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 
 	//adding default deploymentConfigmap
 	devpubtm2volumemounts = append(devpubtm2volumemounts, corev1.VolumeMount{
-		Name:      "wso2am-conf",
+		Name:      deployconfigmap,
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 		SubPath:   "deployment.toml",
 	})
 
 	devpubtm2volume = append(devpubtm2volume, corev1.Volume{
-		Name: "wso2am-conf",
+		Name: deployconfigmap,
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
@@ -187,7 +187,7 @@ func getKeyManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-key-manager" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-key-manager" {
 
 		deployconfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployconfFromYaml != "" {
@@ -234,13 +234,13 @@ func getKeyManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev
 	}
 
 	kmvolumemounts = append(kmvolumemounts, corev1.VolumeMount{
-		Name:      "wso2am-km-conf",
+		Name:      deployconfigmap,
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 		SubPath:   "deployment.toml",
 	})
 
 	kmvolume = append(kmvolume, corev1.Volume{
-		Name: "wso2am-km-conf",
+		Name: deployconfigmap,
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
@@ -263,7 +263,7 @@ func getgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.V
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-gateway" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-gateway" {
 
 		gwconfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if gwconfFromYaml != "" {
@@ -310,13 +310,13 @@ func getgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.V
 	}
 
 	gwvolumemounts = append(gwvolumemounts, corev1.VolumeMount{
-		Name:      "wso2am-gateway-conf",
+		Name:      deployconfigmap,
 		MountPath: "/home/wso2carbon/wso2-config-volume/repository/conf/deployment.toml",
 		SubPath:   "deployment.toml",
 	})
 
 	gwvolume = append(gwvolume, corev1.Volume{
-		Name: "wso2am-gateway-conf",
+		Name: deployconfigmap,
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
