@@ -31,6 +31,6 @@ spec:
     spec:
       containers:
         - name: wso2am-controller
-          image: benura123/wso2am-controller:v3.0.3
+          image: benura123/wso2am-controller:v3.0.4
           imagePullPolicy: Always
       serviceAccountName: wso2am-svc-account
