@@ -1,5 +1,9 @@
 ## Scenario-10 : Deploy API Manager Pattern-2
 
+#### Installation Prerequisiyes
+
+* [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/).
+
 In this scenario we are deploying API Manager Pattern-2 by using the following simple yaml definition. All API Manager servers are exposed via Ingress Controller.
 
 ```yaml
@@ -11,8 +15,6 @@ spec:
   pattern: Pattern-2
 ```
 -----
-
-#### Install the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/).
 
 
 #### Deploy pattern 2
