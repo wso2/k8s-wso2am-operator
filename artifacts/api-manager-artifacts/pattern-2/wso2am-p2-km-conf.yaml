@@ -57,10 +57,6 @@ data:
     data_retrieval_mode = "sync"
     event_waiting_time = 5000
 
-    [apim.event_hub]
-    enable = true
-    service_url = "https://traffic-manager:9443"  
-
     [keystore.tls]
     file_name =  "wso2carbon.jks"
     type =  "JKS"

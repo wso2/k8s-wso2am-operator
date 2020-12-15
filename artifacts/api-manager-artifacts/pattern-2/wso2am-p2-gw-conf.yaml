@@ -136,6 +136,7 @@ data:
 
     [apim.event_hub]
     service_url = "https://wso2-am-svc:9443"
+    event_hub service_url = "https://wso2-am-svc:9443"
     event_listening_endpoints = ["tcp://wso2-am-1-svc:5672","tcp://wso2-am-2-svc:5672"]
 
     [[apim.event_hub.publish.url_group]]
