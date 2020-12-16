@@ -91,11 +91,6 @@ data:
   p2-apim-km-deployment-readinessProbe-initialDelaySeconds: "180"
   p2-apim-km-deployment-replicas: "2"
 
-  # pattern specific configs for gateway instances
-  p2-apim-gw-deployment-livenessProbe-periodSeconds: "20"
-  p2-apim-gw-deployment-livenessProbe-initialDelaySeconds: "180"
-  p2-apim-gw-deployment-readinessProbe-periodSeconds: "20"
-  p2-apim-gw-deployment-readinessProbe-initialDelaySeconds: "180"
   p2-apim-gw-deployment-replicas: "2"
   p2-apim-gw-deployment-maxSurge: "2"
   p2-apim-gw-deployment-maxUnavailable: "0"
