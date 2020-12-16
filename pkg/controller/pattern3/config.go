@@ -1007,7 +1007,7 @@ func AssignMysqlConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *
 
 func MakeConfigMap(apimanager *apimv1alpha1.APIManager, configMap *corev1.ConfigMap) *corev1.ConfigMap {
 	labels := map[string]string{
-		"deployment": "wso2am-pattern-1-am",
+		"deployment": "wso2am-pattern-3-am",
 	}
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
