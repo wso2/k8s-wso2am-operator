@@ -85,9 +85,9 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	if totalProfiles > 0 && (apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-1" || apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-2") {
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if replicasFromYaml != nil {
+			replicas = int64(*replicasFromYaml)
 		}
 
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
@@ -219,7 +219,7 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-gateway" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -362,7 +362,7 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-keymanager" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -492,9 +492,9 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-dashboard" {
 
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if replicasFromYaml != nil {
+			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if minReadySecFromYaml != 0 {
@@ -630,9 +630,9 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-worker" {
 
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if replicasFromYaml != nil {
+			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if minReadySecFromYaml != 0 {
