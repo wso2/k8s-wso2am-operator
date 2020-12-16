@@ -15,7 +15,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2am-p2-analytics-dash-bin
+  name: wso2am-p2-analytics-bin
   namespace : wso2-system
 data:
   carbon.sh: |-
