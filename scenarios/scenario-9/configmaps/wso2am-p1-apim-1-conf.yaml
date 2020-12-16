@@ -56,7 +56,7 @@ data:
     publish_directly_to_gateway = "true"
 
     [apim.sync_runtime_artifacts.gateway]
-    gateway_labels =["Production and Sandbox","Label1","Label2"]
+    gateway_labels =["Production and Sandbox"]
     artifact_retriever = "DBRetriever"
     deployment_retry_duration = 15000
     data_retrieval_mode = "sync"
