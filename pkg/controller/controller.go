@@ -1201,7 +1201,7 @@ func (c *Controller) handleObject(obj interface{}) {
 	}
 }
 
-func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, configmap *corev1.ConfigMap, name string) error {
+func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, configmap *corev1.ConfigMap, name string) error {
 	useMysqlPod := true
 	enableAnalytics := true
 	if apimanager.Spec.UseMysql != "" {

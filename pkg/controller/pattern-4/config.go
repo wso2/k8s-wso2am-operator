@@ -67,27 +67,27 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 	apimVersion := ControlConfigData["api-manager-version"]
 	replicas, _ := strconv.ParseInt(ControlConfigData["apim-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
-	amImages := ControlConfigData["p2-apim-deployment-image"]
+	amImages := ControlConfigData["p4-apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	reqCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-cpu"])
-	reqMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-requests-memory"])
-	limitCPU := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-cpu"])
-	limitMem := resource.MustParse(ControlConfigData["p2-apim-deployment-resources-limits-memory"])
-	liveDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livelinessProbe-initialDelaySeconds"], 10, 32)
-	livePeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-livelinessProbe-periodSeconds"], 10, 32)
+	reqCPU := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-requests-cpu"])
+	reqMem := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-requests-memory"])
+	limitCPU := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-limits-cpu"])
+	limitMem := resource.MustParse(ControlConfigData["p4-apim-deployment-resources-limits-memory"])
+	liveDelay, _ := strconv.ParseInt(ControlConfigData["p4-apim-pubdevtm-deployment-livelinessProbe-initialDelaySeconds"], 10, 32)
+	livePeriod, _ := strconv.ParseInt(ControlConfigData["p4-apim-pubdevtm-deployment-livelinessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-failureThreshold"], 10, 32)
-	readyDelay, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
-	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p2-apim-pubdevtm-deployment-readinessProbe-periodSeconds"], 10, 32)
+	readyDelay, _ := strconv.ParseInt(ControlConfigData["p4-apim-pubdevtm-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
+	readyPeriod, _ := strconv.ParseInt(ControlConfigData["p4-apim-pubdevtm-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
-	memXmx := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xmx"]
-	memXms := ControlConfigData["p2-apim-deployment-resources-jvm-heap-memory-xms"]
+	memXmx := ControlConfigData["p4-apim-deployment-resources-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["p4-apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	if totalProfiles > 0 && (apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-1" || apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-2") {
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if replicasFromYaml != nil {
+			replicas = int64(*replicasFromYaml)
 		}
 
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
@@ -219,7 +219,7 @@ func AssignApimExternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-external-gateway" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -364,7 +364,7 @@ func AssignApimInternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-internal-gateway" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -507,7 +507,7 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-keymanager" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -637,9 +637,9 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-dashboard" {
 
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if replicasFromYaml != nil {
+			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if minReadySecFromYaml != 0 {
@@ -775,9 +775,9 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-worker" {
 
-		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
-		if replicasFromYaml != 0 {
-			replicas = int64(replicasFromYaml)
+		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
+		if replicasFromYaml != nil {
+			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if minReadySecFromYaml != 0 {
