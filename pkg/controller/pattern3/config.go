@@ -86,7 +86,7 @@ func AssignDevConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1
 
 	if totalProfiles > 0 && (apimanager.Spec.Profiles[num].Name == "api-devportal-1" || apimanager.Spec.Profiles[num].Name == "api-devportal-2") {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -218,7 +218,7 @@ func AssignPubConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1
 
 	if totalProfiles > 0 && (apimanager.Spec.Profiles[num].Name == "api-publisher-1" || apimanager.Spec.Profiles[num].Name == "api-publisher-2") {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -351,7 +351,7 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-keymanager" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -485,7 +485,7 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-gateway" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -627,7 +627,7 @@ func AssignApimTrafficManagerConfigMapValues(apimanager *apimv1alpha1.APIManager
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "traffic-manager" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -749,7 +749,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-dashboard" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
@@ -817,7 +817,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 
 		// Get maxSurge value from the YAML file.
 		maxSurgesFromYaml := apimanager.Spec.Profiles[num].Deployment.Strategy.RollingUpdate.MaxSurge
-		if maxSurgesFromYaml != 1 {
+		if maxSurgesFromYaml != 0 {
 			maxSurges = int64(maxSurgesFromYaml)
 		}
 
@@ -888,7 +888,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-worker" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
