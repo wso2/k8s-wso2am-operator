@@ -27,7 +27,3 @@ spec:
           newConfigMap:
             - name: <NEW_CONFIGMAP_1>
               mountPath: <NEW_MOUNTPATH_FOR_CONFIGMAP_1>
-        persistentVolumeClaim:
-          newClaim:
-            - name: <NEW_CLAIM_1>
-              mountPath: <NEW_MOUNTPATH_FOR_CLAIM_1>
