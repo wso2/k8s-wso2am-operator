@@ -27,7 +27,7 @@ import (
 
 func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	deployconfigmap := "wso2am-p1-apim-1-conf-" + apimanager.Name
+	deployconfigmap := "wso2am-p1-apim-1-conf"
 
 	var am1volumemounts []corev1.VolumeMount
 	var am1volume []corev1.Volume
@@ -87,7 +87,7 @@ func getApim1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 
 func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	deployconfigmap := "wso2am-p1-apim-2-conf-" + apimanager.Name
+	deployconfigmap := "wso2am-p1-apim-2-conf"
 
 	var am2volumemounts []corev1.VolumeMount
 	var am2volume []corev1.Volume
@@ -147,7 +147,7 @@ func getApim2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Vol
 
 func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	dashconfigmap := "wso2am-p1-analytics-dash-conf-" + apimanager.Name
+	dashconfigmap := "wso2am-p1-analytics-conf"
 	var dashvolumemounts []corev1.VolumeMount
 	var dashvolume []corev1.Volume
 
@@ -209,7 +209,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 
 func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	deployconfigmap := "wso2am-p1-analytics-worker-conf-" + apimanager.Name
+	deployconfigmap := "wso2am-p1-analytics-conf"
 
 	var workervolumemounts []corev1.VolumeMount
 	var workervolume []corev1.Volume
