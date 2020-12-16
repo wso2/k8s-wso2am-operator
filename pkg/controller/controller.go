@@ -351,14 +351,26 @@ func (c *Controller) syncHandler(key string) error {
 		workerHlServiceName := "wso2-am-analytics-worker-headless-svc"
 
 		if enableAnalytics {
-			analyticsConfName := "wso2am-p1-analytics-conf"
-			analyticsConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsConfName)
-			analyticsConfUserName := "wso2am-p1-analytics-conf-" + apimanager.Name
-			analyticsConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsConfUserName)
+			dashConfName := "wso2am-p1-analytics-dash-conf"
+			dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
+			dashConfUserName := "wso2am-p1-analytics-dash-conf-" + apimanager.Name
+			dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
 			if errors.IsNotFound(err) {
-				analyticsConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, analyticsConfWso2))
+				dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashConfWso2))
 				if err != nil {
-					fmt.Println("Creating analytics configmap in user specified ns", analyticsConfUser)
+					fmt.Println("Creating dashboard configmap in user specified ns", dashConfUser)
+				}
+			}
+
+			workerConfName := "wso2am-p1-analytics-worker-conf"
+			workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
+			workerConfUserName := "wso2am-p1-analytics-worker-conf-" + apimanager.Name
+			workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
+			if errors.IsNotFound(err) {
+				workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, workerConfWso2))
+				if err != nil {
+					fmt.Println("Creating worker configmap in user specified ns", workerConfUser)
+
 				}
 			}
 		}
