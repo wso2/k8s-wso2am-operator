@@ -24,8 +24,6 @@ import (
 	"strconv"
 	"strings"
 
-	"k8s.io/klog"
-
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -54,8 +52,6 @@ func Apim1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num i
 	}
 
 	apim1VolumeMount, apim1Volume := getApim1Volumes(apimanager, num)
-	klog.Info("APIM1-Volunme Mount:", apim1VolumeMount)
-	klog.Info("APIM1-Volunmes: ", apim1Volume)
 	apim1deployports := getApimContainerPorts()
 
 	cmdstring := []string{
@@ -355,8 +351,6 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 // for handling analytics-dashboard deployment
 func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
 
-	klog.Info("MaxSurge: ", y.Maxsurge)
-	klog.Info("MaxUnavail: ", y.Maxunavail)
 	dashdeployports := getDashContainerPorts()
 
 	cmdstring := []string{

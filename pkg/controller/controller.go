@@ -351,12 +351,10 @@ func (c *Controller) syncHandler(key string) error {
 		workerHlServiceName := "wso2-am-analytics-worker-headless-svc"
 
 		if enableAnalytics {
-			klog.Info("Analytics Configs")
 			dashConfName := "wso2am-p1-analytics-dash-conf"
 			dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
 			dashConfUserName := "wso2am-p1-analytics-dash-conf-" + apimanager.Name
 			dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
-			klog.Error("Analytics Configs Error: ", err)
 			if errors.IsNotFound(err) {
 				dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashConfWso2))
 				if err != nil {
@@ -364,12 +362,10 @@ func (c *Controller) syncHandler(key string) error {
 				}
 			}
 
-			klog.Info("Worker Configs")
 			workerConfName := "wso2am-p1-analytics-worker-conf"
 			workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
 			workerConfUserName := "wso2am-p1-analytics-worker-conf-" + apimanager.Name
 			workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
-			klog.Error("Worker Configs Error: ", err)
 			if errors.IsNotFound(err) {
 				workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, workerConfWso2))
 				if err != nil {
@@ -379,12 +375,10 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		klog.Info("Mysql Configs: ")
 		mysqlDbConfName := "wso2am-p1-mysql-dbscripts"
 		mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
 		mysqlDbConfUserName := "wso2am-p1-mysql-dbscripts-" + apimanager.Name
 		mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfUserName)
-		klog.Error("Mysql Config Error: ", err)
 		if errors.IsNotFound(err) {
 			mysqlDbConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, mysqlDbConfWso2))
 			if err != nil {
@@ -392,12 +386,10 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		klog.Info("AM1-Config")
 		am1ConfName := "wso2am-p1-apim-1-conf"
 		am1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am1ConfName)
 		am1ConfUserName := "wso2am-p1-apim-1-conf-" + apimanager.Name
 		am1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am1ConfUserName)
-		klog.Error("AM-1 Configs Error: ", err)
 		if errors.IsNotFound(err) {
 			am1ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, am1ConfWso2))
 			if err != nil {
@@ -406,25 +398,21 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		klog.Info("AM-2 Config")
 		am2ConfName := "wso2am-p1-apim-2-conf"
 		am2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am2ConfName)
 		am2ConfUserName := "wso2am-p1-apim-2-conf-" + apimanager.Name
 		am2ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am2ConfUserName)
 		if errors.IsNotFound(err) {
 			am2ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, am2ConfWso2))
-			klog.Error("AM-2 Configs Error: ", err)
 			if err != nil {
 				fmt.Println("Creating am2 configmap in user specified ns", am2ConfUser)
 			}
 		}
 
-		klog.Info("Dash Config")
 		dashBinConfName := "wso2am-p1-analytics-dash-bin"
 		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
 		dashBinConfUserName := "wso2am-p1-analytics-dash-bin-" + apimanager.Name
 		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
-		klog.Error("Dash Configs Error: ", err)
 		if errors.IsNotFound(err) {
 			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashBinConfWso2))
 			klog.Error("Dash Configs 1 Error: ", err)
@@ -507,12 +495,9 @@ func (c *Controller) syncHandler(key string) error {
 
 			// Get analytics dashboard service name using hardcoded value
 			dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
-			klog.Error("Dashboard-Service Error: ", dashservice)
 			// If the resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
 				dashservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.DashboardService(apimanager))
-				klog.Info("Handled Error")
-				klog.Error("Dasboard Service Cond Error: ", err)
 			} else {
 				fmt.Println("Dash Service is already available. [Service name] ,", dashservice)
 			}

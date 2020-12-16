@@ -245,4 +245,3 @@ func getWorkerContainerPorts() []corev1.ContainerPort {
 	})
 	return workerdeployports
 }
-
