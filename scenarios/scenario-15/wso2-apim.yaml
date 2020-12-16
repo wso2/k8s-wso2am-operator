@@ -20,7 +20,7 @@ kind: APIManager
 metadata:
   name: cluster-1
 spec:
-  pattern: Pattern-2
+  pattern: Pattern-3
   profiles:
     - name: apim-publisher-1
       deployment:
