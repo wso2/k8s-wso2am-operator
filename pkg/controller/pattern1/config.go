@@ -28,6 +28,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog"
 )
 
 type configvalues struct {
@@ -87,7 +88,7 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 
 	if totalProfiles > 0 {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -189,6 +190,7 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 
 func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
+	klog.Info("Dash Config Entered")
 	ControlConfigData := configMap.Data
 
 	imagePullSecret := ControlConfigData["image-pull-secret-name"]
@@ -212,14 +214,18 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-failureThreshold"], 10, 32)
 
+	klog.Info("Dash Config error oc")
+
 	totalProfiles := len(apimanager.Spec.Profiles)
 
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-dashboard" {
 
+		klog.Info("Replicas: ", apimanager.Spec.Profiles[num].Deployment.Replicas)
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
+
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if minReadySecFromYaml != 0 {
 			minReadySec = int64(minReadySecFromYaml)
@@ -285,7 +291,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 
 		// Get maxSurge value from the YAML file.
 		maxSurgesFromYaml := apimanager.Spec.Profiles[num].Deployment.Strategy.RollingUpdate.MaxSurge
-		if maxSurgesFromYaml != 1 {
+		if maxSurgesFromYaml != 0 {
 			maxSurges = int64(maxSurgesFromYaml)
 		}
 
@@ -299,6 +305,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 		if securityContextFromYaml != "" {
 			securityContext = securityContextFromYaml
 		}
+		klog.Info("Dash Config End")
 	}
 
 	cmvalues := &configvalues{
@@ -356,7 +363,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-worker" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds

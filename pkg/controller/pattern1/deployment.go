@@ -355,6 +355,8 @@ func Apim2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num i
 // for handling analytics-dashboard deployment
 func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
 
+	klog.Info("MaxSurge: ", y.Maxsurge)
+	klog.Info("MaxUnavail: ", y.Maxunavail)
 	dashdeployports := getDashContainerPorts()
 
 	cmdstring := []string{
@@ -505,7 +507,7 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 			Kind:       "StatefulSet",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-analytics-worker-" + apimanager.Name,
+			Name:      "wso2-am-analytics-worker-statefulset",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),

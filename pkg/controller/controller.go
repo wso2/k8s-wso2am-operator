@@ -346,21 +346,17 @@ func (c *Controller) syncHandler(key string) error {
 		mysqlserviceName := "mysql-svc"
 		dashboardDeploymentName := "wso2-am-analytics-dashboard-" + apimanager.Name
 		dashboardServiceName := "wso2-am-analytics-dashboard-svc"
-		workerDeploymentName := "wso2-am-analytics-worker-" + apimanager.Name
+		workerDeploymentName := "wso2-am-analytics-worker-statefulset"
 		workerServiceName := "wso2-am-analytics-worker-svc"
 		workerHlServiceName := "wso2-am-analytics-worker-headless-svc"
 
-		dashConfName := "wso2am-p1-analytics-dash-conf"
-		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
-		dashConfUserName := "wso2am-p1-analytics-dash-conf-" + apimanager.Name
-		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
-
-		workerConfName := "wso2am-p1-analytics-worker-conf"
-		workerConfWso2, err1 := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
-		workerConfUserName := "wso2am-p1-analytics-worker-conf-" + apimanager.Name
-		workerConfUser, err1 := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
-
 		if enableAnalytics {
+			klog.Info("Analytics Configs")
+			dashConfName := "wso2am-p1-analytics-dash-conf"
+			dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
+			dashConfUserName := "wso2am-p1-analytics-dash-conf-" + apimanager.Name
+			dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
+			klog.Error("Analytics Configs Error: ", err)
 			if errors.IsNotFound(err) {
 				dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashConfWso2))
 				if err != nil {
@@ -368,7 +364,13 @@ func (c *Controller) syncHandler(key string) error {
 				}
 			}
 
-			if errors.IsNotFound(err1) {
+			klog.Info("Worker Configs")
+			workerConfName := "wso2am-p1-analytics-worker-conf"
+			workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
+			workerConfUserName := "wso2am-p1-analytics-worker-conf-" + apimanager.Name
+			workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
+			klog.Error("Worker Configs Error: ", err)
+			if errors.IsNotFound(err) {
 				workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, workerConfWso2))
 				if err != nil {
 					fmt.Println("Creating worker configmap in user specified ns", workerConfUser)
@@ -377,10 +379,12 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
+		klog.Info("Mysql Configs: ")
 		mysqlDbConfName := "wso2am-p1-mysql-dbscripts"
 		mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
 		mysqlDbConfUserName := "wso2am-p1-mysql-dbscripts-" + apimanager.Name
 		mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfUserName)
+		klog.Error("Mysql Config Error: ", err)
 		if errors.IsNotFound(err) {
 			mysqlDbConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, mysqlDbConfWso2))
 			if err != nil {
@@ -388,10 +392,12 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
+		klog.Info("AM1-Config")
 		am1ConfName := "wso2am-p1-apim-1-conf"
 		am1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am1ConfName)
 		am1ConfUserName := "wso2am-p1-apim-1-conf-" + apimanager.Name
 		am1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am1ConfUserName)
+		klog.Error("AM-1 Configs Error: ", err)
 		if errors.IsNotFound(err) {
 			am1ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, am1ConfWso2))
 			if err != nil {
@@ -400,23 +406,28 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
+		klog.Info("AM-2 Config")
 		am2ConfName := "wso2am-p1-apim-2-conf"
 		am2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(am2ConfName)
 		am2ConfUserName := "wso2am-p1-apim-2-conf-" + apimanager.Name
 		am2ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(am2ConfUserName)
 		if errors.IsNotFound(err) {
 			am2ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, am2ConfWso2))
+			klog.Error("AM-2 Configs Error: ", err)
 			if err != nil {
 				fmt.Println("Creating am2 configmap in user specified ns", am2ConfUser)
 			}
 		}
 
+		klog.Info("Dash Config")
 		dashBinConfName := "wso2am-p1-analytics-dash-bin"
 		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
 		dashBinConfUserName := "wso2am-p1-analytics-dash-bin-" + apimanager.Name
 		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
+		klog.Error("Dash Configs Error: ", err)
 		if errors.IsNotFound(err) {
 			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashBinConfWso2))
+			klog.Error("Dash Configs 1 Error: ", err)
 			if err != nil {
 				fmt.Println("Creating dashboard bin configmap in user specified ns", dashBinConfUser)
 			}
@@ -507,28 +518,9 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		//Get worker-analytics headless service
-		workerhlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerHlServiceName)
-
 		// Get analytics worker deployment name using hardcoded value
 		workerdeployment, err1 := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(workerDeploymentName)
 		if enableAnalytics {
-
-			if errors.IsNotFound(err) {
-				workerhlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerHeadlessService(apimanager))
-			} else {
-				fmt.Println("Worker Headless Service is already available. [Service name] ,", workerhlservice)
-			}
-
-			// Get analytics worker service name using hardcoded value
-			workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
-			// If the resource doesn't exist, we'll create it
-			if errors.IsNotFound(err) {
-				workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerService(apimanager))
-			} else {
-				fmt.Println("Worker Service is already available. [Service name] ,", workerservice)
-			}
-
 			// If the worker resource doesn't exist, we'll create it
 			if errors.IsNotFound(err1) {
 				y := pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
@@ -538,6 +530,23 @@ func (c *Controller) syncHandler(key string) error {
 				if err != nil {
 					return err
 				}
+			}
+			// Get analytics worker service name using hardcoded value
+			workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
+			// If the resource doesn't exist, we'll create it
+			if errors.IsNotFound(err) {
+				workerservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerService(apimanager))
+			} else {
+				fmt.Println("Worker Service is already available. [Service name] ,", workerservice)
+			}
+
+			//Get worker-analytics headless service
+			workerhlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerHlServiceName)
+
+			if errors.IsNotFound(err) {
+				workerhlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern1.WorkerHeadlessService(apimanager))
+			} else {
+				fmt.Println("Worker Headless Service is already available. [Service name] ,", workerhlservice)
 			}
 		}
 
@@ -724,6 +733,7 @@ func (c *Controller) syncHandler(key string) error {
 				return fmt.Errorf(msg)
 			}
 
+			workerhlservice, _ := c.servicesLister.Services(apimanager.Namespace).Get(workerHlServiceName)
 			// If the analytics worker Headless Service is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
 			if !metav1.IsControlledBy(workerhlservice, apimanager) {
 				msg := fmt.Sprintf("worker headless Service %q already exists and is not managed by APIManager", workerhlservice.Name)

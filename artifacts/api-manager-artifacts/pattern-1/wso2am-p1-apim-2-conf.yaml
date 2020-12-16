@@ -51,7 +51,7 @@ data:
 
     [apim.event_hub]
     enable = true
-    service_url = "https://traffic-manager:9443"  
+    service_url = "https://localhost:9443"  
 
     [database.apim_db]
     type = "mysql"

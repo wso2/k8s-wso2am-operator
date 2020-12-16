@@ -48,7 +48,7 @@ data:
 
     [apim.event_hub]
     enable = true
-    service_url = "https://traffic-manager:9443"  
+    service_url = "https://localhost:9443"  
 
     [user_store]
     type = "database_unique_id"
