@@ -1242,11 +1242,11 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	// dashboard configurations
 
 	if enableAnalytics {
-		dashConfName := "wso2am-p2-analytics-dash-conf"
+		dashConfName := "wso2am-p4-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
 		klog.Info("Config Phase 1: OK")
 		klog.Error("Config Phase 1 Error", err)
-		dashConfUserName := "wso2am-p2-analytics-dash-conf-" + apimanager.Name
+		dashConfUserName := "wso2am-p4-analytics-dash-conf-" + apimanager.Name
 		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
 		klog.Info("Config Phase 2: OK")
 		klog.Error("Config Phase 2 Error: ", err)
@@ -1262,9 +1262,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	klog.Info("Worker Config")
 	// worker configurations
 	if enableAnalytics {
-		workerConfName := "wso2am-p2-analytics-worker-conf"
+		workerConfName := "wso2am-p4-analytics-worker-conf"
 		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
-		workerConfUserName := "wso2am-p2-analytics-worker-conf-" + apimanager.Name
+		workerConfUserName := "wso2am-p4-analytics-worker-conf-" + apimanager.Name
 		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
 		if errors.IsNotFound(err) {
 			workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, workerConfWso2))
@@ -1277,9 +1277,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	klog.Info("MYSQL config")
 	// mysql configurations
-	mysqlDbConfName := "wso2am-p2-mysql-dbscripts"
+	mysqlDbConfName := "wso2am-p4-mysql-dbscripts"
 	mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
-	mysqlDbConfUserName := "wso2am-p2-mysql-dbscripts-" + apimanager.Name
+	mysqlDbConfUserName := "wso2am-p4-mysql-dbscripts-" + apimanager.Name
 	mysqlDbConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(mysqlDbConfUserName)
 	if useMysqlPod {
 		if errors.IsNotFound(err) {
@@ -1291,9 +1291,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	klog.Info("Pub-Dev-Tm-1 Config")
-	pubDevTm1ConfName := "wso2am-p2-am-1-conf"
+	pubDevTm1ConfName := "wso2am-p4-am-1-conf"
 	pubDevTm1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubDevTm1ConfName)
-	pubDevTm1ConfUserName := "wso2am-p2-am-1-conf-" + apimanager.Name
+	pubDevTm1ConfUserName := "wso2am-p4-am-1-conf-" + apimanager.Name
 	pubDevTm1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pubDevTm1ConfUserName)
 	if errors.IsNotFound(err) {
 		pubDevTm1ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, pubDevTm1ConfWso2))
@@ -1305,9 +1305,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	klog.Info("Pub-Dev-Tm-2 Config")
-	pubDevTm2ConfName := "wso2am-p2-am-2-conf"
+	pubDevTm2ConfName := "wso2am-p4-am-2-conf"
 	pubDevTm2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubDevTm2ConfName)
-	pubDevTm2ConfUserName := "wso2am-p2-am-2-conf-" + apimanager.Name
+	pubDevTm2ConfUserName := "wso2am-p4-am-2-conf-" + apimanager.Name
 	pubDevTm2ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pubDevTm2ConfUserName)
 	if errors.IsNotFound(err) {
 		pubDevTm2ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, pubDevTm2ConfWso2))
@@ -1317,9 +1317,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	klog.Info("External Gateway Config")
-	gatewayConfName := "wso2am-p2-am-external-gateway-conf"
+	gatewayConfName := "wso2am-p4-am-external-gateway-conf"
 	gatewayConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gatewayConfName)
-	gatewayConfUserName := "wso2am-p2-am-external-gateway-conf-" + apimanager.Name
+	gatewayConfUserName := "wso2am-p4-am-external-gateway-conf-" + apimanager.Name
 	gatewayConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gatewayConfUserName)
 	if errors.IsNotFound(err) {
 		gatewayConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, gatewayConfWso2))
@@ -1329,9 +1329,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	klog.Info("Internal Gateway Config")
-	gatewayInternalConfName := "wso2am-p2-am-internal-gateway-conf"
+	gatewayInternalConfName := "wso2am-p4-am-internal-gateway-conf"
 	gatewayInternalConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gatewayInternalConfName)
-	gatewayInternalConfUserName := "wso2am-p2-am-internal-gateway-conf-" + apimanager.Name
+	gatewayInternalConfUserName := "wso2am-p4-am-internal-gateway-conf-" + apimanager.Name
 	gatewayInternalConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gatewayInternalConfUserName)
 	if errors.IsNotFound(err) {
 		gatewayConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, gatewayInternalConfWso2))
@@ -1341,9 +1341,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	}
 
 	klog.Info("KM Config")
-	kmConfName := "wso2am-p2-am-km-conf"
+	kmConfName := "wso2am-p4-am-km-conf"
 	kmConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(kmConfName)
-	kmConfUserName := "wso2-p2-am-km-conf" + apimanager.Name
+	kmConfUserName := "wso2-p4-am-km-conf" + apimanager.Name
 	kmConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(kmConfUserName)
 	if errors.IsNotFound(err) {
 		kmConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, kmConfWso2))
@@ -1354,9 +1354,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	klog.Info("Dash Bin Config &Worker Bin Config")
 	if enableAnalytics {
-		dashBinConfName := "wso2am-p2-analytics-dash-bin"
+		dashBinConfName := "wso2am-p4-analytics-dash-bin"
 		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
-		dashBinConfUserName := "wso2am-p2-analytics-dash-bin-" + apimanager.Name
+		dashBinConfUserName := "wso2am-p4-analytics-dash-bin-" + apimanager.Name
 		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
 		if errors.IsNotFound(err) {
 			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, dashBinConfWso2))
@@ -1365,9 +1365,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			}
 		}
 
-		workerBinConfName := "wso2am-p2-analytics-worker-bin"
+		workerBinConfName := "wso2am-p4-analytics-worker-bin"
 		workerBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerBinConfName)
-		workerBinConfUserName := "wso2am-p2-analytics-worker-bin-" + apimanager.Name
+		workerBinConfUserName := "wso2am-p4-analytics-worker-bin-" + apimanager.Name
 		workerBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerBinConfUserName)
 		if errors.IsNotFound(err) {
 			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, workerBinConfWso2))
