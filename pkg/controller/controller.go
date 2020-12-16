@@ -1890,8 +1890,6 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	pub1deploymentName := "wso2-am-publisher-1-deployment-" + apimanager.Name
 	pub2deploymentName := "wso2-am-publisher-2-deployment-" + apimanager.Name
-	//pubserviceName := "wso2-am-publisher-svc"
-	// pubDevTm2serviceName := "wso2-am-2-svc"
 	pubcommonserviceName := "wso2-am-publisher-svc"
 	kmdeploymentName := "wso2-am-km-statefulset"
 	kmserviceName := "wso2-am-km-svc"
@@ -1911,14 +1909,13 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	workerServiceName := "wso2-am-analytics-worker-svc"
 	workerhlServiceName := "wso2-am-analytics-worker-headless-svc"
 
-	//mysqlPVCName := "wso2am-mysql"
-
 	pubIngressName := "wso2-am-publisher-ingress"
 	devIngressName := "wso2-am-devportal-ingress"
 	gatewayIngressName := "wso2-am-gw-ingress"
 	dashIngressName := "wso2-am-analytics-dashboard-ingress"
 
 	klog.Info("Started Config Creating for Pattern-3")
+
 	// dashboard configurations
 
 	if enableAnalytics {

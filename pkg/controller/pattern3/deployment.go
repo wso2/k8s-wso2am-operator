@@ -74,6 +74,8 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
 		klog.Info("Pub-1 Containers", initContainers[1])
+	} else {
+		getInitContainers([]string{"init-km"}, &initContainers)
 	}
 
 	klog.Info("Pub-1 Container Phase 1 Done")
@@ -87,10 +89,6 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 	klog.Info("Ready Delay", x.Readydelay)
 	klog.Info("Live Delay", x.Livedelay)
 	return &appsv1.Deployment{
-		// TypeMeta: metav1.TypeMeta{
-		// 	APIVersion: depApiVersion,
-		// 	Kind:       deploymentKind,
-		// },
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depAPIVersion,
 			Kind:       deploymentKind,
@@ -241,6 +239,8 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
 		klog.Info("Pub-2 Containers", initContainers[1])
+	} else {
+		getInitContainers([]string{"init-km"}, &initContainers)
 	}
 
 	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers([]string{"init-am-analytics-worker"}))
@@ -248,15 +248,6 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, pub2SecurityContext)
-
-	// Checking for the availability of API Manager Server 1 deployment
-
-	// apim1InitContainer := corev1.Container{}
-	// apim1InitContainer.Name = "init-apim-1"
-	// apim1InitContainer.Image = "busybox:1.32"
-	// executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
-	// apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
-	//initContainers = append(initContainers, apim1InitContainer)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -409,6 +400,8 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
 		klog.Info("Dev-1 Containers", initContainers[1])
+	} else {
+		getInitContainers([]string{"init-km"}, &initContainers)
 	}
 
 	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers([]string{"init-am-analytics-worker"}))
@@ -568,6 +561,8 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
 		klog.Info("Dev-2 Containers", initContainers[1])
+	} else {
+		getInitContainers([]string{"init-km"}, &initContainers)
 	}
 
 	//initContainers = append(initContainers, getAnalyticsWorkerInitContainers([]string{"init-am-analytics-worker"}))
@@ -575,15 +570,6 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, dev2SecurityContext)
-
-	// Checking for the availability of API Manager Server 1 deployment
-
-	// apim1InitContainer := corev1.Container{}
-	// apim1InitContainer.Name = "init-apim-1"
-	// apim1InitContainer.Image = "busybox:1.32"
-	// executionStr := "echo -e \"Checking for the availability of API Manager Server deployment\"; while ! nc -z \"wso2-am-1-svc\" 9711; do sleep 1; printf \"-\"; done; echo -e \"  >> APIM Server has started\";"
-	// apim1InitContainer.Command = []string{"/bin/sh", "-c", executionStr}
-	//initContainers = append(initContainers, apim1InitContainer)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -1151,8 +1137,6 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	labels := map[string]string{
 		"deployment": "wso2-analytics-dashboard",
 	}
-	//runasuser := int64(802)
-	//defaultMode := int32(0407)
 
 	dashVolumeMount, dashVolume := getAnalyticsDashVolumes(apimanager, num)
 
@@ -1160,8 +1144,6 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	if useMysql {
 		initContainers = getMysqlInitContainers(apimanager, &dashVolume, &dashVolumeMount)
 	}
-
-	// getInitContainers([]string{"init-am"}, &initContainers)
 
 	dashboardSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
@@ -1284,7 +1266,6 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	labels := map[string]string{
 		"deployment": "wso2-analytics-worker",
 	}
-	//runasuser := int64(802)
 
 	workerContainerPorts := getWorkerContainerPorts()
 	initContainers := []corev1.Container{}

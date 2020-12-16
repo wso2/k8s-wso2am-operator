@@ -33,7 +33,6 @@ func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2-gateway",
 	}
 	gatewayports := getGatewaySpecificSvcPorts()
-	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -45,8 +44,7 @@ func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			// Type:     corev1.ServiceType(servType),
-			Ports: gatewayports,
+			Ports:    gatewayports,
 		},
 	}
 }
@@ -57,7 +55,6 @@ func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2-km",
 	}
 	keymanagerports := getKeyManagerSpecificSvcPorts()
-	///servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -69,8 +66,7 @@ func KeyManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			// Type:     corev1.ServiceType(servType),
-			Ports: keymanagerports,
+			Ports:    keymanagerports,
 		},
 	}
 }
@@ -81,7 +77,6 @@ func TrafficManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service 
 		"deployment": "wso2-tm",
 	}
 	tmports := getTrafficManagerSpecificSvcPorts()
-	///servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -93,8 +88,7 @@ func TrafficManagerService(apimanager *apimv1alpha1.APIManager) *corev1.Service 
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			// Type:     corev1.ServiceType(servType),
-			Ports: tmports,
+			Ports:    tmports,
 		},
 	}
 }
@@ -157,8 +151,7 @@ func DashboardService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			//Type:     corev1.ServiceType(servType),
-			Ports: dashports,
+			Ports:    dashports,
 		},
 	}
 }
@@ -169,7 +162,6 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		"deployment": "wso2-analytics-worker",
 	}
 	workerports := getWorkerPorts()
-	//servType := "ClusterIP"
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -181,8 +173,7 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			//Type:     corev1.ServiceType(servType),
-			Ports: workerports,
+			Ports:    workerports,
 		},
 	}
 }
@@ -240,8 +231,7 @@ func PubCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			//Type:     corev1.ServiceType(servType),
-			Ports: pubcommonsvsports,
+			Ports:    pubcommonsvsports,
 		},
 	}
 }
@@ -264,8 +254,7 @@ func DevCommonService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 		},
 		Spec: corev1.ServiceSpec{
 			Selector: labels,
-			//Type:     corev1.ServiceType(servType),
-			Ports: devcommonsvsports,
+			Ports:    devcommonsvsports,
 		},
 	}
 }
