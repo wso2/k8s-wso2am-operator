@@ -64,7 +64,7 @@ data:
 
     [apim.event_hub]
     enable = true
-    service_url = "https://wso2apim:9443"  
+    service_url = "https://localhost:9443"  
 
     [keystore.tls]
     file_name =  "wso2carbon.jks"

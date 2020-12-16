@@ -140,9 +140,9 @@ data:
     publish_response_size = true
 
     [[apim.analytics.url_group]]
-    analytics_url =["tcp://wso2-am-analytics-worker-svc:7612"]
-    analytics_auth_url =["ssl://wso2-am-analytics-worker-svc:7712"]
-    #type = "loadbalance"
+    analytics_url =["tcp://wso2-am-analytics-worker-statefulset-0.wso2-am-analytics-worker-headless-svc':7612","tcp://wso2-am-analytics-worker-statefulset-1.wso2-am-analytics-worker-headless-svc:7612"]
+    analytics_auth_url =["ssl://wso2-am-analytics-worker-statefulset-0.wso2-am-analytics-worker-headless-svc:7712","ssl://wso2-am-analytics-worker-statefulset-1.wso2-am-analytics-worker-headless-svc:7712"]
+    type = "failover"
 
     #[[apim.analytics.url_group]]
     #analytics_url =["tcp://analytics1:7612","tcp://analytics2:7612"]
@@ -219,8 +219,8 @@ data:
     #port = 10005
 
     [[apim.throttling.url_group]]
-    traffic_manager_urls = ["tcp://localhost:9611"]
-    traffic_manager_auth_urls = ["ssl://localhost:9711"]
+    traffic_manager_urls = ["tcp://wso2-am-2-svc:9611"]
+    traffic_manager_auth_urls = ["ssl://wso2-am-2-svc:9711"]
     type = "loadbalance"
 
     [[apim.throttling.url_group]]
