@@ -261,7 +261,7 @@ func getgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.V
 
 func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	dashconfigmap := "wso2am-p2-analytics-conf"
+	dashconfigmap := "wso2am-p2-analytics-dash-conf"
 	var dashvolumemounts []corev1.VolumeMount
 	var dashvolume []corev1.Volume
 
@@ -338,7 +338,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 
 func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	deployconfigmap := "wso2am-p2-analytics-conf"
+	deployconfigmap := "wso2am-p2-analytics-worker-conf"
 
 	var workervolumemounts []corev1.VolumeMount
 	var workervolume []corev1.Volume

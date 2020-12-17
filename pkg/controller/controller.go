@@ -1251,21 +1251,35 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	// dashboard configurations
 
 	if enableAnalytics {
-		analyticsConfName := "wso2am-p2-analytics-conf"
-		analyticsConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsConfName)
+		dashConfName := "wso2am-p2-analytics-dash-conf"
+		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
 		klog.Info("Config Phase 1: OK")
 		klog.Error("Config Phase 1 Error", err)
-		analyticsConfUserName := "wso2am-p2-analytics-conf-" + apimanager.Name
-		analyticsConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsConfUserName)
+		dashConfUserName := "wso2am-p2-analytics-dash-conf-" + apimanager.Name
+		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
 		klog.Info("Config Phase 2: OK")
 		klog.Error("Config Phase 2 Error: ", err)
 		if errors.IsNotFound(err) {
-			analyticsConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, analyticsConfWso2))
+			dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashConfWso2))
 			klog.Error("Dash Conf Error: ", err)
 			if err != nil {
-				fmt.Println("Creating analytics configmap in user specified ns", analyticsConfUser)
+				fmt.Println("Creating dashboard configmap in user specified ns", dashConfUser)
 			}
 		}
+
+		workerConfName := "wso2am-p2-analytics-worker-conf"
+		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
+		workerConfUserName := "wso2am-p2-analytics-worker-conf-" + apimanager.Name
+		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
+		if errors.IsNotFound(err) {
+			workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, workerConfWso2))
+			if err != nil {
+				fmt.Println("Creating worker configmap in user specified ns", workerConfUser)
+
+				fmt.Println("Creating analytics configmap in user specified ns", workerConfUser)
+			}
+		}
+
 	}
 
 	klog.Info("MYSQL config")
@@ -1335,16 +1349,29 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	klog.Info("Analytics Bin Config &Worker Bin Config")
 	if enableAnalytics {
-		analyticsBinConfName := "wso2am-p2-analytics-bin"
-		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
-		analyticsBinConfUserName := "wso2am-p2-analytics-bin-" + apimanager.Name
-		analyticsBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsBinConfUserName)
+		dashBinConfName := "wso2am-p2-analytics-dash-bin"
+		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
+		dashBinConfUserName := "wso2am-p2-analytics-dash-bin-" + apimanager.Name
+		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
 		if errors.IsNotFound(err) {
-			analyticsBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, analyticsBinConfWso2))
+			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashBinConfWso2))
 			if err != nil {
-				fmt.Println("Creating analytics bin configmap in user specified ns", analyticsBinConfUser)
+				fmt.Println("Creating dashboard bin configmap in user specified ns", dashBinConfUser)
 			}
 		}
+
+		workerBinConfName := "wso2am-p2-analytics-worker-bin"
+		workerBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerBinConfName)
+		workerBinConfUserName := "wso2am-p2-analytics-worker-bin-" + apimanager.Name
+		workerBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerBinConfUserName)
+
+		if errors.IsNotFound(err) {
+			workerBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, workerBinConfWso2))
+			if err != nil {
+				fmt.Println("Creating worker bin configmap in user specified ns", workerBinConfUser)
+			}
+		}
+
 	}
 
 	// Parse the object and look for it’s deployment
