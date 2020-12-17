@@ -403,7 +403,7 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "wso2am-p2-analytics-worker-bin",
+					Name: "wso2am-p2-analytics-bin",
 				},
 			},
 		},
