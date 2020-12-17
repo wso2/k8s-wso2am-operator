@@ -46,17 +46,6 @@ data:
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
 
-    [apim.sync_runtime_artifacts.publisher]
-    artifact_saver = "DBSaver"
-    publish_directly_to_gateway = "true"
-
-    [apim.sync_runtime_artifacts.gateway]
-    gateway_labels =["Production and Sandbox"]
-    artifact_retriever = "DBRetriever"
-    deployment_retry_duration = 15000
-    data_retrieval_mode = "sync"
-    event_waiting_time = 5000
-
     [keystore.tls]
     file_name =  "wso2carbon.jks"
     type =  "JKS"
@@ -78,6 +67,7 @@ data:
     type = "org.wso2.carbon.identity.core.handler.AbstractIdentityHandler"
     name = "org.wso2.is.notification.ApimOauthEventInterceptor"
     order = 1
+    
     [event_listener.properties]
     notification_endpoint = "https://localhost:${mgt.transport.https.port}/internal/data/v1/notify"
     username = "${admin.username}"
