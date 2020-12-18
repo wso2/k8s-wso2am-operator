@@ -328,7 +328,7 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 
 	apimVersion := ControlConfigData["api-manager-version"]
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	replicas, _ := strconv.ParseInt(ControlConfigData["apim-km-deployment-replicas"], 10, 32)
+	replicas, _ := strconv.ParseInt(ControlConfigData["p3-apim-km-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
 	amImages := ControlConfigData["apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
@@ -460,10 +460,10 @@ func AssignApimGatewayConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 
 	apimVersion := ControlConfigData["api-manager-version"]
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	replicas, _ := strconv.ParseInt(ControlConfigData["apim-gw-deployment-replicas"], 10, 32)
+	replicas, _ := strconv.ParseInt(ControlConfigData["p3-apim-gw-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
-	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-gw-deployment-maxSurge"], 10, 32)
-	maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-gw-deployment-maxUnavailable"], 10, 32)
+	maxSurges, _ := strconv.ParseInt(ControlConfigData["p3-apim-gw-deployment-maxSurge"], 10, 32)
+	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p3-apim-gw-deployment-maxUnavailable"], 10, 32)
 	amImages := ControlConfigData["apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["apim-deployment-resources-requests-cpu"])
