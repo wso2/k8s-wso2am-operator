@@ -34,10 +34,30 @@ spec:
             memory: 2Gi
             cpu: 2000m
         livenessProbe:
-          initialDelaySeconds: 200
+          initialDelaySeconds: 180
           failureThreshold: 3
-          periodSeconds: 30
+          periodSeconds: 20
         readinessProbe:
-          initialDelaySeconds: 200
+          initialDelaySeconds: 180
           failureThreshold: 3
-          periodSeconds: 30
+          periodSeconds: 20
+    - name: api-devportal-1
+      deployment:
+        replicas: 1
+        minReadySeconds: 100
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 1000m
+          limits:
+            memory: 2Gi
+            cpu: 2000m
+        livenessProbe:
+          initialDelaySeconds: 180
+          failureThreshold: 3
+          periodSeconds: 20
+        readinessProbe:
+          initialDelaySeconds: 180
+          failureThreshold: 3
+          periodSeconds: 20
