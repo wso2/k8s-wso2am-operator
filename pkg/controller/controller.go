@@ -1349,26 +1349,14 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	klog.Info("Analytics Bin Config &Worker Bin Config")
 	if enableAnalytics {
-		dashBinConfName := "wso2am-p2-analytics-bin"
-		dashBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashBinConfName)
-		dashBinConfUserName := "wso2am-p2-analytics-bin-" + apimanager.Name
-		dashBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashBinConfUserName)
+		analyticsBinConfName := "wso2am-p2-analytics-bin"
+		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
+		analyticsBinConfUserName := "wso2am-p2-analytics-bin-" + apimanager.Name
+		analyticsBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsBinConfUserName)
 		if errors.IsNotFound(err) {
-			dashBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashBinConfWso2))
+			analyticsBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, analyticsBinConfWso2))
 			if err != nil {
-				fmt.Println("Creating dashboard bin configmap in user specified ns", dashBinConfUser)
-			}
-		}
-
-		workerBinConfName := "wso2am-p2-analytics-bin"
-		workerBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerBinConfName)
-		workerBinConfUserName := "wso2am-p2-analytics-bin-" + apimanager.Name
-		workerBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerBinConfUserName)
-
-		if errors.IsNotFound(err) {
-			workerBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, workerBinConfWso2))
-			if err != nil {
-				fmt.Println("Creating worker bin configmap in user specified ns", workerBinConfUser)
+				fmt.Println("Creating analytics bin configmap in user specified ns", analyticsBinConfUser)
 			}
 		}
 
