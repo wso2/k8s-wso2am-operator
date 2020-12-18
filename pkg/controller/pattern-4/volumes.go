@@ -34,7 +34,7 @@ func getDevPubTm1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-pub-dev-tm-1" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-1" {
 
 		deployConfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployConfFromYaml != "" {
@@ -94,7 +94,7 @@ func getDevPubTm2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-pub-dev-tm-2" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-pub-dev-tm-2" {
 
 		deployConfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployConfFromYaml != "" {
@@ -153,7 +153,7 @@ func getKeyManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-key-manager" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-key-manager" {
 
 		deployconfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if deployconfFromYaml != "" {
@@ -211,7 +211,7 @@ func getexternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-external-gateway" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-external-gateway" {
 
 		gwconfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if gwconfFromYaml != "" {
@@ -269,7 +269,7 @@ func getinternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
-	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "apim-inernal-gateway" {
+	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "api-inernal-gateway" {
 
 		gwconfFromYaml := apimanager.Spec.Profiles[num].Deployment.Configmaps.DeploymentConfigmap
 		if gwconfFromYaml != "" {
@@ -364,7 +364,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 		SubPath:   "deployment.yaml",
 	})
 	dashvolumemounts = append(dashvolumemounts, corev1.VolumeMount{
-		Name:      "wso2am-p4-analytics-dashboard-bin",
+		Name:      "wso2am-p4-analytics-bin",
 		MountPath: "/home/wso2carbon/wso2-config-volume/wso2/dashboard/bin/carbon.sh",
 		SubPath:   "carbon.sh",
 	})
@@ -381,11 +381,11 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 	})
 
 	dashvolume = append(dashvolume, corev1.Volume{
-		Name: "wso2am-p4-analytics-dashboard-bin",
+		Name: "wso2am-p4-analytics-bin",
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "wso2am-p4-analytics-dash-bin",
+					Name: "wso2am-p4-analytics-bin",
 				},
 			},
 		},
@@ -441,7 +441,7 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 	})
 
 	workervolumemounts = append(workervolumemounts, corev1.VolumeMount{
-		Name:      "wso2am-p4-analytics-worker-bin",
+		Name:      "wso2am-p4-analytics-bin",
 		MountPath: "/home/wso2carbon/wso2-config-volume/wso2/worker/bin/carbon.sh",
 		SubPath:   "carbon.sh",
 	})
@@ -458,11 +458,11 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 	})
 
 	workervolume = append(workervolume, corev1.Volume{
-		Name: "wso2am-p4-analytics-worker-bin",
+		Name: "wso2am-p4-analytics-bin",
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "wso2am-p4-analytics-worker-bin",
+					Name: "wso2am-p4-analytics-bin",
 				},
 			},
 		},
