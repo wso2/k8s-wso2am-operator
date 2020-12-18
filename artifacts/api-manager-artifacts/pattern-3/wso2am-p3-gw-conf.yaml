@@ -135,6 +135,7 @@ data:
     HostnameVerifier = "AllowAll"
 
     [apim.event_hub]
+    enable = true
     service_url = "https://wso2-am-tm-svc:9443"
     event_listening_endpoints = ["tcp://wso2-am-tm-statefulset-0.wso2-am-tm-headless-svc:5672","tcp://wso2-am-tm-statefulset-1.wso2-am-tm-headless-svc:5672"]
 

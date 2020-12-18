@@ -69,10 +69,6 @@ data:
   apim-analytics-deployment-resources-limits-cpu: "2000m"
 
   # pattern specific configs for key manager instances
-  p2-apim-km-deployment-livenessProbe-periodSeconds: "20"
-  p2-apim-km-deployment-livenessProbe-initialDelaySeconds: "180"
-  p2-apim-km-deployment-readinessProbe-periodSeconds: "20"
-  p2-apim-km-deployment-readinessProbe-initialDelaySeconds: "180"
   p2-apim-km-deployment-replicas: "2"
 
   p2-apim-gw-deployment-replicas: "2"
