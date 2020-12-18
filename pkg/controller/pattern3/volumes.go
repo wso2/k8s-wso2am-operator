@@ -478,7 +478,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 		SubPath:   "deployment.yaml",
 	})
 	dashvolumemounts = append(dashvolumemounts, corev1.VolumeMount{
-		Name:      "wso2-am-analytics-dashboard-bin",
+		Name:      "wso2-am-analytics-bin",
 		MountPath: "/home/wso2carbon/wso2-config-volume/wso2/dashboard/bin/carbon.sh",
 		SubPath:   "carbon.sh",
 	})
@@ -495,11 +495,11 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 	})
 
 	dashvolume = append(dashvolume, corev1.Volume{
-		Name: "wso2-am-analytics-dashboard-bin",
+		Name: "wso2-am-analytics-bin",
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "wso2-am-analytics-dashboard-bin",
+					Name: "wso2-am-analytics-bin",
 				},
 			},
 		},
@@ -555,7 +555,7 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 	})
 
 	workervolumemounts = append(workervolumemounts, corev1.VolumeMount{
-		Name:      "wso2-am-analytics-worker-bin",
+		Name:      "wso2-am-analytics-bin",
 		MountPath: "/home/wso2carbon/wso2-config-volume/wso2/worker/bin/carbon.sh",
 		SubPath:   "carbon.sh",
 	})
@@ -572,11 +572,11 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 	})
 
 	workervolume = append(workervolume, corev1.Volume{
-		Name: "wso2-am-analytics-worker-bin",
+		Name: "wso2-am-analytics-bin",
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "wso2-am-analytics-worker-bin",
+					Name: "wso2-am-analytics-bin",
 				},
 			},
 		},
