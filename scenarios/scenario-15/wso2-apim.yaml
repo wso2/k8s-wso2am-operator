@@ -22,7 +22,7 @@ metadata:
 spec:
   pattern: Pattern-3
   profiles:
-    - name: apim-publisher-1
+    - name: api-publisher-1
       deployment:
         configMaps:
           deploymentConfigMap: <NEW_PROFILE_DEPLOYMENT_CONFIGMAP>
