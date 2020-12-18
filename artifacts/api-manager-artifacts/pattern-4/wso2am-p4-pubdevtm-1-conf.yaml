@@ -33,10 +33,6 @@ data:
     password = "admin"
     create_admin_account = true
 
-    [apim.sync_runtime_artifacts.publisher]
-    artifact_saver = "DBSaver"
-    publish_directly_to_gateway = "true"
-
     [user_store]
     type = "database_unique_id"
 
@@ -53,6 +49,10 @@ data:
     username = "wso2carbon"
     password = "wso2carbon"
     driver = "com.mysql.cj.jdbc.Driver"
+
+    [apim.sync_runtime_artifacts.publisher]
+    artifact_saver = "DBSaver"
+    publish_directly_to_gateway = "true"
 
     [keystore.tls]
     file_name =  "wso2carbon.jks"
