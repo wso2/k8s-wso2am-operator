@@ -320,7 +320,7 @@ func getinternalgatewayVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 
 func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
 
-	dashconfigmap := "wso2am-p2-analytics-dash-conf"
+	dashconfigmap := "wso2am-p4-analytics-dash-conf"
 	var dashvolumemounts []corev1.VolumeMount
 	var dashvolume []corev1.Volume
 

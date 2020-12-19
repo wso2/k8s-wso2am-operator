@@ -74,8 +74,8 @@ func AssignDevPubTmConfigMapValues(apimanager *apimv1alpha1.APIManager, configMa
 	reqMem := resource.MustParse(ControlConfigData["apim-deployment-resources-requests-memory"])
 	limitCPU := resource.MustParse(ControlConfigData["apim-deployment-resources-limits-cpu"])
 	limitMem := resource.MustParse(ControlConfigData["apim-deployment-resources-limits-memory"])
-	liveDelay, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livelinessProbe-initialDelaySeconds"], 10, 32)
-	livePeriod, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livelinessProbe-periodSeconds"], 10, 32)
+	liveDelay, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
+	livePeriod, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-failureThreshold"], 10, 32)
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-periodSeconds"], 10, 32)
@@ -325,6 +325,7 @@ func AssignApimExternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 		SecurityContext:    securityContext,
 		JvmMemOpts:         memOpts,
 	}
+	klog.Info("External GW Configs Done!")
 	return cmvalues
 
 }
@@ -470,6 +471,7 @@ func AssignApimInternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 		SecurityContext:    securityContext,
 		JvmMemOpts:         memOpts,
 	}
+	klog.Info("Internal GW Configs Done!")
 	return cmvalues
 
 }

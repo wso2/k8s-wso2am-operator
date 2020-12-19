@@ -836,6 +836,10 @@ func (c *Controller) syncHandler(key string) error {
 
 	}
 
+	if apimanager.Spec.Pattern == "Pattern-4" {
+		pattern4Execution(apimanager, c, configmap, name)
+	}
+
 	if apimanager.Spec.Pattern == "Pattern-X" {
 
 		configMapName := "wso2am-operator-controller-config"
@@ -1354,9 +1358,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	klog.Info("Dash Bin Config &Worker Bin Config")
 	if enableAnalytics {
-		analyticsBinConfName := "wso2am-p4-analytics-dash-bin"
+		analyticsBinConfName := "wso2am-p4-analytics-bin"
 		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
-		analyticsBinConfUserName := "wso2am-p4-analytics-dash-bin-" + apimanager.Name
+		analyticsBinConfUserName := "wso2am-p4-analytics-bin-" + apimanager.Name
 		analyticsBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsBinConfUserName)
 		if errors.IsNotFound(err) {
 			analyticsBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, analyticsBinConfWso2))
@@ -1579,8 +1583,9 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		z := pattern4.AssignApimExternalGatewayConfigMapValues(apimanager, configmap, gatewayexternalnum)
+		klog.Info("External GW Done!")
 		gatewayDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.ExternalGatewayDeployment(apimanager, z, gatewayexternalnum))
-		klog.Error(err)
+		klog.Error("External GW Depl Error: ", err)
 		if err != nil {
 			return err
 		}
@@ -1594,7 +1599,7 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if errors.IsNotFound(err) {
 		z := pattern4.AssignApimInternalGatewayConfigMapValues(apimanager, configmap, gatewayinternalnum)
 		gatewayInternalDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.InternalGatewayDeployment(apimanager, z, gatewayinternalnum))
-		klog.Error(err)
+		klog.Error("Internal GW Error: ", err)
 		if err != nil {
 			return err
 		}

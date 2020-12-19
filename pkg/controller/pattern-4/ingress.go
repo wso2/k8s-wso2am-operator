@@ -79,7 +79,7 @@ func ExternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-external-gw-ingress",
+			Name:      "wso2-am-gw-external-ingress",
 			Namespace: apimanager.Namespace,
 			Annotations: map[string]string{
 				"kubernetes.io/ingress.class":                  "nginx",
@@ -92,14 +92,14 @@ func ExternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 		Spec: v1beta1.IngressSpec{
 			Rules: []networkv1.IngressRule{
 				{
-					Host: "external.gateway.am.wso2.com",
+					Host: "ext.gateway.am.wso2.com",
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []networkv1.HTTPIngressPath{
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2-am-external-gw-svc",
+										ServiceName: "wso2-am-gw-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
 									},
 								},
@@ -111,7 +111,7 @@ func ExternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						"external.gateway.am.wso2.com",
+						"ext.gateway.am.wso2.com",
 					},
 				},
 			},
@@ -124,7 +124,7 @@ func InternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-internal-gw-ingress",
+			Name:      "wso2-am-gw-internal-ingress",
 			Namespace: apimanager.Namespace,
 			Annotations: map[string]string{
 				"kubernetes.io/ingress.class":                  "nginx",
@@ -137,14 +137,14 @@ func InternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 		Spec: v1beta1.IngressSpec{
 			Rules: []networkv1.IngressRule{
 				{
-					Host: "internal.gateway.am.wso2.com",
+					Host: "int.gateway.am.wso2.com",
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []networkv1.HTTPIngressPath{
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2-am-internal-gw-svc",
+										ServiceName: "wso2-am-gw-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
 									},
 								},
@@ -156,7 +156,7 @@ func InternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						"internal.gateway.am.wso2.com",
+						"int.gateway.am.wso2.com",
 					},
 				},
 			},

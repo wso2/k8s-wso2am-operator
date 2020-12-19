@@ -61,7 +61,7 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 	cmdstring := []string{
 		"/bin/sh",
 		"-c",
-		"nc -z 9443",
+		"nc -z localhost 9443",
 	}
 
 	initContainers := []corev1.Container{}
@@ -79,7 +79,6 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 
 	klog.Info("PubDevTm-1 Container Phase 1 Done")
 
-	//initContainers = append(initContainers, getInitContainers([]string{"init-am-analytics-worker"}))
 	pubDev1SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
 
@@ -117,7 +116,7 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						{
-							Name:  "wso2-pattern-2-am-1",
+							Name:  "wso2-pattern-4-am-1",
 							Image: x.Image,
 							LivenessProbe: &corev1.Probe{
 								InitialDelaySeconds: x.Livedelay,
@@ -369,7 +368,7 @@ func ExternalGatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configval
 	gatewaydeployports := getGatewayContainerPorts()
 
 	labels := map[string]string{
-		"deployment": "wso2-external-gateway",
+		"deployment": "wso2-gateway",
 	}
 
 	cmdstring := []string{
@@ -400,7 +399,7 @@ func ExternalGatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configval
 			Kind:       deploymentKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-gw-" + apimanager.Name,
+			Name:      "wso2-am-external-gw-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -535,7 +534,7 @@ func InternalGatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configval
 	gatewaydeployports := getGatewayContainerPorts()
 
 	labels := map[string]string{
-		"deployment": "wso2-internal-gateway",
+		"deployment": "wso2-gateway",
 	}
 
 	cmdstring := []string{
@@ -566,7 +565,7 @@ func InternalGatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configval
 			Kind:       deploymentKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-gw-" + apimanager.Name,
+			Name:      "wso2-am-internal-gw-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
