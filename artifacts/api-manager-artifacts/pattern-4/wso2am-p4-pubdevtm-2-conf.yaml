@@ -86,11 +86,11 @@ data:
     password= "${admin.password}"
     ws_endpoint = "ws://localhost:9099"
     wss_endpoint = "wss://localhost:8099"
-    http_endpoint = "http://external.gateway.am.wso2.com"
-    https_endpoint = "https://external.gateway.am.wso2.com"
+    http_endpoint = "http://ext.gateway.am.wso2.com"
+    https_endpoint = "https://ext.gateway.am.wso2.com"
 
     [[apim.gateway.environment]]
-    name = "Production and Sandbox"
+    name = "Production and Sandbox 2"
     type = "hybrid"
     display_in_api_console = true
     description = "This is a hybrid gateway that handles both production and sandbox token traffic."
@@ -100,8 +100,8 @@ data:
     password= "${admin.password}"
     ws_endpoint = "ws://localhost:9099"
     wss_endpoint = "wss://localhost:8099"
-    http_endpoint = "http://internal.gateway.am.wso2.com"
-    https_endpoint = "https://internal.gateway.am.wso2.com"
+    http_endpoint = "http://int.gateway.am.wso2.com"
+    https_endpoint = "https://int.gateway.am.wso2.com"
 
     #[apim.cache.gateway_token]
     #enable = true
@@ -132,7 +132,7 @@ data:
     #expiry_time = "2m"
 
     [apim.analytics]
-    enable = "$env{Enable_ANALYTICS}"
+    enable = "$env{ENABLE_ANALYTICS}"
     store_api_url = "https://wso2-am-analytics-worker-svc:7444"
     #username = "$ref{super_admin.username}"
     #password = "$ref{super_admin.password}"

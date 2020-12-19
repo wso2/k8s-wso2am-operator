@@ -20,7 +20,7 @@ metadata:
 data:
   deployment.toml: |-
     [server]
-    hostname = "internal.gateway.am.wso2.com"
+    hostname = "int.gateway.am.wso2.com"
     node_ip = "$env{NODE_IP}"
     server_role = "internal-gateway-worker"
 

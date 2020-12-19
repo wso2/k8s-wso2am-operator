@@ -20,7 +20,7 @@ metadata:
 data:
   deployment.toml: |-
     [server]
-    hostname = "external.gateway.am.wso2.com"
+    hostname = "ext.gateway.am.wso2.com"
     node_ip = "$env{NODE_IP}"
     server_role = "external-gateway-worker"
 
@@ -39,7 +39,7 @@ data:
     password = "wso2carbon"
 
     [apim.sync_runtime_artifacts.gateway]
-    gateway_labels =["Production and Sandbox"]
+    gateway_labels =["Production and Sandbox", "Production and Sandbox 2"]
     artifact_retriever = "DBRetriever"
     deployment_retry_duration = 15000
     data_retrieval_mode = "sync"
