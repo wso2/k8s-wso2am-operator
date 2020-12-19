@@ -81,7 +81,7 @@ data:
     display_in_api_console = true
     description = "This is a hybrid gateway that handles both production and sandbox token traffic."
     show_as_token_endpoint_url = true
-    service_url = "https://wso2-am-gw-svc:${mgt.transport.https.port}/services/"
+    service_url = "https://wso2-am-external-gw-svc:${mgt.transport.https.port}/services/"
     username= "${admin.username}"
     password= "${admin.password}"
     ws_endpoint = "ws://localhost:9099"
@@ -95,7 +95,7 @@ data:
     display_in_api_console = true
     description = "This is a hybrid gateway that handles both production and sandbox token traffic."
     show_as_token_endpoint_url = true
-    service_url = "https://wso2-am-gw-svc:${mgt.transport.https.port}/services/"
+    service_url = "https://wso2-am-internal-gw-svc:${mgt.transport.https.port}/services/"
     username= "${admin.username}"
     password= "${admin.password}"
     ws_endpoint = "ws://localhost:9099"
