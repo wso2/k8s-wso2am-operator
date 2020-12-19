@@ -99,7 +99,7 @@ func ExternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2-am-gw-svc",
+										ServiceName: "wso2-am-external-gw-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
 									},
 								},
@@ -144,7 +144,7 @@ func InternalGatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingres
 								{
 									Path: "/",
 									Backend: networkv1.IngressBackend{
-										ServiceName: "wso2-am-gw-svc",
+										ServiceName: "wso2-am-internal-gw-svc",
 										ServicePort: intstr.IntOrString{Type: intstr.Int, IntVal: 8243},
 									},
 								},

@@ -75,16 +75,38 @@ func PubDevTm2Service(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 }
 
-//External & Internal GatewayService is for handling gateway-sevice...
-func GatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
+//External GatewayService is for handling gateway-sevice...
+func ExternalGatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
-		"deployment": "wso2-gateway",
+		"deployment": "wso2-external-gateway",
 	}
 	gatewayports := getGatewaySpecificSvcPorts()
 
 	return &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-gw-svc",
+			Name:      "wso2-am-external-gw-svc",
+			Namespace: apimanager.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: labels,
+			Ports:    gatewayports,
+		},
+	}
+}
+
+//Internal GatewayService is for handling gateway-sevice...
+func InternalGatewayService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
+	labels := map[string]string{
+		"deployment": "wso2-internal-gateway",
+	}
+	gatewayports := getGatewaySpecificSvcPorts()
+
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "wso2-am-internal-gw-svc",
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),

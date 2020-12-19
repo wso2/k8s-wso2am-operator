@@ -1227,7 +1227,8 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	kmserviceName := "wso2-am-km-svc"
 	gwexternaldeploymentName := "wso2-am-external-gw-" + apimanager.Name
 	gwinternaldeploymentName := "wso2-am-internal-gw-" + apimanager.Name
-	gwserviceName := "wso2-am-external-gw-svc"
+	extgwserviceName := "wso2-am-external-gw-svc"
+	intgwserviceName := "wso2-am-internal-gw-svc"
 	mysqldeploymentName := "mysql-" + apimanager.Name
 	mysqlserviceName := "mysql-svc"
 	dashboardDeploymentName := "wso2-am-analytics-dashboard-" + apimanager.Name
@@ -1605,12 +1606,20 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Gateway Service")
+	klog.Info("External Gateway Service")
 	// Get keymanager service name using hardcoded value
-	gatewayService, err := c.servicesLister.Services(apimanager.Namespace).Get(gwserviceName)
+	externalGatewayService, err := c.servicesLister.Services(apimanager.Namespace).Get(extgwserviceName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		gatewayService, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.GatewayService(apimanager))
+		externalGatewayService, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.ExternalGatewayService(apimanager))
+	}
+
+	klog.Info("Internal Gateway Service")
+	// Get keymanager service name using hardcoded value
+	internalGatewayService, err := c.servicesLister.Services(apimanager.Namespace).Get(intgwserviceName)
+	// If resource doesn't exist, we'll create it
+	if errors.IsNotFound(err) {
+		internalGatewayService, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.InternalGatewayService(apimanager))
 	}
 
 	klog.Info("External Gateway Ingress")
@@ -1748,9 +1757,16 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		return fmt.Errorf(msg)
 	}
 
-	// If the gateway Service is not controlled by this Apimanager resource, we should log warning to the event recorder and return
-	if !metav1.IsControlledBy(gatewayService, apimanager) {
-		msg := fmt.Sprintf("gateway-service %q already exists and is not managed by APIManager", gatewayService.Name)
+	// If the external gateway Service is not controlled by this Apimanager resource, we should log warning to the event recorder and return
+	if !metav1.IsControlledBy(externalGatewayService, apimanager) {
+		msg := fmt.Sprintf("ext gateway-service %q already exists and is not managed by APIManager", externalGatewayService.Name)
+		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+		return fmt.Errorf(msg)
+	}
+
+	// If the internal gateway Service is not controlled by this Apimanager resource, we should log warning to the event recorder and return
+	if !metav1.IsControlledBy(internalGatewayService, apimanager) {
+		msg := fmt.Sprintf("int gateway-service %q already exists and is not managed by APIManager", internalGatewayService.Name)
 		c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 		return fmt.Errorf(msg)
 	}
