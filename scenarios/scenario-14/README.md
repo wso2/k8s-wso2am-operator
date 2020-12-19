@@ -41,7 +41,7 @@ You can specify to any or all of the profiles using the given wso2-apim.yaml fil
 
 #### Deploy Pattern-3 by overriding configurations
 
-Please follow the prerequisites section in scenario 10 to deploy Pattern- and execute the following command.
+Please follow the prerequisites section in scenario 10 to deploy Pattern-3 and execute the following command.
 
 ```
   kubectl apply -f wso2-apim.yaml

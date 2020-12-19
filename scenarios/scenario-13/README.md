@@ -17,7 +17,7 @@ spec:
 -----
 
 
-#### Deploy pattern 2
+#### Deploy pattern 3
 
 ```
 kubectl create -f wso2-apim.yaml
