@@ -51,3 +51,5 @@ Add an **/etc/hosts/** entry as follows.
 - **API Analytics Dashboard**   : https://analytics.am.wso2.com
 - **API Internal Gateway**   : https://int.gateway.am.wso2.com
 - **API External Gateway**   : https://ext.gateway.am.wso2.com
+
+In pattern-4 publishers can select either Internal or External gateway in Publisher Environments page.
