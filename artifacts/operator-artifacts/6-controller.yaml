@@ -33,4 +33,4 @@ spec:
         - name: wso2am-controller
           image: benura123/k8s-operator:v1.0.0
           imagePullPolicy: Always
-      serviceAccountName: wso2am-pattern-1-svc-account
+      serviceAccountName: wso2am-svc-account

@@ -37,7 +37,7 @@ In this document, we will walk through the following.
     
     Output: 
     namespace/wso2-system created
-    serviceaccount/wso2am-pattern-1-svc-account created
+    serviceaccount/wso2am-svc-account created
     ...
     configmap/wso2am-p1-apim-2-conf created
     configmap/wso2am-p1-mysql-dbscripts created

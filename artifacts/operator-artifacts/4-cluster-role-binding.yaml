@@ -24,5 +24,5 @@ roleRef:
   name: wso2am-controller-role
 subjects:
   - kind: ServiceAccount
-    name: wso2am-pattern-1-svc-account
+    name: wso2am-svc-account
     namespace: wso2-system

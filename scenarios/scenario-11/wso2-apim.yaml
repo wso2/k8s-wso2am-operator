@@ -14,8 +14,30 @@
 # specific language governing permissions and limitations
 # under the License.
 
-apiVersion: v1
-kind: ServiceAccount
+apiVersion: apim.wso2.com/v1alpha1
+kind: APIManager
 metadata:
-  name: wso2am-svc-account
-  namespace : wso2-system
+  name: cluster-1
+spec:
+  pattern: Pattern-2
+  profiles:
+    - name: api-pub-dev-tm-1
+      deployment:
+        replicas: 1
+        minReadySeconds: 100
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 1000m
+          limits:
+            memory: 2Gi
+            cpu: 2000m
+        livenessProbe:
+          initialDelaySeconds: 180
+          failureThreshold: 3
+          periodSeconds: 30
+        readinessProbe:
+          initialDelaySeconds: 180
+          failureThreshold: 3
+          periodSeconds: 30

@@ -14,8 +14,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-apiVersion: v1
-kind: ServiceAccount
+apiVersion: apim.wso2.com/v1alpha1
+kind: APIManager
 metadata:
-  name: wso2am-svc-account
-  namespace : wso2-system
+  name: apim-pattern-2
+spec:
+  pattern: Pattern-2
