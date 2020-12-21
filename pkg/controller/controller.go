@@ -1211,12 +1211,10 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if apimanager.Spec.UseMysql != "" {
 		useMysqlPod, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
 	}
-	klog.Info("Allow Analytics Spec: ", apimanager.Spec.EnableAnalytics)
+
 	if apimanager.Spec.EnableAnalytics != "" {
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
-
-	klog.Info("Allow-Analytics: ", enableAnalytics)
 
 	pubDevTm1deploymentName := "wso2-am-1-" + apimanager.Name
 	pubDevTm2deploymentName := "wso2-am-2-" + apimanager.Name
@@ -1242,19 +1240,13 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	gatewayinternalIngressName := "wso2-am-internal-gw-ingress"
 	dashIngressName := "wso2-am-analytics-dashboard-ingress"
 
-	klog.Info("Started Config Creating for Pattern-2")
-
 	// dashboard configurations
 
 	if enableAnalytics {
-		dashConfName := "wso2am-p4-analytics-dash-conf"
+		dashConfName := "wso2am-analytics-dash-conf"
 		dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
-		klog.Info("Config Phase 1: OK")
-		klog.Error("Config Phase 1 Error", err)
-		dashConfUserName := "wso2am-p4-analytics-dash-conf-" + apimanager.Name
+		dashConfUserName := "wso2am-analytics-dash-conf-" + apimanager.Name
 		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
-		klog.Info("Config Phase 2: OK")
-		klog.Error("Config Phase 2 Error: ", err)
 		if errors.IsNotFound(err) {
 			dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, dashConfWso2))
 			klog.Error("Dash Conf Error: ", err)
@@ -1264,12 +1256,11 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Worker Config")
 	// worker configurations
 	if enableAnalytics {
-		workerConfName := "wso2am-p4-analytics-worker-conf"
+		workerConfName := "wso2am-analytics-worker-conf"
 		workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
-		workerConfUserName := "wso2am-p4-analytics-worker-conf-" + apimanager.Name
+		workerConfUserName := "wso2am-analytics-worker-conf-" + apimanager.Name
 		workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
 		if errors.IsNotFound(err) {
 			workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, workerConfWso2))
@@ -1280,7 +1271,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("MYSQL config")
 	// mysql configurations
 	mysqlDbConfName := "wso2am-p4-mysql-dbscripts"
 	mysqlDbConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(mysqlDbConfName)
@@ -1295,7 +1285,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Pub-Dev-Tm-1 Config")
 	pubDevTm1ConfName := "wso2am-p4-am-1-conf"
 	pubDevTm1ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubDevTm1ConfName)
 	pubDevTm1ConfUserName := "wso2am-p4-am-1-conf-" + apimanager.Name
@@ -1309,7 +1298,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Pub-Dev-Tm-2 Config")
 	pubDevTm2ConfName := "wso2am-p4-am-2-conf"
 	pubDevTm2ConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubDevTm2ConfName)
 	pubDevTm2ConfUserName := "wso2am-p4-am-2-conf-" + apimanager.Name
@@ -1321,7 +1309,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("External Gateway Config")
 	gatewayConfName := "wso2am-p4-am-external-gateway-conf"
 	gatewayConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gatewayConfName)
 	gatewayConfUserName := "wso2am-p4-am-external-gateway-conf-" + apimanager.Name
@@ -1333,7 +1320,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Internal Gateway Config")
 	gatewayInternalConfName := "wso2am-p4-am-internal-gateway-conf"
 	gatewayInternalConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gatewayInternalConfName)
 	gatewayInternalConfUserName := "wso2am-p4-am-internal-gateway-conf-" + apimanager.Name
@@ -1345,7 +1331,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("KM Config")
 	kmConfName := "wso2am-p4-am-km-conf"
 	kmConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(kmConfName)
 	kmConfUserName := "wso2-p4-am-km-conf" + apimanager.Name
@@ -1357,11 +1342,10 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Dash Bin Config &Worker Bin Config")
 	if enableAnalytics {
-		analyticsBinConfName := "wso2am-p4-analytics-bin"
+		analyticsBinConfName := "wso2am-analytics-bin"
 		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
-		analyticsBinConfUserName := "wso2am-p4-analytics-bin-" + apimanager.Name
+		analyticsBinConfUserName := "wso2am-analytics-bin-" + apimanager.Name
 		analyticsBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsBinConfUserName)
 		if errors.IsNotFound(err) {
 			analyticsBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, analyticsBinConfWso2))
@@ -1413,7 +1397,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Mysql Depl")
 	// Get mysql deployment name using hardcoded value
 	mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 
@@ -1427,7 +1410,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			}
 		}
 
-		klog.Info("Mysql Service")
 		// Get mysql service name using hardcoded value
 		mysqlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(mysqlserviceName)
 
@@ -1444,7 +1426,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Dash Depl")
 	// Get analytics dashboard deployment name using hardcoded value
 	dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
 	if enableAnalytics {
@@ -1458,7 +1439,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			}
 		}
 
-		klog.Info("Dash Service")
 		// Get analytics dashboard service name using hardcoded value
 		dashservice, err := c.servicesLister.Services(apimanager.Namespace).Get(dashboardServiceName)
 		// If the resource doesn't exist, we'll create it
@@ -1468,7 +1448,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Dash Service is already available. [Service name] ,", dashservice)
 		}
 
-		klog.Info("Dash Ingress")
 		// Get ingress name using hardcoded value
 		dashIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
 		// If resource doesn't exist, we'll create it
@@ -1480,7 +1459,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 
 	}
 
-	klog.Info("Worker Depl")
 	// Get analytics worker deployment name using hardcoded value
 
 	// workerdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(workerDeploymentName)
@@ -1497,7 +1475,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			}
 		}
 
-		klog.Info("Worker Service")
 		// Get analytics worker service name using hardcoded value
 		workerservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerServiceName)
 		// If the resource doesn't exist, we'll create it
@@ -1507,7 +1484,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Worker Service is already available. [Service name] ,", workerservice)
 		}
 
-		klog.Info("Worker HL Service")
 		workerhlservice, err := c.servicesLister.Services(apimanager.Namespace).Get(workerhlServiceName)
 		if errors.IsNotFound(err) {
 			workerhlservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.WorkerHeadlessService(apimanager))
@@ -1516,20 +1492,17 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Pub-Dev-Tm-1 Depl")
 	pubDevTm1Deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(pubDevTm1deploymentName)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		x := pattern4.AssignDevPubTmConfigMapValues(apimanager, configmap, pubDevTm1num)
 
 		pubDevTm1Deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.PubDev1Deployment(apimanager, x, pubDevTm1num))
-		klog.Error("Pub-Dev-TM-1 Error: ", err)
 		if err != nil {
 			return err
 		}
 	}
 
-	klog.Info("Pub-Dev-Tm-1 Service")
 	// Get apim instance 1 service name using hardcoded value
 	pubDevTm1Service, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTm1serviceName)
 	// If the resource doesn't exist, we'll create it
@@ -1537,7 +1510,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		pubDevTm1Service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.PubDevTm1Service(apimanager))
 	}
 
-	klog.Info("Pub-Dev-Tm-2 Depl")
 	// Get apim instance 2 deployment name using hardcoded value
 	pubDevTm2Deployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(pubDevTm2deploymentName)
 	// If the resource doesn't exist, we'll create it
@@ -1550,7 +1522,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Pub-Dev-Tm-2 Service")
 	// Get apim instance 2 service name using hardcoded value
 	pubDevTm2Service, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTm2serviceName)
 	// If the resource doesn't exist, we'll create it
@@ -1558,7 +1529,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		pubDevTm2Service, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.PubDevTm2Service(apimanager))
 	}
 
-	klog.Info("Common Service")
 	// Get apim common service name using hardcoded value
 	commonservice, err := c.servicesLister.Services(apimanager.Namespace).Get(pubDevTmcommonserviceName)
 	// If the resource doesn't exist, we'll create it
@@ -1566,7 +1536,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		commonservice, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.PubDevTmCommonService(apimanager))
 	}
 
-	klog.Info("Pub-Dev-Tm Ingress")
 	// Get ingress name using hardcoded value
 	pubDevTmIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(pubDevTmIngressName)
 	// If resource doesn't exist, we'll create it
@@ -1577,36 +1546,28 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("External Gateway Depl")
 	// Get gateway deployment name using hardcoded value
 	gatewayDeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(gwexternaldeploymentName)
-	klog.Error("External Gateway Depl Error: ", err)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		z := pattern4.AssignApimExternalGatewayConfigMapValues(apimanager, configmap, gatewayexternalnum)
-		klog.Info("External GW Done!")
 		gatewayDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.ExternalGatewayDeployment(apimanager, z, gatewayexternalnum))
-		klog.Error("External GW Depl Error: ", err)
 		if err != nil {
 			return err
 		}
 	}
 
-	klog.Info("Internal Gateway Depl")
 	// Get gateway deployment name using hardcoded value
 	gatewayInternalDeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(gwinternaldeploymentName)
-	klog.Error("Internal Gateway Depl Error: ", err)
 	// If the resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		z := pattern4.AssignApimInternalGatewayConfigMapValues(apimanager, configmap, gatewayinternalnum)
 		gatewayInternalDeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern4.InternalGatewayDeployment(apimanager, z, gatewayinternalnum))
-		klog.Error("Internal GW Error: ", err)
 		if err != nil {
 			return err
 		}
 	}
 
-	klog.Info("External Gateway Service")
 	// Get keymanager service name using hardcoded value
 	externalGatewayService, err := c.servicesLister.Services(apimanager.Namespace).Get(extgwserviceName)
 	// If resource doesn't exist, we'll create it
@@ -1614,7 +1575,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		externalGatewayService, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.ExternalGatewayService(apimanager))
 	}
 
-	klog.Info("Internal Gateway Service")
 	// Get keymanager service name using hardcoded value
 	internalGatewayService, err := c.servicesLister.Services(apimanager.Namespace).Get(intgwserviceName)
 	// If resource doesn't exist, we'll create it
@@ -1622,33 +1582,26 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		internalGatewayService, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.InternalGatewayService(apimanager))
 	}
 
-	klog.Info("External Gateway Ingress")
 	// Get ingress name using hardcoded value
 	gatewayIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayexternalIngressName)
-	klog.Error("External Gateway Ingress Phase 1 Error: ", err)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.ExternalGatewayIngress(apimanager))
-		klog.Error("External Gateway Ingress Depl Error: ", err)
 		if err != nil {
 			return err
 		}
 	}
 
-	klog.Info("Internal Gateway Ingress")
 	// Get ingress name using hardcoded value
 	gatewayInternalIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayinternalIngressName)
-	klog.Error("Internal Gateway Ingress Phase 1 Error: ", err)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		gatewayInternalIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.InternalGatewayIngress(apimanager))
-		klog.Error("Internal Gateway Ingress Depl Error: ", err)
 		if err != nil {
 			return err
 		}
 	}
 
-	klog.Info("KM Depl")
 	// Get keymanager statefulset name using hardcoded value
 	kmDeployment, err := c.statefulSetsLister.StatefulSets(apimanager.Namespace).Get(kmdeploymentName)
 	// If resource doesn't exist, we'll create it
@@ -1660,14 +1613,11 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("KM Service")
 	// Get keymanager service name using hardcoded value
 	kmService, err := c.servicesLister.Services(apimanager.Namespace).Get(kmserviceName)
-	klog.Error("KM Service Phase 1 Error: ", err)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
 		kmService, err = c.kubeclientset.CoreV1().Services(apimanager.Namespace).Create(pattern4.KeyManagerService(apimanager))
-		klog.Error("KM Service Error: ", err)
 		if err != nil {
 			return err
 		}
@@ -1676,7 +1626,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	// If an error occurs during Get/Create, we'll requeue the item so we can
 	// attempt processing again later. This could have been caused by a
 	// temporary network failure, or any other transient reason.
-	klog.Error("Final Error: ", err)
 	if err != nil {
 		return err
 	}
