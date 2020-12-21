@@ -101,11 +101,11 @@ In this document, we will walk through the following.
 1. [Scenario-1 : Deploy A Single API Manager Instance (Custom Pattern)](scenarios/scenario-1)
 2. [Scenario-2 : Deploy API Manager Pattern-1 (LoadBalancer Service Type)](scenarios/scenario-2)
 3. [Scenario-3 : Deploy API Manager Pattern-1 (NodePort Service Type)](scenarios/scenario-3)
-4. [Scenario-4 : Deploy A Single API Manager Instance with Analytics (Custom Pattern)](scenarios/scenario-4)
+4. [Scenario-4 : Deploy API Manager Pattern-1 (Ingress Service Type)](scenarios/scenario-4)
 5. [Scenario-5 : Override default configuration values](scenarios/scenario-5)
 6. [Scenario-6 : Override ConfigMaps](scenarios/scenario-6)
 7. [Scenario-7 : Add new configmaps](scenarios/scenario-7)
-8. [Scenario-9 : Expose API Manager using Ingress](scenarios/scenario-9)
+8. [Scenario-8 : Deploy A Single API Manager Instance with Analytics (Custom Pattern)](scenarios/scenario-8)
 
 ## Clean up
 
