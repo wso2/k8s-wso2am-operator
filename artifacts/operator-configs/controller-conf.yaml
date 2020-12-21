@@ -68,22 +68,6 @@ data:
   apim-analytics-deployment-resources-limits-memory: "4Gi"
   apim-analytics-deployment-resources-limits-cpu: "2000m"
 
-  # pattern specific configs for apim instances
-  p4-apim-deployment-image: "wso2/wso2am:3.2.0"
-  p4-apim-deployment-resources-requests-cpu: "500m"
-  p4-apim-deployment-resources-requests-memory: "1Gi"
-  p4-apim-deployment-resources-limits-cpu: "2000m"
-  p4-apim-deployment-resources-limits-memory: "2Gi"
-  p4-apim-deployment-resources-jvm-heap-memory-xms: "512m"
-  p4-apim-deployment-resources-jvm-heap-memory-xmx: "512m"
-
-
-  # pattern-specific configs for pun-dev-tm instances
-  p4-apim-pubdevtm-deployment-livenessProbe-initialDelaySeconds: "180"
-  p4-apim-pubdevtm-deployment-livenessProbe-periodSeconds: "20"
-  p4-apim-pubdevtm-deployment-readinessProbe-initialDelaySeconds: "180"
-  p4-apim-pubdevtm-deployment-readinessProbe-periodSeconds: "20"
-
   # pattern specific configs for key manager instances
   p4-apim-km-deployment-livenessProbe-periodSeconds: "20"
   p4-apim-km-deployment-livenessProbe-initialDelaySeconds: "180"
