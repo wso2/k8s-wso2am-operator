@@ -17,7 +17,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wso2am-p1-analytics-dash-conf
+  name: wso2am-analytics-dash-conf
   namespace: wso2-system
 data:
   deployment.yaml: |

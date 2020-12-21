@@ -69,25 +69,25 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-deployment-maxSurge"], 10, 32)
 	maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-deployment-maxUnavailable"], 10, 32)
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	amImages := ControlConfigData["p1-apim-deployment-image"]
+	amImages := ControlConfigData["apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
-	reqCPU := resource.MustParse(ControlConfigData["p1-apim-deployment-resources-requests-cpu"])
-	reqMem := resource.MustParse(ControlConfigData["p1-apim-deployment-resources-requests-memory"])
-	limitCPU := resource.MustParse(ControlConfigData["p1-apim-deployment-resources-limits-cpu"])
-	limitMem := resource.MustParse(ControlConfigData["p1-apim-deployment-resources-limits-memory"])
+	reqCPU := resource.MustParse(ControlConfigData["apim-deployment-resources-requests-cpu"])
+	reqMem := resource.MustParse(ControlConfigData["apim-deployment-resources-requests-memory"])
+	limitCPU := resource.MustParse(ControlConfigData["apim-deployment-resources-limits-cpu"])
+	limitMem := resource.MustParse(ControlConfigData["apim-deployment-resources-limits-memory"])
 	liveDelay, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
 	livePeriod, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-livenessProbe-failureThreshold"], 10, 32)
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-deployment-readinessProbe-failureThreshold"], 10, 32)
-	memXmx := ControlConfigData["apim-deployment-env-jvm-heap-memory-xmx"]
-	memXms := ControlConfigData["apim-deployment-env-jvm-heap-memory-xms"]
+	memXmx := ControlConfigData["apim-deployment-resources-jvm-heap-memory-xmx"]
+	memXms := ControlConfigData["apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
 
 	if totalProfiles > 0 {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 
@@ -199,12 +199,12 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
 	maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxUnavailable"], 10, 32)
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	amImages := ControlConfigData["p1-apim-analytics-deployment-dashboard-image"]
+	amImages := ControlConfigData["apim-analytics-deployment-dashboard-image"]
 	imagePull, _ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
-	reqCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-cpu"])
-	reqMem := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-memory"])
-	limitCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-limits-cpu"])
-	limitMem := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-limits-memory"])
+	reqCPU := resource.MustParse(ControlConfigData["apim-analytics-deployment-resources-requests-cpu"])
+	reqMem := resource.MustParse(ControlConfigData["apim-analytics-deployment-resources-requests-memory"])
+	limitCPU := resource.MustParse(ControlConfigData["apim-analytics-deployment-resources-limits-cpu"])
+	limitMem := resource.MustParse(ControlConfigData["apim-analytics-deployment-resources-limits-memory"])
 	liveDelay, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
 	livePeriod, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-failureThreshold"], 10, 32)
@@ -217,9 +217,10 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-dashboard" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
+
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds
 		if minReadySecFromYaml != 0 {
 			minReadySec = int64(minReadySecFromYaml)
@@ -285,7 +286,7 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 
 		// Get maxSurge value from the YAML file.
 		maxSurgesFromYaml := apimanager.Spec.Profiles[num].Deployment.Strategy.RollingUpdate.MaxSurge
-		if maxSurgesFromYaml != 1 {
+		if maxSurgesFromYaml != 0 {
 			maxSurges = int64(maxSurgesFromYaml)
 		}
 
@@ -338,12 +339,12 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	maxSurges, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxSurge"], 10, 32)
 	maxUnavail, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-maxUnavailable"], 10, 32)
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
-	amImages := ControlConfigData["p1-apim-analytics-deployment-worker-image"]
+	amImages := ControlConfigData["apim-analytics-deployment-worker-image"]
 	imagePull, _ := ControlConfigData["apim-analytics-deployment-imagePullPolicy"]
-	reqCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-cpu"])
-	reqMem := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-requests-memory"])
-	limitCPU := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-limits-cpu"])
-	limitMem := resource.MustParse(ControlConfigData["p1-apim-analytics-deployment-resources-limits-memory"])
+	reqCPU := resource.MustParse(ControlConfigData["apim-analytics-deployment-resources-requests-cpu"])
+	reqMem := resource.MustParse(ControlConfigData["apim-analytics-deployment-resources-requests-memory"])
+	limitCPU := resource.MustParse(ControlConfigData["apim-analytics-deployment-resources-limits-cpu"])
+	limitMem := resource.MustParse(ControlConfigData["apim-analytics-deployment-resources-limits-memory"])
 	liveDelay, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-initialDelaySeconds"], 10, 32)
 	livePeriod, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-periodSeconds"], 10, 32)
 	liveThres, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-livenessProbe-failureThreshold"], 10, 32)
@@ -356,7 +357,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	if totalProfiles > 0 && apimanager.Spec.Profiles[num].Name == "analytics-worker" {
 
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
-		if *replicasFromYaml != 0 {
+		if replicasFromYaml != nil {
 			replicas = int64(*replicasFromYaml)
 		}
 		minReadySecFromYaml := apimanager.Spec.Profiles[num].Deployment.MinReadySeconds

@@ -36,11 +36,6 @@ type APIManager struct {
 	Status APIManagerStatus `json:"status"`
 }
 
-type PVCServer struct {
-	SynapseConfigs string `json:"synapseConfigs"`
-	ExecutionPlans string `json:"executionPlans"`
-}
-
 type Storage struct {
 	Memory string `json:"memory"`
 	CPU    string `json:"cpu"`
@@ -67,24 +62,17 @@ type Configmap struct {
 	NewConfigmap        []NewVolume `json:"newConfigMap"`
 }
 
-type PVC struct {
-	SynapseConfigs string      `json:"synapseConfigs"`
-	ExecutionPlans string      `json:"executionPlans"`
-	NewClaim       []NewVolume `json:"newClaim"`
-}
-
 type Deployment struct {
-	Resources             Resources `json:"resources"`
-	Replicas              *int32    `json:"replicas"`
-	MinReadySeconds       int32     `json:"minReadySeconds"`
-	Strategy              Strategy  `json:"strategy"`
-	Image                 string    `json:"image"`
-	ImagePullPolicy       string    `json:"imagePullPolicy"`
-	LivenessProbe         Probe     `json:"livenessProbe"`
-	ReadinessProbe        Probe     `json:"readinessProbe"`
-	Configmaps            Configmap `json:"configMaps"`
-	PersistentVolumeClaim PVC       `json:"persistentVolumeClaim"`
-	SecurityContext       string    `json:"securityContext"`
+	Resources       Resources `json:"resources"`
+	Replicas        *int32    `json:"replicas"`
+	MinReadySeconds int32     `json:"minReadySeconds"`
+	Strategy        Strategy  `json:"strategy"`
+	Image           string    `json:"image"`
+	ImagePullPolicy string    `json:"imagePullPolicy"`
+	LivenessProbe   Probe     `json:"livenessProbe"`
+	ReadinessProbe  Probe     `json:"readinessProbe"`
+	Configmaps      Configmap `json:"configMaps"`
+	SecurityContext string    `json:"securityContext"`
 }
 
 type Strategy struct {

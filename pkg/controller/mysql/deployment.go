@@ -21,17 +21,16 @@ package mysql
 
 import (
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
 )
 
 //  for handling mysql deployment
 func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 
 	mysqlvolumemount, mysqlvolume := pattern1.GetMysqlVolumes(apimanager)
-
 
 	labels := map[string]string{
 		"deployment": "wso2apim-with-analytics-mysql",
@@ -40,7 +39,7 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "mysql-"+apimanager.Name,
+			Name:      "mysql-" + apimanager.Name,
 			Namespace: apimanager.Namespace,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -70,22 +69,22 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 									},
 								},
 								InitialDelaySeconds: 30,
-								PeriodSeconds:     10,
-								FailureThreshold: 5,
+								PeriodSeconds:       10,
+								FailureThreshold:    5,
 							},
 							ReadinessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
-									Exec:&corev1.ExecAction{
-										Command:[]string{
-											 "sh",
-											 "-c",
-											 "mysqladmin ping -u wso2carbon -p${MYSQL_PASSWORD}",
+									Exec: &corev1.ExecAction{
+										Command: []string{
+											"sh",
+											"-c",
+											"mysqladmin ping -u wso2carbon -p${MYSQL_PASSWORD}",
 										},
 									},
 								},
 								InitialDelaySeconds: 15,
-								PeriodSeconds:5,
-								FailureThreshold:1,
+								PeriodSeconds:       5,
+								FailureThreshold:    1,
 							},
 							ImagePullPolicy: "Always",
 							SecurityContext: &corev1.SecurityContext{
@@ -104,7 +103,6 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 									Name:  "MYSQL_PASSWORD",
 									Value: "wso2carbon",
 								},
-
 							},
 							Ports: []corev1.ContainerPort{
 								{
@@ -118,11 +116,10 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 								"--max-connections",
 								"10000",
 							},
-
 						},
 					},
 
-					Volumes:mysqlvolume,
+					Volumes: mysqlvolume,
 
 					// ServiceAccountName: "wso2am-pattern-1-svc-account",
 				},
@@ -130,5 +127,3 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager) *appsv1.Deployment {
 		},
 	}
 }
-
-

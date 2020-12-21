@@ -86,7 +86,7 @@ func getAnalyticsWorkerInitContainers() corev1.Container {
 	analyticsWorkerInitContainer := corev1.Container{}
 	analyticsWorkerInitContainer.Name = "init-am-analytics-worker"
 	analyticsWorkerInitContainer.Image = "busybox:1.32"
-	analyticsExecutionStr := "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\"; while ! nc -z wso2am-pattern1-am-analytics-worker-service 7712; do sleep 1; printf \"-\"; done; echo -e \"  >> WSO2 API Manager Analytics Worker has started\";"
+	analyticsExecutionStr := "echo -e \"Checking for the availability of WSO2 API Manager Analytics Worker deployment\"; while ! nc -z wso2-am-analytics-worker-svc 7712; do sleep 1; printf \"-\"; done; echo -e \"  >> WSO2 API Manager Analytics Worker has started\";"
 	analyticsWorkerInitContainer.Command = []string{"sh", "-c", analyticsExecutionStr}
 
 	return analyticsWorkerInitContainer
