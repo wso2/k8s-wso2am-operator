@@ -351,9 +351,9 @@ func (c *Controller) syncHandler(key string) error {
 		workerHlServiceName := "wso2-am-analytics-worker-headless-svc"
 
 		if enableAnalytics {
-			dashConfName := "wso2am-p1-analytics-dash-conf"
+			dashConfName := "wso2am-analytics-dash-conf"
 			dashConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashConfName)
-			dashConfUserName := "wso2am-p1-analytics-dash-conf-" + apimanager.Name
+			dashConfUserName := "wso2am-analytics-dash-conf-" + apimanager.Name
 			dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
 			if errors.IsNotFound(err) {
 				dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashConfWso2))
@@ -362,9 +362,9 @@ func (c *Controller) syncHandler(key string) error {
 				}
 			}
 
-			workerConfName := "wso2am-p1-analytics-worker-conf"
+			workerConfName := "wso2am-analytics-worker-conf"
 			workerConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(workerConfName)
-			workerConfUserName := "wso2am-p1-analytics-worker-conf-" + apimanager.Name
+			workerConfUserName := "wso2am-analytics-worker-conf-" + apimanager.Name
 			workerConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(workerConfUserName)
 			if errors.IsNotFound(err) {
 				workerConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, workerConfWso2))
@@ -409,9 +409,9 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		analyticsBinConfName := "wso2am-p1-analytics-bin"
+		analyticsBinConfName := "wso2am-analytics-bin"
 		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
-		analyticsBinConfUserName := "wso2am-p1-analytics-bin-" + apimanager.Name
+		analyticsBinConfUserName := "wso2am-analytics-bin-" + apimanager.Name
 		analyticsBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsBinConfUserName)
 		if errors.IsNotFound(err) {
 			analyticsBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, analyticsBinConfWso2))
