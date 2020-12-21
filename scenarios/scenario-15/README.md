@@ -1,19 +1,55 @@
-## Scenario-15 : Override ConfigMaps
+## Scenario-15 : Deploy API Manager Pattern-4
 
-You can override the default deployemnt configmaps present for each profile.
+#### Installation Prerequisiyes
 
-1. Create a new deployment configmap using the deployment.toml/ deployment.yaml files. And apply the command.
+* [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/).
 
-    ```
-      kubectl create configmap <NEW-PROFILE-CONFIGMAP> --from-file=<PATH_TO_DEPLOYMENT.TOML>
-    ```
+In this scenario we are deploying API Manager Pattern-3 by using the following simple yaml definition. All API Manager servers are exposed via Ingress Controller.
 
-2. Update the custom resources with created configmap.
+```yaml
+apiVersion: apim.wso2.com/v1alpha1
+kind: APIManager
+metadata:
+  name: cluster-1
+spec:
+  pattern: Pattern-4
+```
+-----
 
-    Replace, the **deploymentConfigmap** with configmap name.
 
-3. Deploy updated pattern-3.
+#### Deploy pattern 4
 
-    ```
-      kubectl apply -f wso2-apim.yaml
-    ```
+```
+kubectl create -f wso2-apim.yaml
+```
+
+#### Access API Manager
+
+Get the external address of the ingresses using the command,
+
+```
+
+kubectl get ing
+
+Output:
+NAME                                   HOSTS                    ADDRESS           PORTS      AGE
+wso2-am-analytics-dashboard-ingress    analytics.am.wso2.com    35.198.248.85     80, 443    36m
+wso2-am-ingress                        am.wso2.com              35.198.248.85     80, 443    36m
+wso2-am-gw-external-ingress            ext.gateway.am.wso2.com  35.198.248.85     80, 443    36m
+wso2-am-gw-internal-ingress            int.gateway.am.wso2.com  35.198.248.85     80, 443    36m
+```
+
+Add an **/etc/hosts/** entry as follows.
+
+```
+/etc/hosts
+- - - - - - - - - - 
+<EXTERNAL-ADDRESS>       analytics.am.wso2.com gateway.am.wso2.com publisher.am.wso2.com devportal.am.wso2.com
+```
+
+- **API Publisher & Devportal** : https://am.wso2.com 
+- **API Analytics Dashboard**   : https://analytics.am.wso2.com
+- **API Internal Gateway**   : https://int.gateway.am.wso2.com
+- **API External Gateway**   : https://ext.gateway.am.wso2.com
+
+In pattern-4 publishers can select either Internal or External gateway in Publisher Environments page.
