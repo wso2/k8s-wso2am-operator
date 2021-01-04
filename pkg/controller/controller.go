@@ -338,8 +338,6 @@ func (c *Controller) syncHandler(key string) error {
 		}
 	}
 
-	klog.Info("Pattern: ", apimanager.Spec.Pattern)
-
 	if apimanager.Spec.Pattern == "Pattern-1" {
 
 		apim1deploymentName := "wso2-am-1-" + apimanager.Name
@@ -421,7 +419,6 @@ func (c *Controller) syncHandler(key string) error {
 			analyticsBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsBinConfUserName)
 			if errors.IsNotFound(err) {
 				analyticsBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, analyticsBinConfWso2))
-				klog.Error("Dash Configs 1 Error: ", err)
 				if err != nil {
 					fmt.Println("Creating analytics bin configmap in user specified ns", analyticsBinConfUser)
 				}
@@ -1257,7 +1254,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		dashConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashConfUserName)
 		if errors.IsNotFound(err) {
 			dashConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashConfWso2))
-			klog.Error("Dash Conf Error: ", err)
 			if err != nil {
 				fmt.Println("Creating dashboard configmap in user specified ns", dashConfUser)
 			}
@@ -1298,7 +1294,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	pubDevTm1ConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pubDevTm1ConfUserName)
 	if errors.IsNotFound(err) {
 		pubDevTm1ConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, pubDevTm1ConfWso2))
-		klog.Error("PubDevTm1 Error: ", err)
 		if err != nil {
 			fmt.Println("Creating Pub-Dev-Tm-1 configmap in user specified ns", pubDevTm1ConfUser)
 
@@ -1491,7 +1486,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		x := pattern2.AssignDevPubTmConfigMapValues(apimanager, configmap, pubDevTm1num)
 
 		pubDevTm1Deployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern2.PubDev1Deployment(apimanager, x, pubDevTm1num))
-		klog.Error("Pub-Dev-TM-1 Error: ", err)
 		if err != nil {
 			return err
 		}
@@ -1962,7 +1956,6 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	pubConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pubConfUserName)
 	if errors.IsNotFound(err) {
 		pubConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, pubConfWso2))
-		klog.Error("Pub Error: ", err)
 		if err != nil {
 			fmt.Println("Creating Pub-1 configmap in user specified ns", pubConfUser)
 
@@ -1975,7 +1968,6 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	devConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(devConfUserName)
 	if errors.IsNotFound(err) {
 		devConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, devConfWso2))
-		klog.Error("Dev Error: ", err)
 		if err != nil {
 			fmt.Println("Creating Dev configmap in user specified ns", devConfUser)
 
@@ -1988,7 +1980,6 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	tmConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(tmConfUserName)
 	if errors.IsNotFound(err) {
 		tmConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, tmConfWso2))
-		klog.Error("Dev Error: ", err)
 		if err != nil {
 			fmt.Println("Creating TM configmap in user specified ns", tmConfUser)
 

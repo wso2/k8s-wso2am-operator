@@ -23,7 +23,6 @@ package pattern3
 import (
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/klog"
 )
 
 func getDev1Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
@@ -262,7 +261,6 @@ func getPub2Volumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.Volu
 }
 
 func getTrafficManagerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]corev1.VolumeMount, []corev1.Volume) {
-	klog.Info("Called TM Volume")
 	deployconfigmap := "wso2-am-tm-conf"
 
 	var tmvolumemounts []corev1.VolumeMount

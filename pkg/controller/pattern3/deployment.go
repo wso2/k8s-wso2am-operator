@@ -29,14 +29,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/klog"
 )
 
 // PubDev1Deployment creates a new Deployment for a PubDevTm instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it...
 func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num int) *appsv1.Deployment {
-	klog.Info("Pub-1 Depl Starting.........")
 	useMysql := true
 	enableAnalytics := true
 	if apimanager.Spec.UseMysql != "" {
@@ -46,16 +44,12 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	klog.Info("Pub-1 EnableAnalytics: ", enableAnalytics)
-
 	labels := map[string]string{
 		"deployment": "wso2-am-pubisher",
 	}
 
 	pub1VolumeMount, pub1Volume := getPub1Volumes(apimanager, num)
 	pub1deployports := getPubContainerPorts()
-
-	klog.Info(pub1VolumeMount)
 
 	cmdstring := []string{
 		"/bin/sh",
@@ -69,25 +63,17 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 		initContainers = getMysqlInitContainers(apimanager, &pub1Volume, &pub1VolumeMount)
 	}
 
-	klog.Info("Pub-1 Containers Done")
-
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
-		klog.Info("Pub-1 Containers", initContainers[1])
 	} else {
 		getInitContainers([]string{"init-km"}, &initContainers)
 	}
-
-	klog.Info("Pub-1 Container Phase 1 Done")
 
 	//initContainers = append(initContainers, getInitContainers([]string{"init-am-analytics-worker"}))
 	pub1SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, pub1SecurityContext)
-	klog.Info("Pub-1 Security Context Done")
-	klog.Info("Ready Delay", x.Readydelay)
-	klog.Info("Live Delay", x.Livedelay)
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depAPIVersion,
@@ -238,7 +224,6 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
-		klog.Info("Pub-2 Containers", initContainers[1])
 	} else {
 		getInitContainers([]string{"init-km"}, &initContainers)
 	}
@@ -399,7 +384,6 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
-		klog.Info("Dev-1 Containers", initContainers[1])
 	} else {
 		getInitContainers([]string{"init-km"}, &initContainers)
 	}
@@ -560,7 +544,6 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 
 	if enableAnalytics {
 		getInitContainers([]string{"init-apim-analytics", "init-km"}, &initContainers)
-		klog.Info("Dev-2 Containers", initContainers[1])
 	} else {
 		getInitContainers([]string{"init-km"}, &initContainers)
 	}
@@ -853,7 +836,6 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 
 	kmVolumeMount, kmVolume := getKeyManagerVolumes(apimanager, num)
 	kmdeployports := getKeyManagerContainerPorts()
-	klog.Info("Key Manager Vol: ", kmVolumeMount)
 
 	labels := map[string]string{
 		"deployment": "wso2-km",
@@ -986,7 +968,6 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 
 	tmVolumeMount, tmVolume := getTrafficManagerVolumes(apimanager, num)
 	tmdeployports := getTmContainerPorts()
-	klog.Info("TM Volumes: ", tmVolumeMount)
 
 	labels := map[string]string{
 		"deployment": "wso2-tm",
@@ -998,16 +979,12 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 		"nc -z localhost 9611",
 	}
 
-	klog.Info("TM Replicas: ", z.Replicas)
-
 	initContainers := getMysqlInitContainers(apimanager, &tmVolume, &tmVolumeMount)
-	klog.Info("TM Volume Done ")
 
 	tmSecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, tmSecurityContext)
-	klog.Info("TM Volume Done 1")
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -1120,7 +1097,6 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 
 // for handling analytics-dashboard deployment
 func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num int) *appsv1.Deployment {
-	klog.Info("Dash Image: ", y.Image)
 	useMysql := true
 	if apimanager.Spec.UseMysql != "" {
 		useMysql, _ = strconv.ParseBool(apimanager.Spec.UseMysql)
