@@ -411,15 +411,17 @@ func (c *Controller) syncHandler(key string) error {
 			}
 		}
 
-		analyticsBinConfName := "wso2am-analytics-bin"
-		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
-		analyticsBinConfUserName := "wso2am-analytics-bin-" + apimanager.Name
-		analyticsBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsBinConfUserName)
-		if errors.IsNotFound(err) {
-			analyticsBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, analyticsBinConfWso2))
-			klog.Error("Dash Configs 1 Error: ", err)
-			if err != nil {
-				fmt.Println("Creating analytics bin configmap in user specified ns", analyticsBinConfUser)
+		if enableAnalytics {
+			analyticsBinConfName := "wso2am-analytics-bin"
+			analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
+			analyticsBinConfUserName := "wso2am-analytics-bin-" + apimanager.Name
+			analyticsBinConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(analyticsBinConfUserName)
+			if errors.IsNotFound(err) {
+				analyticsBinConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, analyticsBinConfWso2))
+				klog.Error("Dash Configs 1 Error: ", err)
+				if err != nil {
+					fmt.Println("Creating analytics bin configmap in user specified ns", analyticsBinConfUser)
+				}
 			}
 		}
 
