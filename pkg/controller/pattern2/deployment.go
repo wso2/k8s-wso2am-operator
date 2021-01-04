@@ -29,14 +29,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/klog"
 )
 
 // PubDev1Deployment creates a new Deployment for a PubDevTm instance 1 resource. It also sets
 // the appropriate OwnerReferences on the resource so handleObject can discover
 // the Apimanager resource that 'owns' it...
 func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num int) *appsv1.Deployment {
-	klog.Info("PubDevTm-1 Depl Starting.........")
 	useMysql := true
 	enableAnalytics := true
 	if apimanager.Spec.UseMysql != "" {
@@ -46,8 +44,6 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 		enableAnalytics, _ = strconv.ParseBool(apimanager.Spec.EnableAnalytics)
 	}
 
-	klog.Info("PubDevTm-1 EnableAnalytics: ", enableAnalytics)
-
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-am",
 		"node":       "wso2am-pattern-2-am-1",
@@ -55,8 +51,6 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 
 	pubDevTm1VolumeMount, pubDevTm1Volume := getDevPubTm1Volumes(apimanager, num)
 	pubDevTm1deployports := getPubDevTmContainerPorts()
-
-	klog.Info(pubDevTm1VolumeMount)
 
 	cmdstring := []string{
 		"/bin/sh",
@@ -70,22 +64,14 @@ func PubDev1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num
 		initContainers = getMysqlInitContainers(apimanager, &pubDevTm1Volume, &pubDevTm1VolumeMount)
 	}
 
-	klog.Info("PubDevTm-1 Containers Done")
-
 	if enableAnalytics {
 		getInitContainers([]string{"init-am-analytics-worker"}, &initContainers)
-		klog.Info("Pub-Dev-Tm-1 Containers", initContainers[1])
 	}
-
-	klog.Info("PubDevTm-1 Container Phase 1 Done")
 
 	pubDev1SecurityContext := &corev1.SecurityContext{}
 	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, pubDev1SecurityContext)
-	klog.Info("PubDevTm-1 Security Context Done")
-	klog.Info("Ready Delay", x.Readydelay)
-	klog.Info("Live Delay", x.Livedelay)
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depAPIVersion,
@@ -232,7 +218,6 @@ func PubDev2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 
 	if enableAnalytics {
 		getInitContainers([]string{"init-am-analytics-worker"}, &initContainers)
-		klog.Info("Pub-Dev-Tm-2 Containers", initContainers[1])
 	}
 
 	pubDev2SecurityContext := &corev1.SecurityContext{}

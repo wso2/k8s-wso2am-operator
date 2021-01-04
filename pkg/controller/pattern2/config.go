@@ -28,7 +28,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/klog"
 )
 
 type configvalues struct {
@@ -465,8 +464,6 @@ func AssignKeyManagerConfigMapValues(apimanager *apimv1alpha1.APIManager, config
 func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
 
 	ControlConfigData := configMap.Data
-	klog.Info("ConfigMap Data: ", ControlConfigData["image-pull-secret-name"])
-
 	imagePullSecret := ControlConfigData["image-pull-secret-name"]
 	serviceAccountName := ControlConfigData["service-account-name"]
 
