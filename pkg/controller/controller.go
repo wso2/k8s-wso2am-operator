@@ -27,10 +27,10 @@ import (
 
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/mysql"
-	pattern4 "github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern-4"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern2"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern3"
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern4"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/patternX"
 	clientset "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned"
 	samplescheme "github.com/wso2/k8s-wso2am-operator/pkg/generated/clientset/versioned/scheme"
