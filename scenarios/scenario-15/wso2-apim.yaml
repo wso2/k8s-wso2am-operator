@@ -1,3 +1,4 @@
+
 #Copyright (c)  WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 #
 # WSO2 Inc. licenses this file to you under the Apache License,
@@ -14,23 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: apim.wso2.com/v1alpha1
+kind: APIManager
 metadata:
-  name: wso2am-controller
-  namespace: wso2-system
+  name: cluster-1
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: wso2am-controller
-  template:
-    metadata:
-      labels:
-        app: wso2am-controller
-    spec:
-      containers:
-        - name: wso2am-controller
-          image: benura123/k8s-operator:v4.0.1
-          imagePullPolicy: Always
-      serviceAccountName: wso2am-svc-account
+  pattern: Pattern-3
+  profiles:
+    - name: api-publisher-1
+      deployment:
+        configMaps:
+          deploymentConfigMap: <NEW_PROFILE_DEPLOYMENT_CONFIGMAP>
