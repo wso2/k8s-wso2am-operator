@@ -23,6 +23,7 @@ import (
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern1"
 	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern2"
+	"github.com/wso2/k8s-wso2am-operator/pkg/controller/pattern3"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -37,6 +38,9 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager, pattern string) *appsv
 		mysqlvolumemount, mysqlvolume = pattern1.GetMysqlVolumes(apimanager)
 	} else if pattern == "Pattern-2" {
 		mysqlvolumemount, mysqlvolume = pattern2.GetMysqlVolumes(apimanager)
+		//mysqlvolumemount, mysqlvolume = pattern2.GetMysqlVolumes(apimanager)
+	} else if pattern == "Pattern-3" {
+		mysqlvolumemount, mysqlvolume = pattern3.GetMysqlVolumes(apimanager)
 	}
 
 	labels := map[string]string{
@@ -65,7 +69,7 @@ func MysqlDeployment(apimanager *apimv1alpha1.APIManager, pattern string) *appsv
 					Containers: []corev1.Container{
 						{
 							Name:  "wso2apim-with-analytics-mysql",
-							Image: "benura123/mysql-dock:v5.7",
+							Image: "mysql:5.7",
 							LivenessProbe: &corev1.Probe{
 								Handler: corev1.Handler{
 									Exec: &corev1.ExecAction{
