@@ -69,26 +69,14 @@ data:
   apim-analytics-deployment-resources-limits-cpu: "2000m"
 
   # pattern specific configs for key manager instances
-  p4-apim-km-deployment-livenessProbe-periodSeconds: "20"
-  p4-apim-km-deployment-livenessProbe-initialDelaySeconds: "180"
-  p4-apim-km-deployment-readinessProbe-periodSeconds: "20"
-  p4-apim-km-deployment-readinessProbe-initialDelaySeconds: "180"
   p4-apim-km-deployment-replicas: "2"
 
   # pattern specific configs for external gateway instances
-  p4-apim-external-gw-deployment-livenessProbe-periodSeconds: "20"
-  p4-apim-external-gw-deployment-livenessProbe-initialDelaySeconds: "180"
-  p4-apim-external-gw-deployment-readinessProbe-periodSeconds: "20"
-  p4-apim-external-gw-deployment-readinessProbe-initialDelaySeconds: "180"
   p4-apim-external-gw-deployment-replicas: "2"
   p4-apim-external-gw-deployment-maxSurge: "2"
   p4-apim-external-gw-deployment-maxUnavailable: "0"
 
   # pattern specific configs for internal gateway instances
-  p4-apim-internal-gw-deployment-livenessProbe-periodSeconds: "20"
-  p4-apim-internal-gw-deployment-livenessProbe-initialDelaySeconds: "180"
-  p4-apim-internal-gw-deployment-readinessProbe-periodSeconds: "20"
-  p4-apim-internal-gw-deployment-readinessProbe-initialDelaySeconds: "180"
   p4-apim-internal-gw-deployment-replicas: "2"
   p4-apim-internal-gw-deployment-maxSurge: "2"
   p4-apim-internal-gw-deployment-maxUnavailable: "0"
