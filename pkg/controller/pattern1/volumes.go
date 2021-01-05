@@ -214,7 +214,7 @@ func getAnalyticsDashVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]co
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "wso2am-analytics-bin",
+					Name: "wso2am-analytics-bin-" + apimanager.Name,
 				},
 			},
 		},
@@ -292,7 +292,7 @@ func getAnalyticsWorkerVolumes(apimanager *apimv1alpha1.APIManager, num int) ([]
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "wso2am-analytics-bin",
+					Name: "wso2am-analytics-bin-" + apimanager.Name,
 				},
 			},
 		},

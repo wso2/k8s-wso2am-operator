@@ -20,3 +20,5 @@ metadata:
   name: apim-pattern-1
 spec:
   pattern: Pattern-1
+  service:
+     type: LoadBalancer
