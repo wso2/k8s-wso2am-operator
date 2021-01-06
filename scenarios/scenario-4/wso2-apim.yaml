@@ -17,6 +17,22 @@
 apiVersion: apim.wso2.com/v1alpha1
 kind: APIManager
 metadata:
-  name: apim-pattern-2
+  name: cluster-1
 spec:
-  pattern: Pattern-2
+  pattern: Pattern-1
+  expose: Ingress
+  service:
+    type: ClusterIP
+  profiles:
+    - name: api-manager-1
+      deployment:
+        configMaps:
+          deploymentConfigMap: apim-conf-ingress-1
+    - name: api-manager-2
+      deployment:
+        configMaps:
+          deploymentConfigMap: apim-conf-ingress-2
+    - name: analytics-dashboard
+      deployment:
+        configMaps:
+          deploymentConfigMap: apim-analytics-dash-conf-ingress

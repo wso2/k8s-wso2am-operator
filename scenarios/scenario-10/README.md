@@ -1,51 +1,46 @@
-## Scenario-10 : Deploy API Manager Pattern-2
+## Scenario-10 : Override default configuration values
 
-#### Installation Prerequisiyes
+You can override the default configuration values of relavant artifacts.
 
-* [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/).
+There are different set of profiles based on each patterns. Some of them are:
 
-In this scenario we are deploying API Manager Pattern-2 by using the following simple yaml definition. All API Manager servers are exposed via Ingress Controller.
+In pattern-2 we have,
 
-```yaml
-apiVersion: apim.wso2.com/v1alpha1
-kind: APIManager
-metadata:
-  name: cluster-1
-spec:
-  pattern: Pattern-2
+* api-pub-dev-tm-1
+* api-pub-dev-tm-2
+* analytics-dashboard
+* analytics-worker
+* api-keymanager
+* api-gateway
+
+For the above profiles, you can override the fields such as,
+
+* Replicas
+* MinReadySeconds
+* Resources 
+  * Requests 
+    * Memory 
+    * CPU
+  * Limits 
+    * Memory 
+    * CPU
+* LivenessProbe
+  - InitialDelaySeconds
+  - PeriodSeconds
+  - FailureTHreshold
+* ReadinessProbe
+  - InitialDelaySeconds
+  - PeriodSeconds
+  - FailureTHreshold
+* imagePullPolicy
+* securityContext
+
+You can specify to any or all of the profiles using the given wso2-apim.yaml file. A sample configuration values for one of the profile is given, you can include required profiles as an array. Then apply the command,
+
+#### Deploy Pattern-2 by overriding configurations
+
+Please follow the prerequisites section in scenario 10 to deploy Pattern-2 and execute the following command.
+
 ```
------
-
-
-#### Deploy pattern 2
-
+  kubectl apply -f wso2-apim.yaml
 ```
-kubectl create -f wso2-apim.yaml
-```
-
-#### Access API Manager
-
-Get the external address of the ingresses using the command,
-
-```
-
-kubectl get ing
-
-Output:
-NAME                                                                        HOSTS                                      ADDRESS       PORTS    AGE
-wso2-am-analytics-dashboard-ingress    analytics.am.wso2.com    34.67.188.5   80, 443 6m17s
-```
-
-Add an **/etc/hosts/** entry as follows.
-
-```
-/etc/hosts
-- - - - - - - - - - 
-<EXTERNAL-ADDRESS>       analytics.am.wso2.com gateway.am.wso2.com am.wso2.com
-```
-
-- **API Publisher** : https://am.wso2.com/publisher 
-- **API Devportal** : https://am.wso2.com/devportal 
-- **API Analytics Dashboard**   : https://analytics.am.wso2.com
-
-

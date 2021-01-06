@@ -1,4 +1,3 @@
-
 #Copyright (c)  WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 #
 # WSO2 Inc. licenses this file to you under the Apache License,
@@ -20,9 +19,4 @@ kind: APIManager
 metadata:
   name: cluster-1
 spec:
-  pattern: Pattern-3
-  profiles:
-    - name: api-publisher-1
-      deployment:
-        configMaps:
-          deploymentConfigMap: <NEW_PROFILE_DEPLOYMENT_CONFIGMAP>
+  pattern: Pattern-4

@@ -25,6 +25,3 @@ spec:
       deployment:
         configMaps:
           deploymentConfigMap: <NEW_PROFILE_DEPLOYMENT_CONFIGMAP>
-        persistentVolumeClaim:
-          synapseConfigs: <NEW_PROFILE_SYNAPSE_CONFIGS_PVC>
-          executionPlans: <NEW_PROFILE_EXECUTION_PLANS_PVC>

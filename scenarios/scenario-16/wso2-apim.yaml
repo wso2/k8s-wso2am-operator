@@ -19,9 +19,9 @@ kind: APIManager
 metadata:
   name: cluster-1
 spec:
-  pattern: Pattern-3
+  pattern: Pattern-4
   profiles:
-    - name: api-publisher-1
+    - name: api-pub-dev-tm-1
       deployment:
         replicas: 1
         minReadySeconds: 100
@@ -29,7 +29,7 @@ spec:
         resources:
           requests:
             memory: 1Gi
-            cpu: 1000m
+            cpu: 1500m
           limits:
             memory: 2Gi
             cpu: 2000m
@@ -41,15 +41,15 @@ spec:
           initialDelaySeconds: 180
           failureThreshold: 3
           periodSeconds: 20
-    - name: api-devportal-1
+    - name: api-keymanager
       deployment:
         replicas: 1
-        minReadySeconds: 100
+        minReadySeconds: 120
         imagePullPolicy: Always
         resources:
           requests:
             memory: 1Gi
-            cpu: 1000m
+            cpu: 1500m
           limits:
             memory: 2Gi
             cpu: 2000m

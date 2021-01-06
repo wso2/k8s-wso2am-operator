@@ -90,7 +90,7 @@ In this document, we will walk through the following.
     ```
     - This will give the external IPs of the nodes available in the cluster. Pick any IP to include in /etc/hosts file.
   
-- Access URLs 
+- Access URLs for Pattern-1
     - **API Publisher** : https://wso2apim:32001/publisher 
     - **API Devportal** : https://wso2apim:32001/devportal 
        
@@ -98,15 +98,23 @@ In this document, we will walk through the following.
 
 ## Sample Scenarios
 
-1. [Scenario-1 : Deploy A Single API Manager Instance (Custom Pattern)](scenarios/scenario-1)
-2. [Scenario-2 : Deploy API Manager Pattern-1 (LoadBalancer Service Type)](scenarios/scenario-2)
-3. [Scenario-3 : Deploy API Manager Pattern-1 (NodePort Service Type)](scenarios/scenario-3)
-4. [Scenario-4 : Deploy A Single API Manager Instance with Analytics (Custom Pattern)](scenarios/scenario-4)
-5. [Scenario-5 : Override default configuration values](scenarios/scenario-5)
-6. [Scenario-6 : Override ConfigMaps and PersistentVolumeClaims](scenarios/scenario-6)
-7. [Scenario-7 : Add new configmaps and Persistent Volume Claims](scenarios/scenario-7)
-8. [Scenario-8 : Running External NFS](scenarios/scenario-8)
-9. [Scenario-9 : Expose API Manager using Ingress](scenarios/scenario-9)
+1.  [Scenario-1  : Deploy A Single API Manager Instance (Custom Pattern)](scenarios/scenario-1)
+2.  [Scenario-2  : Deploy API Manager Pattern-1 (LoadBalancer Service Type)](scenarios/scenario-2)
+3.  [Scenario-3  : Deploy API Manager Pattern-1 (NodePort Service Type)](scenarios/scenario-3)
+4.  [Scenario-4  : Deploy API Manager Pattern-1 (Ingress Service Type)](scenarios/scenario-4)
+5.  [Scenario-5  : Override default configuration values](scenarios/scenario-5)
+6.  [Scenario-6  : Override ConfigMaps](scenarios/scenario-6)
+7.  [Scenario-7  : Add new configmaps](scenarios/scenario-7)
+8.  [Scenario-8  : Deploy A Single API Manager Instance with Analytics (Custom Pattern)](scenarios/scenario-8)
+9.  [Scenario-9  : Deploy API Manager Pattern-2 (Ingress Service Type)](scenarios/scenario-9)
+10. [Scenario-10 : Override default configuration values (Pattern-2)](scenarios/scenario-10)
+11. [Scenario-11 : Override ConfigMaps (Pattern-2)](scenarios/scenario-11)
+12. [Scenario-12 : Deploy API Manager Pattern-3 (Ingress Service Type)](scenarios/scenario-12)
+13. [Scenario-13 : Override default configuration values (Pattern-3)](scenarios/scenario-13)
+14. [Scenario-14 : Override ConfigMaps (Pattern-3)](scenarios/scenario-14)
+15. [Scenario-15 : Deploy API Manager Pattern-4 (Ingress Service Type)](scenarios/scenario-15)
+16. [Scenario-16 : Override default configuration values (Pattern-4)](scenarios/scenario-16)
+17. [Scenario-17 : Override ConfigMaps (Pattern-4)](scenarios/scenario-17)
 
 ## Clean up
 

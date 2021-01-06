@@ -1,6 +1,6 @@
-## Scenario-7 : Add new configmaps and Persistent Volume Claims
+## Scenario-7 : Add new configmaps
 
-You can create new configmaps and persistant volume claims with new Mountpath and made it available in the cluster.
+You can create new configmaps with new Mountpath and made it available in the cluster.
 
 1. Create a new configmap for any of the profiles and then add under **newConfigmap** field with mountpath as specified in the wso2-apim.yaml file.
    
@@ -22,14 +22,3 @@ You can create new configmaps and persistant volume claims with new Mountpath an
     ```
     kubectl apply -f scenarios/scenario-5/wso2-apim.yaml
     ```
-    
-    
-Similarly, you can create new persistent volume claims for desired profiles with mountpath and add them under **newClaim** field.
-
-```
-persistentVolumeClaim:
-  newClaim:
-    - name: <NEW_CLAIM_1>
-      mountPath: <NEW_MOUNTPATH_FOR_CLAIM_1>
-```
-    

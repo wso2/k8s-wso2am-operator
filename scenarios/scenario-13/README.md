@@ -1,53 +1,48 @@
-## Scenario-13 : Deploy API Manager Pattern-3
+## Scenario-13 : Override default configuration values
 
-#### Installation Prerequisiyes
+You can override the default configuration values of relavant artifacts.
 
-* [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/).
+There are different set of profiles based on each patterns. Some of them are:
 
-In this scenario we are deploying API Manager Pattern-3 by using the following simple yaml definition. All API Manager servers are exposed via Ingress Controller.
+In pattern-3 we have,
 
-```yaml
-apiVersion: apim.wso2.com/v1alpha1
-kind: APIManager
-metadata:
-  name: cluster-1
-spec:
-  pattern: Pattern-3
+* api-publisher-1
+* api-publisher-2
+* api-devportal-1
+* api-devportal-2
+* analytics-dashboard
+* analytics-worker
+* api-keymanager
+* api-gateway
+
+For the above profiles, you can override the fields such as,
+
+* Replicas
+* MinReadySeconds
+* Resources 
+  * Requests 
+    * Memory 
+    * CPU
+  * Limits 
+    * Memory 
+    * CPU
+* LivenessProbe
+  - InitialDelaySeconds
+  - PeriodSeconds
+  - FailureTHreshold
+* ReadinessProbe
+  - InitialDelaySeconds
+  - PeriodSeconds
+  - FailureTHreshold
+* imagePullPolicy
+* securityContext
+
+You can specify to any or all of the profiles using the given wso2-apim.yaml file. A sample configuration values for one of the profile is given, you can include required profiles as an array. Then apply the command,
+
+#### Deploy Pattern-3 by overriding configurations
+
+Please follow the prerequisites section in scenario 10 to deploy Pattern-3 and execute the following command.
+
 ```
------
-
-
-#### Deploy pattern 3
-
+  kubectl apply -f wso2-apim.yaml
 ```
-kubectl create -f wso2-apim.yaml
-```
-
-#### Access API Manager
-
-Get the external address of the ingresses using the command,
-
-```
-
-kubectl get ing
-
-Output:
-NAME                                   HOSTS                    ADDRESS         PORTS      AGE
-wso2-am-analytics-dashboard-ingress    analytics.am.wso2.com    34.67.188.5     80, 443    36m
-wso2-am-devportal-ingress              devportal.am.wso2.com    34.67.188.5     80, 443    36m
-wso2-am-gw-ingress                     gateway.am.wso2.com      34.67.188.5     80, 443    36m
-wso2-am-publisher-ingress              publisher.am.wso2.com    34.67.188.5     80, 443    36m
-```
-
-Add an **/etc/hosts/** entry as follows.
-
-```
-/etc/hosts
-- - - - - - - - - - 
-<EXTERNAL-ADDRESS>       analytics.am.wso2.com gateway.am.wso2.com publisher.am.wso2.com devportal.am.wso2.com
-```
-
-- **API Publisher** : https://publisher.am.wso2.com 
-- **API Devportal** : https://devportal.am.wso2.com
-- **API Analytics Dashboard**   : https://analytics.am.wso2.com
-- **API Gateway**   : https://gateway.am.wso2.com

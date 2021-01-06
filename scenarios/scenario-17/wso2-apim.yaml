@@ -17,6 +17,11 @@
 apiVersion: apim.wso2.com/v1alpha1
 kind: APIManager
 metadata:
-  name: apim-pattern-2
+  name: cluster-1
 spec:
-  pattern: Pattern-2
+  pattern: Pattern-4
+  profiles:
+    - name: api-pub-dev-tm-1
+      deployment:
+        configMaps:
+          deploymentConfigMap: <NEW_PROFILE_DEPLOYMENT_CONFIGMAP>

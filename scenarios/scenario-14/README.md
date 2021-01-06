@@ -1,48 +1,19 @@
-## Scenario-14 : Override default configuration values
+## Scenario-14 : Override ConfigMaps
 
-You can override the default configuration values of relavant artifacts.
+You can override the default deployemnt configmaps present for each profile.
 
-There are different set of profiles based on each patterns. Some of them are:
+1. Create a new deployment configmap using the deployment.toml/ deployment.yaml files. And apply the command.
 
-In pattern-3 we have,
+    ```
+      kubectl create configmap <NEW-PROFILE-CONFIGMAP> --from-file=<PATH_TO_DEPLOYMENT.TOML>
+    ```
 
-* api-publisher-1
-* api-publisher-2
-* api-devportal-1
-* api-devportal-2
-* analytics-dashboard
-* analytics-worker
-* api-keymanager
-* api-gateway
+2. Update the custom resources with created configmap.
 
-For the above profiles, you can override the fields such as,
+    Replace, the **deploymentConfigmap** with configmap name.
 
-* Replicas
-* MinReadySeconds
-* Resources 
-  * Requests 
-    * Memory 
-    * CPU
-  * Limits 
-    * Memory 
-    * CPU
-* LivenessProbe
-  - InitialDelaySeconds
-  - PeriodSeconds
-  - FailureTHreshold
-* ReadinessProbe
-  - InitialDelaySeconds
-  - PeriodSeconds
-  - FailureTHreshold
-* imagePullPolicy
-* securityContext
+3. Deploy updated pattern-3.
 
-You can specify to any or all of the profiles using the given wso2-apim.yaml file. A sample configuration values for one of the profile is given, you can include required profiles as an array. Then apply the command,
-
-#### Deploy Pattern-3 by overriding configurations
-
-Please follow the prerequisites section in scenario 10 to deploy Pattern-3 and execute the following command.
-
-```
-  kubectl apply -f wso2-apim.yaml
-```
+    ```
+      kubectl apply -f wso2-apim.yaml
+    ```

@@ -1,45 +1,100 @@
-## Scenario-8 : Running External NFS
+## Scenario-4 : Deploy A Single API Manager Instance with Analytics (Custom Pattern)
 
-**Prerequisites**
+In this scenario we are deploying a single API Manager instance with API analytics (dashboard and worker profiles)in Kubernetes.
 
-A pre-configured Network File System (NFS) to be used as the persistent volume for artifact sharing and persistence. In the NFS server instance, create a Linux system user account named wso2carbon with user id 802 and a system group named wso2 with group id 802. Add the wso2carbon user to the group wso2.
+#### Deploy MySQL Database
 
 ```
-groupadd --system -g 802 wso2
-useradd --system -g 802 -u 802 wso2carbon 
+ kubectl create -f mysql/
 ```
-    
-1. Setup a Network File System (NFS) to be used for persistent storage.
 
-    Create and export unique directories within the NFS server instance for each Kubernetes Persistent Volume resource defined in the pv.yaml file.
+#### Deploy the configmap and the custom pattern
 
-2. Grant ownership to wso2carbon user and wso2 group, for each of the previously created directories. 
+The configmap contains the configurations of API Manager node and Analytics
 
+```
+ kubectl create -f configmaps/
+ kubectl create -f custom-pattern.yaml
+```
+
+#### Access API Manager
+
+To access the API Manager, add a host mapping entry to the /etc/hosts file. As we have exposed the API portal service in Node Port type, you can use the IP address of any Kubernetes node.
+
+```
+<Any K8s Node IP>  wso2apim
+```
+
+- For Docker for Mac use "127.0.0.1" for the K8s node IP
+- For Minikube, use minikube ip command to get the K8s node IP
+- For GKE
     ```
-    sudo chown -R wso2carbon:wso2 <directory_name>
+    (kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="ExternalIP")].address }')
     ```
-   
-3. Grant read-write-execute permissions to the wso2carbon user, for each of the previously created directories.
+    - This will give the external IPs of the nodes available in the cluster. Pick any IP to include in /etc/hosts file.
+  
+- **API Publisher** : https://wso2apim:32001/publisher 
+- **API Devportal** : https://wso2apim:32001/devportal 
+- **API Analytics Dashboard**   : https://wso2apim-analytics:32201/analytics-dashboard 
 
-    ```
-    chmod -R 700 <directory_name>
-    ```
 
-4. Update the StorageClassName in the storage-class.yaml file as you want.
+## Custom Patterns
 
-    Then, apply the following command to create a new Storage Class,
+In scenario 2 you can find the pattern-1 deployment of API Manager. By giving the pattern numbers, you can deploy those patterns. In custom patterns, you can come with your own pattern. 
 
-    ```
-    kubectl create -f storage-class.yaml 
-    ```
-    
-5. Update each Kubernetes Persistent Volume resource with the corresponding Namespace (NAME_SPACE), NFS server IP (NFS_SERVER_IP) and exported, NFS server directory path (NFS_LOCATION_PATH) in the pv.yaml file.
-      
-    Then, deploy the persistent volume resource as follows,
+You can introduce a new custom pattern with any number of profiles.
 
-    ```
-    kubectl create -f pv.yaml 
-    ```
+There are several types of profiles:
 
-6. Update PVC Configmap with the corresponding StorageClassName in the <KUBERNETES_HOME>/artifacts/operator-configs/pvc-config.yaml file.
+    * api-manager
+    * analytics-dashboard
+    * analytics-worker
 
+
+- You can create any no.of profiles with given types.
+- You can provide desired configuration values if you wish, if not provided it will take upon the default type specific configuration values.
+- Under a profile, everything except name, type, service, and configMaps are optional fields.
+- You need to create relevant configmaps and persistent volume claims and add them under deploymentConfigmap, synapseConfigs and executionPlans. If you do not specify any persistent volume claims, default ones will not be created unlike in Pattern 1. You would not need a NFS deployment in this case.
+
+#### Available options in a custom pattern can be found here.
+
+```
+apiVersion: apim.wso2.com/v1alpha1
+kind: APIManager
+metadata:
+  name: cluster-1
+spec:
+  pattern: Pattern-X
+  service:
+    type: NodePort
+  useMysql: "<true|false>"
+  profiles:
+    - name: <NEW_PROFILE_NAME>
+      type: api-manager
+      service:
+        name: <NEW_PROFILE_SERVICE_NAME>
+      deployment:
+        replicas: 1
+        minReadySeconds: 100
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 2000m
+          limits:
+            memory: 3Gi
+            cpu: 3000m
+        livenessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        configMaps:
+          deploymentConfigMap: <NEW_PROFILE_DEPLOYMENT_CONFIGMAP>
+        persistentVolumeClaim:
+          synapseConfigs: <NEW_PROFILE_SYNAPSE_CONFIGS>
+          executionPlans: <NEW_PROFILE_EXECUTION_PLANS>
+```
