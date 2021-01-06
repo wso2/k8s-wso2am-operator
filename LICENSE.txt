@@ -1,0 +1,102 @@
+
+This product is licensed by WSO2 Inc. under Apache License 2.0. The license
+can be downloaded from the following locations:
+	http://www.apache.org/licenses/LICENSE-2.0.html
+	http://www.apache.org/licenses/LICENSE-2.0.txt
+
+This product also contains software under different licenses. This table below
+all the contained got client libraries and the license under which they are 
+provided to you.
+
+
+Name                                                                                                License
+_________________________________________________________________________________________________________________________________________________
+
+
+golang.org/x/text                                                                                   BSD-3-Clause
+
+github.com/modern-go/concurrent                                                                     Apache-2.0
+
+k8s.io/utils                                                                                        Apache-2.0
+
+github.com/golang/protobuf                                                                          BSD-3-Clause
+
+github.com/spf13/pflag                                                                              BSD-3-Clause
+
+golang.org/x/net                                                                                    BSD-3-Clause
+
+golang.org/x/time/rate                                                                              BSD-3-Clause
+
+github.com/hashicorp/golang-lru                                                                     MPL-2.0
+
+k8s.io/kube-openapi/pkg/util/proto                                                                  Apache-2.0
+
+golang.org/x/crypto/ssh/terminal                                                                    BSD-3-Clause 
+
+golang.org/x/sys/unix                                                                               BSD-3-Clause
+
+github.com/google/go-cmp/cmp                                                                        BSD-3-Clause
+
+github.com/gogo/protobuf                                                                            BSD-3-Clause
+
+gopkg.in/yaml.v2                                                                                    Apache-2.0
+
+github.com/imdario/mergo                                                                            BSD-3-Clause
+
+github.com/wso2/k8s-wso2am-operator                                                                 Apache-2.0
+
+k8s.io/apimachinery                                                                                 Apache-2.0
+
+github.com/google/gofuzz                                                                            Apache-2.0 
+
+k8s.io/klog                                                                                         Apache-2.0
+
+k8s.io/api                                                                                          Apache-2.0
+
+github.com/modern-go/reflect2                                                                       Apache-2.0
+
+cloud.google.com/go/compute/metadata                                                                Apache-2.0 
+
+sigs.k8s.io/yaml                                                                                    MIT
+
+k8s.io/client-go                                                                                    Apache-2.0
+
+github.com/googleapis/gnostic                                                                       Apache-2.0
+
+github.com/golang/groupcache/lru                                                                    Apache-2.0
+
+gopkg.in/inf.v0                                                                                     BSD-3-Clause
+
+github.com/json-iterator/go                                                                         MIT
+
+github.com/davecgh/go-spew/spew                                                                     ISC
+
+golang.org/x/oauth2                                                                                 BSD-3-Clause
+
+github.com/google/gofuzz                                                                            Apache-2.0
+
+gopkg.in/inf.v0                                                                                     BSD-3-Clause 
+
+k8s.io/klog                                                                                         Apache-2.0
+
+golang.org/x/text                                                                                   BSD-3-Clause 
+
+github.com/wso2/k8s-wso2am-operator/pkg/apis/apim                                                   Apache-2.0
+
+github.com/wso2/k8s-wso2am-operator/pkg                                                             Apache-2.0
+
+golang.org/x/oauth2                                                                                 BSD-3-Clause
+
+sigs.k8s.io/yaml                                                                                    MIT
+
+github.com/googleapis/gnostic                                                                       Apache-2.0
+
+k8s.io/kube-openapi/pkg/util/proto                                                                  Apache-2.0
+
+golang.org/x/sys/unix                                                                               BSD-3-Clause
+
+github.com/modern-go/concurrent                                                                     Apache-2.0
+
+golang.org/x/time/rate                                                                              BSD-3-Clause
+
+github.com/google/go-cmp/cmp                                                                        BSD-3-Clause
