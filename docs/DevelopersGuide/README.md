@@ -57,3 +57,23 @@
 
 ```
 
+## Get licenses of third part librries
+
+* Install go-licenses package
+``` 
+go get -v github.com/google/go-licenses
+
+```
+* Build go-licenses pckage
+``` 
+go build github.com/google/go-licenses
+
+```
+* Get licenses of third party libraries
+``` 
+./go-licenses csv <path-to-go-file> >> LICENSE.txt
+
+```
+
+
+
