@@ -462,7 +462,6 @@ func (c *Controller) syncHandler(key string) error {
 		if useMysqlPod {
 			// If the resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
-				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager, "Pattern-1"))
 				if err != nil {
 					return err
@@ -593,8 +592,8 @@ func (c *Controller) syncHandler(key string) error {
 
 		if apimanager.Spec.Expose == "Ingress" {
 			// Get apim instance 1 service name using hardcoded value
-			apimingressname := "wso2-am-p1-ingress"
-			amingress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(apimingressname)
+			apimIngressName := "wso2-am-p1-ingress"
+			amingress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(apimIngressName)
 			// If the resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
 				amingress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.ApimIngress(apimanager))
@@ -787,7 +786,6 @@ func (c *Controller) syncHandler(key string) error {
 		if useMysqlPod {
 			//for instance mysql deployment
 			if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-				//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 				klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
 				mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager, "Pattern-1"))
 			}
@@ -1078,7 +1076,6 @@ func (c *Controller) syncHandler(key string) error {
 				mysqldeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(mysqldeploymentName)
 				// If the resource doesn't exist, we'll create it
 				if errors.IsNotFound(err) {
-					//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager, "Pattern-X"))
 					if err != nil {
 						return err
@@ -1111,7 +1108,6 @@ func (c *Controller) syncHandler(key string) error {
 
 				//for instance mysql deployment
 				if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-					//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 					klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
 					mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager, "Pattern-X"))
 				}
@@ -1396,7 +1392,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if useMysqlPod {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager, "Pattern-2"))
 			if err != nil {
 				return err
@@ -1810,7 +1805,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if useMysqlPod {
 		//for instance mysql deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
 			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager, "Pattern-2"))
 		}
@@ -2082,7 +2076,6 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if useMysqlPod {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager, "Pattern-3"))
 			if err != nil {
 				return err
@@ -2591,7 +2584,6 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if useMysqlPod {
 		//for instance mysql deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
 			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager, "Pattern-2"))
 		}
@@ -2882,7 +2874,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if useMysqlPod {
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(mysql.MysqlDeployment(apimanager, "Pattern-4"))
 			if err != nil {
 				return err
@@ -3343,7 +3334,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	if useMysqlPod {
 		//for instance mysql deployment
 		if apimanager.Spec.Replicas != nil && *apimanager.Spec.Replicas != *mysqldeployment.Spec.Replicas {
-			//y:= pattern1.AssignMysqlConfigMapValues(apimanager,configmap)
 			klog.V(4).Infof("APIManager %s replicas: %d, deployment2 replicas: %d", name, *apimanager.Spec.Replicas, *mysqldeployment.Spec.Replicas)
 			mysqldeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Update(mysql.MysqlDeployment(apimanager, "Pattern-2"))
 		}
