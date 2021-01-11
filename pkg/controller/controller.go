@@ -593,33 +593,33 @@ func (c *Controller) syncHandler(key string) error {
 		if apimanager.Spec.Expose == "Ingress" {
 			// Get apim instance 1 service name using hardcoded value
 			apimIngressName := "wso2-am-p1-ingress"
-			amingress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(apimIngressName)
+			amIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(apimIngressName)
 			// If the resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
-				amingress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.ApimIngress(apimanager))
+				amIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.ApimIngress(apimanager))
 				if err != nil {
 					return err
 				}
 			}
 			// Get apim instance 1 service name using hardcoded value
-			gatewayingressname := "wso2-am-gateway-p1-ingress"
-			gatewayingress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayingressname)
+			gatewayIngressName := "wso2-am-gateway-p1-ingress"
+			gatewayIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayIngressName)
 			// If the resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
-				gatewayingress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.GatewayIngress(apimanager))
+				gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.GatewayIngress(apimanager))
 				if err != nil {
 					return err
 				}
 			}
 
 			// Get apim instance 1 service name using hardcoded value
-			dashingressname := "wso2-am-analytics-dashboard-p1-ingress"
-			dashingress, err1 := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashingressname)
+			dashIngressName := "wso2-am-analytics-dashboard-p1-ingress"
+			dashIngress, err1 := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
 
 			if enableAnalytics {
 				// If the resource doesn't exist, we'll create it
 				if errors.IsNotFound(err1) {
-					dashingress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.DashboardIngress(apimanager))
+					dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.DashboardIngress(apimanager))
 					if err != nil {
 						return err
 					}
@@ -627,22 +627,22 @@ func (c *Controller) syncHandler(key string) error {
 			}
 
 			// If the apim ingress is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-			if !metav1.IsControlledBy(amingress, apimanager) {
-				msg := fmt.Sprintf("am ingress %q already exists and is not managed by APIManager", amingress.Name)
+			if !metav1.IsControlledBy(amIngress, apimanager) {
+				msg := fmt.Sprintf("am ingress %q already exists and is not managed by APIManager", amIngress.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
 			// If the apim ingress is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-			if !metav1.IsControlledBy(gatewayingress, apimanager) {
-				msg := fmt.Sprintf("gateway ingress %q already exists and is not managed by APIManager", gatewayingress.Name)
+			if !metav1.IsControlledBy(gatewayIngress, apimanager) {
+				msg := fmt.Sprintf("gateway ingress %q already exists and is not managed by APIManager", gatewayIngress.Name)
 				c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 				return fmt.Errorf(msg)
 			}
 
 			if enableAnalytics {
 				// If the apim ingress is not controlled by this Apimanager resource, we should log a warning to the event recorder and return
-				if !metav1.IsControlledBy(dashingress, apimanager) {
-					msg := fmt.Sprintf("dashboard ingress %q already exists and is not managed by APIManager", dashingress.Name)
+				if !metav1.IsControlledBy(dashIngress, apimanager) {
+					msg := fmt.Sprintf("dashboard ingress %q already exists and is not managed by APIManager", dashIngress.Name)
 					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
 					return fmt.Errorf(msg)
 				}
