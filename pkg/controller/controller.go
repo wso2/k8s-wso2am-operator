@@ -591,12 +591,47 @@ func (c *Controller) syncHandler(key string) error {
 		}
 
 		if apimanager.Spec.Expose == "Ingress" {
+			klog.Info("Pattern-1 Ingress")
+			apimingressConfName := "wso2am-apim-p1-ingress-configs"
+			apimingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(apimingressConfName)
+			apimingressConfUserName := "wso2am-apim-p1-ingress-configs-" + apimanager.Name
+			apimingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(apimingressConfUserName)
+			if errors.IsNotFound(err) {
+				apimingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, apimingressConfWso2))
+				if err != nil {
+					fmt.Println("Creating APIM configmap in user specified ns", apimingressConfUser)
+				}
+			}
+
+			gwingressConfName := "wso2am-gw-p1-ingress-configs"
+			gwingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gwingressConfName)
+			gwingressConfUserName := "wso2am-gw-p1-ingress-configs-" + apimanager.Name
+			gwingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gwingressConfUserName)
+			if errors.IsNotFound(err) {
+				gwingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, gwingressConfWso2))
+				if err != nil {
+					fmt.Println("Creating Gateway configmap in user specified ns", gwingressConfUser)
+				}
+			}
+
+			dashboardingressConfName := "wso2am-dashboard-p1-ingress-configs"
+			dashboardingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashboardingressConfName)
+			dashboardingressConfUserName := "wso2am-dashboard-p1-ingress-configs-" + apimanager.Name
+			dashboardingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashboardingressConfUserName)
+			if errors.IsNotFound(err) {
+				dashboardingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashboardingressConfWso2))
+				if err != nil {
+					fmt.Println("Creating Dashboard configmap in user specified ns", dashboardingressConfUser)
+				}
+			}
+
 			// Get apim instance 1 service name using hardcoded value
 			apimIngressName := "wso2-am-p1-ingress"
 			amIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(apimIngressName)
 			// If the resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
-				amIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.ApimIngress(apimanager))
+				y := pattern1.AssignAPIMIngressConfigMapValues(apimanager, apimingressConfUser)
+				amIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.ApimIngress(apimanager, y))
 				if err != nil {
 					return err
 				}
@@ -606,7 +641,8 @@ func (c *Controller) syncHandler(key string) error {
 			gatewayIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayIngressName)
 			// If the resource doesn't exist, we'll create it
 			if errors.IsNotFound(err) {
-				gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.GatewayIngress(apimanager))
+				x := pattern1.AssignGatewayIngressConfigMapValues(apimanager, gwingressConfUser)
+				gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.GatewayIngress(apimanager, x))
 				if err != nil {
 					return err
 				}
@@ -619,7 +655,8 @@ func (c *Controller) syncHandler(key string) error {
 			if enableAnalytics {
 				// If the resource doesn't exist, we'll create it
 				if errors.IsNotFound(err1) {
-					dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.DashboardIngress(apimanager))
+					z := pattern1.AssignDashboardIngressConfigMapValues(apimanager, dashboardingressConfUser)
+					dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern1.DashboardIngress(apimanager, z))
 					if err != nil {
 						return err
 					}
