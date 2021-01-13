@@ -30,9 +30,7 @@ data:
     nginx.ingress.kubernetes.io/cors-allow-methods: GET, PUT, POST, DELETE, PATCH, OPTIONS
     nginx.ingress.kubernetes.io/cors-allow-headers: authorization, Access-Control-Allow-Origin, Content-Type, SOAPAction, apikey, Authorization
   ingressResourceName: "wso2-am-p1-ingress"
-  #Define whether ingress to use http or https endpoint of operator deployment
   ingressTransportMode: "https"
-  #Define the hostname of the ingress
   ingressHostName : "wso2apim"
 
 ---
@@ -46,9 +44,7 @@ data:
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     kubernetes.io/ingress.class: nginx
   ingressResourceName: "wso2-am-gateway-p1-ingress"
-  #Define whether ingress to use http or https endpoint of operator deployment
   ingressTransportMode: "https"
-  #Define the hostname of the ingress
   ingressHostName : "wso2apim-gateway"
 
 ---
@@ -62,7 +58,5 @@ data:
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     kubernetes.io/ingress.class: nginx
   ingressResourceName: "wso2-am-analytics-dashboard-p1-ingress"
-  #Define whether ingress to use http or https endpoint of operator deployment
   ingressTransportMode: "https"
-  #Define the hostname of the ingress
   ingressHostName : "wso2apim-gateway"
