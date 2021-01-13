@@ -614,17 +614,6 @@ func (c *Controller) syncHandler(key string) error {
 				}
 			}
 
-			dashboardingressConfName := "wso2am-dashboard-p1-ingress-configs"
-			dashboardingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashboardingressConfName)
-			dashboardingressConfUserName := "wso2am-dashboard-p1-ingress-configs-" + apimanager.Name
-			dashboardingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashboardingressConfUserName)
-			if errors.IsNotFound(err) {
-				dashboardingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashboardingressConfWso2))
-				if err != nil {
-					fmt.Println("Creating Dashboard configmap in user specified ns", dashboardingressConfUser)
-				}
-			}
-
 			// Get apim instance 1 service name using hardcoded value
 			apimIngressName := "wso2-am-p1-ingress"
 			amIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(apimIngressName)
@@ -653,6 +642,17 @@ func (c *Controller) syncHandler(key string) error {
 			dashIngress, err1 := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
 
 			if enableAnalytics {
+				dashboardingressConfName := "wso2am-dashboard-p1-ingress-configs"
+				dashboardingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashboardingressConfName)
+				dashboardingressConfUserName := "wso2am-dashboard-p1-ingress-configs-" + apimanager.Name
+				dashboardingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashboardingressConfUserName)
+				if errors.IsNotFound(err) {
+					dashboardingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern1.MakeConfigMap(apimanager, dashboardingressConfWso2))
+					if err != nil {
+						fmt.Println("Creating Dashboard configmap in user specified ns", dashboardingressConfUser)
+					}
+				}
+
 				// If the resource doesn't exist, we'll create it
 				if errors.IsNotFound(err1) {
 					z := pattern1.AssignDashboardIngressConfigMapValues(apimanager, dashboardingressConfUser)
@@ -2079,6 +2079,39 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	pubingressConfName := "wso2am-pub-p3-ingress-configs"
+	pubingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubingressConfName)
+	pubingressConfUserName := "wso2am-pub-p3-ingress-configs-" + apimanager.Name
+	pubingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pubingressConfUserName)
+	if errors.IsNotFound(err) {
+		pubingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, pubingressConfWso2))
+		if err != nil {
+			fmt.Println("Creating APIM configmap in user specified ns", pubingressConfUser)
+		}
+	}
+
+	devingressConfName := "wso2am-devportal-p3-ingress-configs"
+	devingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(devingressConfName)
+	devingressConfUserName := "wso2am-devportal-p3-ingress-configs-" + apimanager.Name
+	devingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(devingressConfUserName)
+	if errors.IsNotFound(err) {
+		devingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, devingressConfWso2))
+		if err != nil {
+			fmt.Println("Creating APIM configmap in user specified ns", devingressConfUser)
+		}
+	}
+
+	gwingressConfName := "wso2am-gw-p3-ingress-configs"
+	gwingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gwingressConfName)
+	gwingressConfUserName := "wso2am-gw-p3-ingress-configs-" + apimanager.Name
+	gwingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gwingressConfUserName)
+	if errors.IsNotFound(err) {
+		gwingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, gwingressConfWso2))
+		if err != nil {
+			fmt.Println("Creating Gateway configmap in user specified ns", gwingressConfUser)
+		}
+	}
+
 	if enableAnalytics {
 		analyticsBinConfName := "wso2am-analytics-bin"
 		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
@@ -2173,6 +2206,7 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	// Get analytics dashboard deployment name using hardcoded value
 	dashdeployment, err := c.deploymentsLister.Deployments(apimanager.Namespace).Get(dashboardDeploymentName)
 	if enableAnalytics {
+
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern3.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
@@ -2191,11 +2225,23 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Dash Service is already available. [Service name] ,", dashservice)
 		}
 
+		dashboardingressConfName := "wso2am-dashboard-p3-ingress-configs"
+		dashboardingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashboardingressConfName)
+		dashboardingressConfUserName := "wso2am-dashboard-p3-ingress-configs-" + apimanager.Name
+		dashboardingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashboardingressConfUserName)
+		if errors.IsNotFound(err) {
+			dashboardingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern3.MakeConfigMap(apimanager, dashboardingressConfWso2))
+			if err != nil {
+				fmt.Println("Creating Dashboard configmap in user specified ns", dashboardingressConfUser)
+			}
+		}
+
 		// Get ingress name using hardcoded value
 		dashIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
 		// If resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern3.DashboardIngress(apimanager))
+			y := pattern3.AssignDashboardIngressConfigMapValues(apimanager, dashboardingressConfUser)
+			dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern3.DashboardIngress(apimanager, y))
 		} else {
 			fmt.Println("Dash Ingress is already available. [Ingress name] ,", dashIngress)
 		}
@@ -2264,7 +2310,8 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	pubIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(pubIngressName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		pubIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern3.PubIngress(apimanager))
+		y := pattern3.AssignPubIngressConfigMapValues(apimanager, pubingressConfUser)
+		pubIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern3.PubIngress(apimanager, y))
 		if err != nil {
 			return err
 		}
@@ -2302,7 +2349,8 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	devIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(devIngressName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		devIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern3.DevportalIngress(apimanager))
+		y := pattern3.AssignDevIngressConfigMapValues(apimanager, devingressConfUser)
+		devIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern3.DevportalIngress(apimanager, y))
 		if err != nil {
 			return err
 		}
@@ -2355,7 +2403,8 @@ func pattern3Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	gatewayIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayIngressName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern3.GatewayIngress(apimanager))
+		y := pattern3.AssignGatewayIngressConfigMapValues(apimanager, gwingressConfUser)
+		gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern3.GatewayIngress(apimanager, y))
 		if err != nil {
 			return err
 		}
@@ -2885,6 +2934,45 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	pubdevingressConfName := "wso2am-pubdev-p4-ingress-configs"
+	pubdevingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubdevingressConfName)
+	pubdevingressConfUserName := "wso2am-pubdev-p4-ingress-configs-" + apimanager.Name
+	pubdevingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pubdevingressConfUserName)
+	if errors.IsNotFound(err) {
+		pubdevingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, pubdevingressConfWso2))
+		if err != nil {
+			fmt.Println("Creating APIM configmap in user specified ns", pubdevingressConfUser)
+		}
+	}
+
+	klog.Info("PubDev Ingress Done")
+
+	gwingressConfName := "wso2am-ext-gw-p4-ingress-configs"
+	gwingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gwingressConfName)
+	gwingressConfUserName := "wso2am-ext-gw-p4-ingress-configs-" + apimanager.Name
+	gwingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gwingressConfUserName)
+	if errors.IsNotFound(err) {
+		gwingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, gwingressConfWso2))
+		if err != nil {
+			fmt.Println("Creating Gateway configmap in user specified ns", gwingressConfUser)
+		}
+	}
+
+	klog.Info("Ext GW Ingress Done")
+
+	intgwingressConfName := "wso2am-int-gw-p4-ingress-configs"
+	intgwingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(intgwingressConfName)
+	intgwingressConfUserName := "wso2am-int-gw-p4-ingress-configs-" + apimanager.Name
+	intgwingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(intgwingressConfUserName)
+	if errors.IsNotFound(err) {
+		intgwingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, intgwingressConfWso2))
+		if err != nil {
+			fmt.Println("Creating Gateway configmap in user specified ns", intgwingressConfUser)
+		}
+	}
+
+	klog.Info("Int GW Ingress Done")
+
 	if enableAnalytics {
 		analyticsBinConfName := "wso2am-analytics-bin"
 		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
@@ -2990,11 +3078,23 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Dash Service is already available. [Service name] ,", dashservice)
 		}
 
+		dashboardingressConfName := "wso2am-dashboard-p4-ingress-configs"
+		dashboardingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashboardingressConfName)
+		dashboardingressConfUserName := "wso2am-dashboard-p4-ingress-configs-" + apimanager.Name
+		dashboardingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashboardingressConfUserName)
+		if errors.IsNotFound(err) {
+			dashboardingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern4.MakeConfigMap(apimanager, dashboardingressConfWso2))
+			if err != nil {
+				fmt.Println("Creating Dashboard configmap in user specified ns", dashboardingressConfUser)
+			}
+		}
+
 		// Get ingress name using hardcoded value
 		dashIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
 		// If resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.DashboardIngress(apimanager))
+			y := pattern4.AssignDashboardIngressConfigMapValues(apimanager, dashboardingressConfUser)
+			dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.DashboardIngress(apimanager, y))
 		} else {
 			fmt.Println("Dash Ingress is already available. [Ingress name] ,", dashIngress)
 		}
@@ -3082,7 +3182,8 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	pubDevTmIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(pubDevTmIngressName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		pubDevTmIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.PubDevTmIngress(apimanager))
+		y := pattern4.AssignPubDevIngressConfigMapValues(apimanager, pubdevingressConfUser)
+		pubDevTmIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.PubDevTmIngress(apimanager, y))
 		if err != nil {
 			return err
 		}
@@ -3128,7 +3229,8 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	gatewayIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayexternalIngressName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.ExternalGatewayIngress(apimanager))
+		y := pattern4.AssignGatewayIngressConfigMapValues(apimanager, gwingressConfUser)
+		gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.ExternalGatewayIngress(apimanager, y))
 		if err != nil {
 			return err
 		}
@@ -3138,7 +3240,8 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	gatewayInternalIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayinternalIngressName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		gatewayInternalIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.InternalGatewayIngress(apimanager))
+		y := pattern4.AssignGatewayIngressConfigMapValues(apimanager, intgwingressConfUser)
+		gatewayInternalIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern4.InternalGatewayIngress(apimanager, y))
 		if err != nil {
 			return err
 		}

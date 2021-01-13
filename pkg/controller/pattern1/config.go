@@ -489,7 +489,6 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 }
 
 func AssignAPIMIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap) *ingressConfigvalues {
-	klog.Info("APIM CONFIGMAPS")
 	ControlConfigData := configMap.Data
 
 	annotations := ControlConfigData["ingress.properties"]
@@ -497,19 +496,14 @@ func AssignAPIMIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 	hostName := ControlConfigData["ingressHostName"]
 
 	annotationsArray := strings.Split(annotations, "\n")
-	klog.Info("LENGTH: ", len(annotationsArray))
 	annotationsMap := make(map[string]string)
 	for _, c := range annotationsArray {
-		mapObj := strings.Split(strings.TrimSpace(c), ":")
+		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
 		klog.Info(len(mapObj))
 		if len(mapObj) > 1 {
 			annotationsMap[mapObj[0]] = mapObj[1]
 		}
 	}
-
-	klog.Info("Annotations: ", annotationsMap)
-	klog.Info("IngressName: ", ingressName)
-	klog.Info("HostName: ", hostName)
 
 	ingressVals := &ingressConfigvalues{
 		Annotations: annotationsMap,
@@ -529,19 +523,15 @@ func AssignGatewayIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, co
 	hostName := ControlConfigData["ingressHostName"]
 
 	annotationsArray := strings.Split(annotations, "\n")
-	klog.Info("LENGTH: ", len(annotationsArray))
+
 	annotationsMap := make(map[string]string)
 	for _, c := range annotationsArray {
-		mapObj := strings.Split(strings.TrimSpace(c), ":")
+		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
 		klog.Info(len(mapObj))
 		if len(mapObj) > 1 {
 			annotationsMap[mapObj[0]] = mapObj[1]
 		}
 	}
-
-	klog.Info("Annotations: ", annotationsMap)
-	klog.Info("IngressName: ", ingressName)
-	klog.Info("HostName: ", hostName)
 
 	ingressVals := &ingressConfigvalues{
 		Annotations: annotationsMap,
@@ -561,19 +551,15 @@ func AssignDashboardIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, 
 	hostName := ControlConfigData["ingressHostName"]
 
 	annotationsArray := strings.Split(annotations, "\n")
-	klog.Info("LENGTH: ", len(annotationsArray))
+
 	annotationsMap := make(map[string]string)
 	for _, c := range annotationsArray {
-		mapObj := strings.Split(strings.TrimSpace(c), ":")
+		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
 		klog.Info(len(mapObj))
 		if len(mapObj) > 1 {
 			annotationsMap[mapObj[0]] = mapObj[1]
 		}
 	}
-
-	klog.Info("Annotations: ", annotationsMap)
-	klog.Info("IngressName: ", ingressName)
-	klog.Info("HostName: ", hostName)
 
 	ingressVals := &ingressConfigvalues{
 		Annotations: annotationsMap,

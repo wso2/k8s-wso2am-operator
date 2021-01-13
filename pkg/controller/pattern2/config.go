@@ -29,7 +29,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/klog"
 )
 
 type configvalues struct {
@@ -792,8 +791,7 @@ func AssignPubDevIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, con
 	annotationsArray := strings.Split(annotations, "\n")
 	annotationsMap := make(map[string]string)
 	for _, c := range annotationsArray {
-		mapObj := strings.Split(strings.TrimSpace(c), ":")
-		klog.Info(len(mapObj))
+		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
 		if len(mapObj) > 1 {
 			annotationsMap[mapObj[0]] = mapObj[1]
 		}
@@ -819,8 +817,7 @@ func AssignGatewayIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, co
 	annotationsArray := strings.Split(annotations, "\n")
 	annotationsMap := make(map[string]string)
 	for _, c := range annotationsArray {
-		mapObj := strings.Split(strings.TrimSpace(c), ":")
-		klog.Info(len(mapObj))
+		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
 		if len(mapObj) > 1 {
 			annotationsMap[mapObj[0]] = mapObj[1]
 		}
@@ -846,8 +843,7 @@ func AssignDashboardIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, 
 	annotationsArray := strings.Split(annotations, "\n")
 	annotationsMap := make(map[string]string)
 	for _, c := range annotationsArray {
-		mapObj := strings.Split(strings.TrimSpace(c), ":")
-		klog.Info(len(mapObj))
+		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
 		if len(mapObj) > 1 {
 			annotationsMap[mapObj[0]] = mapObj[1]
 		}
