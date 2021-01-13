@@ -940,59 +940,7 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 
 }
 
-func AssignPubDevIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap) *ingressConfigvalues {
-	ControlConfigData := configMap.Data
-
-	annotations := ControlConfigData["ingress.properties"]
-	ingressName := ControlConfigData["ingressResourceName"]
-	hostName := ControlConfigData["ingressHostName"]
-
-	annotationsArray := strings.Split(annotations, "\n")
-	annotationsMap := make(map[string]string)
-	for _, c := range annotationsArray {
-		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
-		if len(mapObj) > 1 {
-			annotationsMap[mapObj[0]] = mapObj[1]
-		}
-	}
-
-	ingressVals := &ingressConfigvalues{
-		Annotations: annotationsMap,
-		IngressName: ingressName,
-		Hostname:    hostName,
-	}
-
-	return ingressVals
-}
-
-func AssignGatewayIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap) *ingressConfigvalues {
-
-	ControlConfigData := configMap.Data
-
-	annotations := ControlConfigData["ingress.properties"]
-	ingressName := ControlConfigData["ingressResourceName"]
-	hostName := ControlConfigData["ingressHostName"]
-
-	annotationsArray := strings.Split(annotations, "\n")
-	annotationsMap := make(map[string]string)
-	for _, c := range annotationsArray {
-		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
-		if len(mapObj) > 1 {
-			annotationsMap[mapObj[0]] = mapObj[1]
-		}
-	}
-
-	ingressVals := &ingressConfigvalues{
-		Annotations: annotationsMap,
-		IngressName: ingressName,
-		Hostname:    hostName,
-	}
-
-	return ingressVals
-}
-
-func AssignDashboardIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap) *ingressConfigvalues {
-
+func AssignIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap) *ingressConfigvalues {
 	ControlConfigData := configMap.Data
 
 	annotations := ControlConfigData["ingress.properties"]
