@@ -59,10 +59,9 @@ type configvalues struct {
 }
 
 type ingressConfigvalues struct {
-	Annotations   map[string]string
-	Hostname      string
-	TransportMode string
-	IngressName   string
+	Annotations map[string]string
+	Hostname    string
+	IngressName string
 }
 
 func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
@@ -495,7 +494,6 @@ func AssignAPIMIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 
 	annotations := ControlConfigData["ingress.properties"]
 	ingressName := ControlConfigData["ingressResourceName"]
-	transportMode := ControlConfigData["ingressTransportMode"]
 	hostName := ControlConfigData["ingressHostName"]
 
 	annotationsArray := strings.Split(annotations, "\n")
@@ -511,14 +509,12 @@ func AssignAPIMIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, confi
 
 	klog.Info("Annotations: ", annotationsMap)
 	klog.Info("IngressName: ", ingressName)
-	klog.Info("TransportMode: ", transportMode)
 	klog.Info("HostName: ", hostName)
 
 	ingressVals := &ingressConfigvalues{
-		Annotations:   annotationsMap,
-		IngressName:   ingressName,
-		TransportMode: transportMode,
-		Hostname:      hostName,
+		Annotations: annotationsMap,
+		IngressName: ingressName,
+		Hostname:    hostName,
 	}
 
 	return ingressVals
@@ -530,7 +526,6 @@ func AssignGatewayIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, co
 
 	annotations := ControlConfigData["ingress.properties"]
 	ingressName := ControlConfigData["ingressResourceName"]
-	transportMode := ControlConfigData["ingressTransportMode"]
 	hostName := ControlConfigData["ingressHostName"]
 
 	annotationsArray := strings.Split(annotations, "\n")
@@ -546,14 +541,12 @@ func AssignGatewayIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, co
 
 	klog.Info("Annotations: ", annotationsMap)
 	klog.Info("IngressName: ", ingressName)
-	klog.Info("TransportMode: ", transportMode)
 	klog.Info("HostName: ", hostName)
 
 	ingressVals := &ingressConfigvalues{
-		Annotations:   annotationsMap,
-		IngressName:   ingressName,
-		TransportMode: transportMode,
-		Hostname:      hostName,
+		Annotations: annotationsMap,
+		IngressName: ingressName,
+		Hostname:    hostName,
 	}
 
 	return ingressVals
@@ -565,7 +558,6 @@ func AssignDashboardIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, 
 
 	annotations := ControlConfigData["ingress.properties"]
 	ingressName := ControlConfigData["ingressResourceName"]
-	transportMode := ControlConfigData["ingressTransportMode"]
 	hostName := ControlConfigData["ingressHostName"]
 
 	annotationsArray := strings.Split(annotations, "\n")
@@ -581,14 +573,12 @@ func AssignDashboardIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, 
 
 	klog.Info("Annotations: ", annotationsMap)
 	klog.Info("IngressName: ", ingressName)
-	klog.Info("TransportMode: ", transportMode)
 	klog.Info("HostName: ", hostName)
 
 	ingressVals := &ingressConfigvalues{
-		Annotations:   annotationsMap,
-		IngressName:   ingressName,
-		TransportMode: transportMode,
-		Hostname:      hostName,
+		Annotations: annotationsMap,
+		IngressName: ingressName,
+		Hostname:    hostName,
 	}
 
 	return ingressVals

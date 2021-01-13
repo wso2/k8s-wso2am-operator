@@ -1371,6 +1371,29 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
+	klog.Info("Pattern-2 Ingress Configs")
+	pubdevingressConfName := "wso2am-pubdev-p2-ingress-configs"
+	pubdevingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(pubdevingressConfName)
+	pubdevingressConfUserName := "wso2am-pubdev-p2-ingress-configs-" + apimanager.Name
+	pubdevingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(pubdevingressConfUserName)
+	if errors.IsNotFound(err) {
+		pubdevingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, pubdevingressConfWso2))
+		if err != nil {
+			fmt.Println("Creating APIM configmap in user specified ns", pubdevingressConfUser)
+		}
+	}
+
+	gwingressConfName := "wso2am-gw-p2-ingress-configs"
+	gwingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gwingressConfName)
+	gwingressConfUserName := "wso2am-gw-p2-ingress-configs-" + apimanager.Name
+	gwingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(gwingressConfUserName)
+	if errors.IsNotFound(err) {
+		gwingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, gwingressConfWso2))
+		if err != nil {
+			fmt.Println("Creating Gateway configmap in user specified ns", gwingressConfUser)
+		}
+	}
+
 	if enableAnalytics {
 		analyticsBinConfName := "wso2am-analytics-bin"
 		analyticsBinConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(analyticsBinConfName)
@@ -1382,7 +1405,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 				fmt.Println("Creating analytics bin configmap in user specified ns", analyticsBinConfUser)
 			}
 		}
-
 	}
 
 	// Parse the object and look for it’s deployment
@@ -1457,7 +1479,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		// If the resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
 			y := pattern2.AssignApimAnalyticsDashboardConfigMapValues(apimanager, configmap, dashnum)
-
 			dashdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern2.DashboardDeployment(apimanager, y, dashnum))
 			if err != nil {
 				return err
@@ -1473,11 +1494,23 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Dash Service is already available. [Service name] ,", dashservice)
 		}
 
+		dashboardingressConfName := "wso2am-dashboard-p2-ingress-configs"
+		dashboardingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(dashboardingressConfName)
+		dashboardingressConfUserName := "wso2am-dashboard-p2-ingress-configs-" + apimanager.Name
+		dashboardingressConfUser, err := c.configMapLister.ConfigMaps(apimanager.Namespace).Get(dashboardingressConfUserName)
+		if errors.IsNotFound(err) {
+			dashboardingressConfUser, err = c.kubeclientset.CoreV1().ConfigMaps(apimanager.Namespace).Create(pattern2.MakeConfigMap(apimanager, dashboardingressConfWso2))
+			if err != nil {
+				fmt.Println("Creating Dashboard configmap in user specified ns", dashboardingressConfUser)
+			}
+		}
+
 		// Get ingress name using hardcoded value
 		dashIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(dashIngressName)
 		// If resource doesn't exist, we'll create it
 		if errors.IsNotFound(err) {
-			dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern2.DashboardIngress(apimanager))
+			y := pattern2.AssignDashboardIngressConfigMapValues(apimanager, dashboardingressConfUser)
+			dashIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern2.DashboardIngress(apimanager, y))
 		} else {
 			fmt.Println("Dash Ingress is already available. [Ingress name] ,", dashIngress)
 		}
@@ -1565,7 +1598,8 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	pubDevTmIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(pubDevTmIngressName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		pubDevTmIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern2.PubDevTmIngress(apimanager))
+		y := pattern2.AssignPubDevIngressConfigMapValues(apimanager, pubdevingressConfUser)
+		pubDevTmIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern2.PubDevTmIngress(apimanager, y))
 		if err != nil {
 			return err
 		}
@@ -1594,7 +1628,8 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 	gatewayIngress, err := c.ingressLister.Ingresses(apimanager.Namespace).Get(gatewayIngressName)
 	// If resource doesn't exist, we'll create it
 	if errors.IsNotFound(err) {
-		gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern2.GatewayIngress(apimanager))
+		y := pattern2.AssignGatewayIngressConfigMapValues(apimanager, gwingressConfUser)
+		gatewayIngress, err = c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(pattern2.GatewayIngress(apimanager, y))
 		if err != nil {
 			return err
 		}
