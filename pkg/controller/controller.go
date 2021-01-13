@@ -2945,8 +2945,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("PubDev Ingress Done")
-
 	gwingressConfName := "wso2am-ext-gw-p4-ingress-configs"
 	gwingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(gwingressConfName)
 	gwingressConfUserName := "wso2am-ext-gw-p4-ingress-configs-" + apimanager.Name
@@ -2958,8 +2956,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		}
 	}
 
-	klog.Info("Ext GW Ingress Done")
-
 	intgwingressConfName := "wso2am-int-gw-p4-ingress-configs"
 	intgwingressConfWso2, err := c.configMapLister.ConfigMaps("wso2-system").Get(intgwingressConfName)
 	intgwingressConfUserName := "wso2am-int-gw-p4-ingress-configs-" + apimanager.Name
@@ -2970,8 +2966,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 			fmt.Println("Creating Gateway configmap in user specified ns", intgwingressConfUser)
 		}
 	}
-
-	klog.Info("Int GW Ingress Done")
 
 	if enableAnalytics {
 		analyticsBinConfName := "wso2am-analytics-bin"
