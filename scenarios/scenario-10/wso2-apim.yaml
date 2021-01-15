@@ -23,6 +23,8 @@ spec:
   profiles:
     - name: api-pub-dev-tm-1
       deployment:
+        envs:
+          - "name: pubdev"
         replicas: 1
         minReadySeconds: 100
         imagePullPolicy: Always
