@@ -63,16 +63,17 @@ type Configmap struct {
 }
 
 type Deployment struct {
-	Resources       Resources `json:"resources"`
-	Replicas        *int32    `json:"replicas"`
-	MinReadySeconds int32     `json:"minReadySeconds"`
-	Strategy        Strategy  `json:"strategy"`
-	Image           string    `json:"image"`
-	ImagePullPolicy string    `json:"imagePullPolicy"`
-	LivenessProbe   Probe     `json:"livenessProbe"`
-	ReadinessProbe  Probe     `json:"readinessProbe"`
-	Configmaps      Configmap `json:"configMaps"`
-	SecurityContext string    `json:"securityContext"`
+	Resources            Resources `json:"resources"`
+	Replicas             *int32    `json:"replicas"`
+	MinReadySeconds      int32     `json:"minReadySeconds"`
+	Strategy             Strategy  `json:"strategy"`
+	Image                string    `json:"image"`
+	ImagePullPolicy      string    `json:"imagePullPolicy"`
+	LivenessProbe        Probe     `json:"livenessProbe"`
+	ReadinessProbe       Probe     `json:"readinessProbe"`
+	Configmaps           Configmap `json:"configMaps"`
+	SecurityContext      string    `json:"securityContext"`
+	EnvironmentVariables []string  `json:"envs"`
 }
 
 type Strategy struct {

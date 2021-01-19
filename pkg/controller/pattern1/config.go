@@ -31,28 +31,29 @@ import (
 )
 
 type configvalues struct {
-	Livedelay          int32
-	Liveperiod         int32
-	Livethres          int32
-	Readydelay         int32
-	Readyperiod        int32
-	Readythres         int32
-	Minreadysec        int32
-	Maxsurge           int32
-	Maxunavail         int32
-	Replicas           int32
-	Imagepull          string
-	Image              string
-	Reqcpu             resource.Quantity
-	Reqmem             resource.Quantity
-	Limitcpu           resource.Quantity
-	Limitmem           resource.Quantity
-	APIMVersion        string
-	ImagePullSecret    string
-	ServiceAccountName string
-	SecurityContext    string
-	JvmMemOpts         string
-	Enablenalytics     string
+	Livedelay            int32
+	Liveperiod           int32
+	Livethres            int32
+	Readydelay           int32
+	Readyperiod          int32
+	Readythres           int32
+	Minreadysec          int32
+	Maxsurge             int32
+	Maxunavail           int32
+	Replicas             int32
+	Imagepull            string
+	Image                string
+	Reqcpu               resource.Quantity
+	Reqmem               resource.Quantity
+	Limitcpu             resource.Quantity
+	Limitmem             resource.Quantity
+	APIMVersion          string
+	ImagePullSecret      string
+	ServiceAccountName   string
+	SecurityContext      string
+	JvmMemOpts           string
+	Enablenalytics       string
+	EnvironmentVariables []string
 }
 
 func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap, num int) *configvalues {
@@ -84,6 +85,8 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 	memXmx := ControlConfigData["apim-deployment-resources-jvm-heap-memory-xmx"]
 	memXms := ControlConfigData["apim-deployment-resources-jvm-heap-memory-xms"]
 	memOpts := "-Xms" + memXms + " -Xmx" + memXmx
+
+	var envVariables []string
 
 	if totalProfiles > 0 {
 		replicasFromYaml := apimanager.Spec.Profiles[num].Deployment.Replicas
@@ -158,29 +161,36 @@ func AssignApimConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v
 		if securityContextFromYaml != "" {
 			securityContext = securityContextFromYaml
 		}
+
+		envVariablesFromYaml := apimanager.Spec.Profiles[num].Deployment.EnvironmentVariables
+		if len(envVariablesFromYaml) > 0 {
+			envVariables = envVariablesFromYaml
+		}
 	}
+
 	cmvalues := &configvalues{
-		Livedelay:          int32(liveDelay),
-		Liveperiod:         int32(livePeriod),
-		Livethres:          int32(liveThres),
-		Readydelay:         int32(readyDelay),
-		Readyperiod:        int32(readyPeriod),
-		Readythres:         int32(readyThres),
-		Minreadysec:        int32(minReadySec),
-		Maxsurge:           int32(maxSurges),
-		Maxunavail:         int32(maxUnavail),
-		Imagepull:          imagePull,
-		Image:              amImages,
-		Reqcpu:             reqCPU,
-		Reqmem:             reqMem,
-		Limitcpu:           limitCPU,
-		Limitmem:           limitMem,
-		Replicas:           int32(replicas),
-		APIMVersion:        apimVersion,
-		ImagePullSecret:    imagePullSecret,
-		ServiceAccountName: serviceAccountName,
-		SecurityContext:    securityContext,
-		JvmMemOpts:         memOpts,
+		Livedelay:            int32(liveDelay),
+		Liveperiod:           int32(livePeriod),
+		Livethres:            int32(liveThres),
+		Readydelay:           int32(readyDelay),
+		Readyperiod:          int32(readyPeriod),
+		Readythres:           int32(readyThres),
+		Minreadysec:          int32(minReadySec),
+		Maxsurge:             int32(maxSurges),
+		Maxunavail:           int32(maxUnavail),
+		Imagepull:            imagePull,
+		Image:                amImages,
+		Reqcpu:               reqCPU,
+		Reqmem:               reqMem,
+		Limitcpu:             limitCPU,
+		Limitmem:             limitMem,
+		Replicas:             int32(replicas),
+		APIMVersion:          apimVersion,
+		ImagePullSecret:      imagePullSecret,
+		ServiceAccountName:   serviceAccountName,
+		SecurityContext:      securityContext,
+		JvmMemOpts:           memOpts,
+		EnvironmentVariables: envVariables,
 	}
 
 	return cmvalues
@@ -211,6 +221,8 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-failureThreshold"], 10, 32)
+
+	var envVariables []string
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
@@ -300,28 +312,34 @@ func AssignApimAnalyticsDashboardConfigMapValues(apimanager *apimv1alpha1.APIMan
 		if securityContextFromYaml != "" {
 			securityContext = securityContextFromYaml
 		}
+
+		envVariablesFromYaml := apimanager.Spec.Profiles[num].Deployment.EnvironmentVariables
+		if len(envVariablesFromYaml) > 0 {
+			envVariables = envVariablesFromYaml
+		}
 	}
 
 	cmvalues := &configvalues{
-		Livedelay:          int32(liveDelay),
-		Liveperiod:         int32(livePeriod),
-		Livethres:          int32(liveThres),
-		Readydelay:         int32(readyDelay),
-		Readyperiod:        int32(readyPeriod),
-		Readythres:         int32(readyThres),
-		Minreadysec:        int32(minReadySec),
-		Maxsurge:           int32(maxSurges),
-		Maxunavail:         int32(maxUnavail),
-		Imagepull:          imagePull,
-		Image:              amImages,
-		Reqcpu:             reqCPU,
-		Reqmem:             reqMem,
-		Limitcpu:           limitCPU,
-		Limitmem:           limitMem,
-		Replicas:           int32(replicas),
-		ImagePullSecret:    imagePullSecret,
-		ServiceAccountName: serviceAccountName,
-		SecurityContext:    securityContext,
+		Livedelay:            int32(liveDelay),
+		Liveperiod:           int32(livePeriod),
+		Livethres:            int32(liveThres),
+		Readydelay:           int32(readyDelay),
+		Readyperiod:          int32(readyPeriod),
+		Readythres:           int32(readyThres),
+		Minreadysec:          int32(minReadySec),
+		Maxsurge:             int32(maxSurges),
+		Maxunavail:           int32(maxUnavail),
+		Imagepull:            imagePull,
+		Image:                amImages,
+		Reqcpu:               reqCPU,
+		Reqmem:               reqMem,
+		Limitcpu:             limitCPU,
+		Limitmem:             limitMem,
+		Replicas:             int32(replicas),
+		ImagePullSecret:      imagePullSecret,
+		ServiceAccountName:   serviceAccountName,
+		SecurityContext:      securityContext,
+		EnvironmentVariables: envVariables,
 	}
 	return cmvalues
 
@@ -351,6 +369,8 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	readyDelay, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-initialDelaySeconds"], 10, 32)
 	readyPeriod, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-periodSeconds"], 10, 32)
 	readyThres, _ := strconv.ParseInt(ControlConfigData["apim-analytics-deployment-readinessProbe-failureThreshold"], 10, 32)
+
+	var envVariables []string
 
 	totalProfiles := len(apimanager.Spec.Profiles)
 
@@ -427,28 +447,34 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 		if securityContextFromYaml != "" {
 			securityContext = securityContextFromYaml
 		}
+
+		envVariablesFromYaml := apimanager.Spec.Profiles[num].Deployment.EnvironmentVariables
+		if len(envVariablesFromYaml) > 0 {
+			envVariables = envVariablesFromYaml
+		}
 	}
 
 	cmvalues := &configvalues{
-		Livedelay:          int32(liveDelay),
-		Liveperiod:         int32(livePeriod),
-		Livethres:          int32(liveThres),
-		Readydelay:         int32(readyDelay),
-		Readyperiod:        int32(readyPeriod),
-		Readythres:         int32(readyThres),
-		Minreadysec:        int32(minReadySec),
-		Maxsurge:           int32(maxSurges),
-		Maxunavail:         int32(maxUnavail),
-		Imagepull:          imagePull,
-		Image:              amImages,
-		Reqcpu:             reqCPU,
-		Reqmem:             reqMem,
-		Limitcpu:           limitCPU,
-		Limitmem:           limitMem,
-		Replicas:           int32(replicas),
-		ImagePullSecret:    imagePullSecret,
-		ServiceAccountName: serviceAccountName,
-		SecurityContext:    securityContext,
+		Livedelay:            int32(liveDelay),
+		Liveperiod:           int32(livePeriod),
+		Livethres:            int32(liveThres),
+		Readydelay:           int32(readyDelay),
+		Readyperiod:          int32(readyPeriod),
+		Readythres:           int32(readyThres),
+		Minreadysec:          int32(minReadySec),
+		Maxsurge:             int32(maxSurges),
+		Maxunavail:           int32(maxUnavail),
+		Imagepull:            imagePull,
+		Image:                amImages,
+		Reqcpu:               reqCPU,
+		Reqmem:               reqMem,
+		Limitcpu:             limitCPU,
+		Limitmem:             limitMem,
+		Replicas:             int32(replicas),
+		ImagePullSecret:      imagePullSecret,
+		ServiceAccountName:   serviceAccountName,
+		SecurityContext:      securityContext,
+		EnvironmentVariables: envVariables,
 	}
 	return cmvalues
 

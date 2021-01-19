@@ -74,6 +74,38 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 	securityContextString := strings.Split(strings.TrimSpace(x.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, pub1SecurityContext)
+
+	envVariables := []corev1.EnvVar{
+		{
+			Name: "NODE_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			},
+		},
+		{
+			Name:  "JVM_MEM_OPTS",
+			Value: x.JvmMemOpts,
+		},
+		{
+			Name:  "ENABLE_ANALYTICS",
+			Value: strconv.FormatBool(enableAnalytics),
+		},
+		{
+			Name:  "PROFILE_NAME",
+			Value: "api-publisher",
+		},
+	}
+
+	for _, env := range x.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
+
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: depAPIVersion,
@@ -152,29 +184,8 @@ func Pub1Deployment(apimanager *apimv1alpha1.APIManager, x *configvalues, num in
 							SecurityContext: pub1SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(x.Imagepull),
 							Ports:           pub1deployports,
-							Env: []corev1.EnvVar{
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-								{
-									Name:  "JVM_MEM_OPTS",
-									Value: x.JvmMemOpts,
-								},
-								{
-									Name:  "ENABLE_ANALYTICS",
-									Value: strconv.FormatBool(enableAnalytics),
-								},
-								{
-									Name:  "PROFILE_NAME",
-									Value: "api-publisher",
-								},
-							},
-							VolumeMounts: pub1VolumeMount,
+							Env:             envVariables,
+							VolumeMounts:    pub1VolumeMount,
 						},
 					},
 					ServiceAccountName: x.ServiceAccountName,
@@ -233,6 +244,37 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, pub2SecurityContext)
+
+	envVariables := []corev1.EnvVar{
+		{
+			Name: "NODE_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			},
+		},
+		{
+			Name:  "JVM_MEM_OPTS",
+			Value: z.JvmMemOpts,
+		},
+		{
+			Name:  "ENABLE_ANALYTICS",
+			Value: strconv.FormatBool(enableAnalytics),
+		},
+		{
+			Name:  "PROFILE_NAME",
+			Value: "api-publisher",
+		},
+	}
+
+	for _, env := range z.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -313,29 +355,8 @@ func Pub2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num in
 							SecurityContext: pub2SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 							Ports:           pub2deployports,
-							Env: []corev1.EnvVar{
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-								{
-									Name:  "JVM_MEM_OPTS",
-									Value: z.JvmMemOpts,
-								},
-								{
-									Name:  "ENABLE_ANALYTICS",
-									Value: strconv.FormatBool(enableAnalytics),
-								},
-								{
-									Name:  "PROFILE_NAME",
-									Value: "api-publisher",
-								},
-							},
-							VolumeMounts: pub2VolumeMount,
+							Env:             envVariables,
+							VolumeMounts:    pub2VolumeMount,
 						},
 					},
 					ServiceAccountName: z.ServiceAccountName,
@@ -393,6 +414,37 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, dev1SecurityContext)
+
+	envVariables := []corev1.EnvVar{
+		{
+			Name: "NODE_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			},
+		},
+		{
+			Name:  "JVM_MEM_OPTS",
+			Value: z.JvmMemOpts,
+		},
+		{
+			Name:  "ENABLE_ANALYTICS",
+			Value: strconv.FormatBool(enableAnalytics),
+		},
+		{
+			Name:  "PROFILE_NAME",
+			Value: "api-devportal",
+		},
+	}
+
+	for _, env := range z.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -473,29 +525,8 @@ func Devportal1Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 							SecurityContext: dev1SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 							Ports:           dev1deployports,
-							Env: []corev1.EnvVar{
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-								{
-									Name:  "JVM_MEM_OPTS",
-									Value: z.JvmMemOpts,
-								},
-								{
-									Name:  "ENABLE_ANALYTICS",
-									Value: strconv.FormatBool(enableAnalytics),
-								},
-								{
-									Name:  "PROFILE_NAME",
-									Value: "api-devportal",
-								},
-							},
-							VolumeMounts: dev1VolumeMount,
+							Env:             envVariables,
+							VolumeMounts:    dev1VolumeMount,
 						},
 					},
 					ServiceAccountName: z.ServiceAccountName,
@@ -553,6 +584,37 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, dev2SecurityContext)
+
+	envVariables := []corev1.EnvVar{
+		{
+			Name: "NODE_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			},
+		},
+		{
+			Name:  "JVM_MEM_OPTS",
+			Value: z.JvmMemOpts,
+		},
+		{
+			Name:  "ENABLE_ANALYTICS",
+			Value: strconv.FormatBool(enableAnalytics),
+		},
+		{
+			Name:  "PROFILE_NAME",
+			Value: "api-devportal",
+		},
+	}
+
+	for _, env := range z.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -633,29 +695,8 @@ func Devportal2Deployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 							SecurityContext: dev2SecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 							Ports:           dev2deployports,
-							Env: []corev1.EnvVar{
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-								{
-									Name:  "JVM_MEM_OPTS",
-									Value: z.JvmMemOpts,
-								},
-								{
-									Name:  "ENABLE_ANALYTICS",
-									Value: strconv.FormatBool(enableAnalytics),
-								},
-								{
-									Name:  "PROFILE_NAME",
-									Value: "api-devportal",
-								},
-							},
-							VolumeMounts: dev2VolumeMount,
+							Env:             envVariables,
+							VolumeMounts:    dev2VolumeMount,
 						},
 					},
 					ServiceAccountName: z.ServiceAccountName,
@@ -703,6 +744,37 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, gatewaySecurityContext)
+
+	envVariables := []corev1.EnvVar{
+		{
+			Name:  "PROFILE_NAME",
+			Value: "gateway-worker",
+		},
+		{
+			Name: "NODE_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			},
+		},
+		{
+			Name:  "JVM_MEM_OPTS",
+			Value: z.JvmMemOpts,
+		},
+		{
+			Name:  "ENABLE_ANALYTICS",
+			Value: strconv.FormatBool(enableAnalytics),
+		},
+	}
+
+	for _, env := range z.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -793,29 +865,8 @@ func GatewayDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, num
 							SecurityContext: gatewaySecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 							Ports:           gatewaydeployports,
-							Env: []corev1.EnvVar{
-								{
-									Name:  "PROFILE_NAME",
-									Value: "gateway-worker",
-								},
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-								{
-									Name:  "JVM_MEM_OPTS",
-									Value: z.JvmMemOpts,
-								},
-								{
-									Name:  "ENABLE_ANALYTICS",
-									Value: strconv.FormatBool(enableAnalytics),
-								},
-							},
-							VolumeMounts: gatewayVolumeMount,
+							Env:             envVariables,
+							VolumeMounts:    gatewayVolumeMount,
 						},
 					},
 					ServiceAccountName: z.ServiceAccountName,
@@ -853,6 +904,33 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, keyManagerSecurityContext)
+
+	envVariables := []corev1.EnvVar{
+		{
+			Name: "NODE_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			},
+		},
+		{
+			Name:  "JVM_MEM_OPTS",
+			Value: z.JvmMemOpts,
+		},
+		{
+			Name:  "PROFILE_NAME",
+			Value: "api-key-manager",
+		},
+	}
+
+	for _, env := range z.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -929,25 +1007,8 @@ func KeyManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalues, 
 							SecurityContext: keyManagerSecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 							Ports:           kmdeployports,
-							Env: []corev1.EnvVar{
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-								{
-									Name:  "JVM_MEM_OPTS",
-									Value: z.JvmMemOpts,
-								},
-								{
-									Name:  "PROFILE_NAME",
-									Value: "api-key-manager",
-								},
-							},
-							VolumeMounts: kmVolumeMount,
+							Env:             envVariables,
+							VolumeMounts:    kmVolumeMount,
 						},
 					},
 					ServiceAccountName: z.ServiceAccountName,
@@ -985,6 +1046,33 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 	securityContextString := strings.Split(strings.TrimSpace(z.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, tmSecurityContext)
+
+	envVariables := []corev1.EnvVar{
+		{
+			Name: "NODE_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			},
+		},
+		{
+			Name:  "JVM_MEM_OPTS",
+			Value: z.JvmMemOpts,
+		},
+		{
+			Name:  "PROFILE_NAME",
+			Value: "traffic-manager",
+		},
+	}
+
+	for _, env := range z.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -1061,25 +1149,8 @@ func TrafficManagerDeployment(apimanager *apimv1alpha1.APIManager, z *configvalu
 							SecurityContext: tmSecurityContext,
 							ImagePullPolicy: corev1.PullPolicy(z.Imagepull),
 							Ports:           tmdeployports,
-							Env: []corev1.EnvVar{
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-								{
-									Name:  "JVM_MEM_OPTS",
-									Value: z.JvmMemOpts,
-								},
-								{
-									Name:  "PROFILE_NAME",
-									Value: "traffic-manager",
-								},
-							},
-							VolumeMounts: tmVolumeMount,
+							Env:             envVariables,
+							VolumeMounts:    tmVolumeMount,
 						},
 					},
 					ServiceAccountName: z.ServiceAccountName,
@@ -1125,6 +1196,16 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, dashboardSecurityContext)
+
+	envVariables := []corev1.EnvVar{}
+
+	for _, env := range y.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -1201,7 +1282,7 @@ func DashboardDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, n
 									},
 								},
 							},
-
+							Env: envVariables,
 							Resources: corev1.ResourceRequirements{
 								Requests: corev1.ResourceList{
 									corev1.ResourceCPU:    y.Reqcpu,
@@ -1253,6 +1334,33 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 	securityContextString := strings.Split(strings.TrimSpace(y.SecurityContext), ":")
 
 	AssignSecurityContext(securityContextString, workerSecurityContext)
+
+	envVariables := []corev1.EnvVar{
+		{
+			Name: "NODE_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			},
+		},
+		{
+			Name: "NODE_ID",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "metadata.name",
+				},
+			},
+		},
+	}
+
+	for _, env := range y.EnvironmentVariables {
+		variable := strings.Split(strings.ReplaceAll(strings.TrimSpace(env), " ", ""), ":")
+		envObject := corev1.EnvVar{}
+		envObject.Name = variable[0]
+		envObject.Value = variable[1]
+		envVariables = append(envVariables, envObject)
+	}
 
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
@@ -1339,25 +1447,8 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 							SecurityContext: workerSecurityContext,
 							Ports:           workerContainerPorts,
-							Env: []corev1.EnvVar{
-								{
-									Name: "NODE_IP",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "status.podIP",
-										},
-									},
-								},
-								{
-									Name: "NODE_ID",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											FieldPath: "metadata.name",
-										},
-									},
-								},
-							},
-							VolumeMounts: workerVolMounts,
+							Env:             envVariables,
+							VolumeMounts:    workerVolMounts,
 						},
 					},
 					ServiceAccountName: y.ServiceAccountName,
