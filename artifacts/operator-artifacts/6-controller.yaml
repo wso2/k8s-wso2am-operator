@@ -31,6 +31,6 @@ spec:
     spec:
       containers:
         - name: wso2am-controller
-          image: benura123/k8s-operator:v4.0.1
+          image: benura123/k8s-test:v1.0.11
           imagePullPolicy: Always
       serviceAccountName: wso2am-svc-account

@@ -22,6 +22,7 @@ package pattern4
 
 import (
 	"strconv"
+	"strings"
 
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -54,6 +55,12 @@ type configvalues struct {
 	SecurityContext      string
 	JvmMemOpts           string
 	EnvironmentVariables []string
+}
+
+type ingressConfigvalues struct {
+	Annotations map[string]string
+	Hostname    string
+	IngressName string
 }
 
 //AssignDevPubTmConfigMapValues is to assign config-map values...
@@ -205,8 +212,8 @@ func AssignApimExternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
 	replicas, _ := strconv.ParseInt(ControlConfigData["p4-apim-gw-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
-	maxSurges, _ := strconv.ParseInt(ControlConfigData["p4-apim-gw-deployment-maxSurge"], 10, 32)
-	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p4-apim-gw-deployment-maxUnavailable"], 10, 32)
+	maxSurges, _ := strconv.ParseInt(ControlConfigData["p4-apim-external-gw-deployment-maxSurge"], 10, 32)
+	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p4-apim-external-gw-deployment-maxUnavailable"], 10, 32)
 	amImages := ControlConfigData["apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["apim-deployment-resources-requests-cpu"])
@@ -359,8 +366,8 @@ func AssignApimInternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 	securityContext := ControlConfigData["apim-deployment-securityContext"]
 	replicas, _ := strconv.ParseInt(ControlConfigData["p4-apim-gw-deployment-replicas"], 10, 32)
 	minReadySec, _ := strconv.ParseInt(ControlConfigData["apim-deployment-minReadySeconds"], 10, 32)
-	maxSurges, _ := strconv.ParseInt(ControlConfigData["p4-apim-gw-deployment-maxSurge"], 10, 32)
-	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p4-apim-gw-deployment-maxUnavailable"], 10, 32)
+	maxSurges, _ := strconv.ParseInt(ControlConfigData["p4-apim-internal-gw-deployment-maxSurge"], 10, 32)
+	maxUnavail, _ := strconv.ParseInt(ControlConfigData["p4-apim-internal-gw-deployment-maxUnavailable"], 10, 32)
 	amImages := ControlConfigData["apim-deployment-image"]
 	imagePull, _ := ControlConfigData["apim-deployment-imagePullPolicy"]
 	reqCPU := resource.MustParse(ControlConfigData["apim-deployment-resources-requests-cpu"])
@@ -496,7 +503,7 @@ func AssignApimInternalGatewayConfigMapValues(apimanager *apimv1alpha1.APIManage
 		JvmMemOpts:           memOpts,
 		EnvironmentVariables: envVariables,
 	}
-	klog.Info("Internal GW Configs Done!")
+
 	return cmvalues
 
 }
@@ -931,6 +938,31 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	}
 	return cmvalues
 
+}
+
+func AssignIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap) *ingressConfigvalues {
+	ControlConfigData := configMap.Data
+
+	annotations := ControlConfigData["ingress.properties"]
+	ingressName := ControlConfigData["ingressResourceName"]
+	hostName := ControlConfigData["ingressHostName"]
+
+	annotationsArray := strings.Split(annotations, "\n")
+	annotationsMap := make(map[string]string)
+	for _, c := range annotationsArray {
+		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
+		if len(mapObj) > 1 {
+			annotationsMap[mapObj[0]] = mapObj[1]
+		}
+	}
+
+	ingressVals := &ingressConfigvalues{
+		Annotations: annotationsMap,
+		IngressName: ingressName,
+		Hostname:    hostName,
+	}
+
+	return ingressVals
 }
 
 //AssignMysqlConfigMapValues is to assign config-map values...

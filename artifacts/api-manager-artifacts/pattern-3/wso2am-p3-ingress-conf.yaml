@@ -1,0 +1,73 @@
+#Copyright (c)  WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#
+# WSO2 Inc. licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2am-pub-p3-ingress-configs
+  namespace: wso2-system
+data:
+  ingress.properties: |
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+  ingressResourceName: "wso2-am-publisher-ingress"
+  ingressHostName : "publisher.am.wso2.com"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2am-devportal-p3-ingress-configs
+  namespace: wso2-system
+data:
+  ingress.properties: |
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+  ingressResourceName: "wso2-am-devportal-ingress"
+  ingressHostName : "devportal.am.wso2.com"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2am-gw-p3-ingress-configs
+  namespace: wso2-system
+data:
+  ingress.properties: |
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+  ingressResourceName: "wso2-am-gw-ingress"
+  ingressHostName : "gateway.am.wso2.com"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wso2am-dashboard-p3-ingress-configs
+  namespace: wso2-system
+data:
+  ingress.properties: |
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+  ingressResourceName: "wso2-am-analytics-dashboard-ingress"
+  ingressHostName : "analytics.am.wso2.com"

@@ -28,19 +28,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func PubDevTmIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
+func PubDevTmIngress(apimanager *apimv1alpha1.APIManager, x *ingressConfigvalues) *v1beta1.Ingress {
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-ingress",
-			Namespace: apimanager.Namespace,
-			Annotations: map[string]string{
-				"kubernetes.io/ingress.class":                     "nginx",
-				"nginx.ingress.kubernetes.io/backend-protocol":    "HTTPS",
-				"nginx.ingress.kubernetes.io/affinity":            "cookie",
-				"nginx.ingress.kubernetes.io/session-cookie-name": "route",
-				"nginx.ingress.kubernetes.io/session-cookie-hash": "sha1",
-			},
+			Name:        x.IngressName,
+			Namespace:   apimanager.Namespace,
+			Annotations: x.Annotations,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
@@ -48,7 +42,7 @@ func PubDevTmIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 		Spec: v1beta1.IngressSpec{
 			Rules: []networkv1.IngressRule{
 				{
-					Host: "am.wso2.com",
+					Host: x.Hostname,
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []networkv1.HTTPIngressPath{
@@ -67,7 +61,7 @@ func PubDevTmIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						"am.wso2.com",
+						x.Hostname,
 					},
 				},
 			},
@@ -75,16 +69,13 @@ func PubDevTmIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 	}
 }
 
-func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
+func GatewayIngress(apimanager *apimv1alpha1.APIManager, x *ingressConfigvalues) *v1beta1.Ingress {
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-gw-ingress",
-			Namespace: apimanager.Namespace,
-			Annotations: map[string]string{
-				"kubernetes.io/ingress.class":                  "nginx",
-				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
-			},
+			Name:        x.IngressName,
+			Namespace:   apimanager.Namespace,
+			Annotations: x.Annotations,
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
 			},
@@ -92,7 +83,7 @@ func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 		Spec: v1beta1.IngressSpec{
 			Rules: []networkv1.IngressRule{
 				{
-					Host: "gateway.am.wso2.com",
+					Host: x.Hostname,
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []networkv1.HTTPIngressPath{
@@ -111,7 +102,7 @@ func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						"gateway.am.wso2.com",
+						x.Hostname,
 					},
 				},
 			},
@@ -119,16 +110,13 @@ func GatewayIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 	}
 }
 
-func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
+func DashboardIngress(apimanager *apimv1alpha1.APIManager, x *ingressConfigvalues) *v1beta1.Ingress {
 
 	return &v1beta1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "wso2-am-analytics-dashboard-ingress",
-			Namespace: apimanager.Namespace,
-			Annotations: map[string]string{
-				"kubernetes.io/ingress.class":                  "nginx",
-				"nginx.ingress.kubernetes.io/backend-protocol": "HTTPS",
-			},
+			Name:        x.IngressName,
+			Namespace:   apimanager.Namespace,
+			Annotations: x.Annotations,
 
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(apimanager, apimv1alpha1.SchemeGroupVersion.WithKind("APIManager")),
@@ -137,7 +125,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 		Spec: v1beta1.IngressSpec{
 			Rules: []networkv1.IngressRule{
 				{
-					Host: "analytics.am.wso2.com",
+					Host: x.Hostname,
 					IngressRuleValue: v1beta1.IngressRuleValue{
 						HTTP: &v1beta1.HTTPIngressRuleValue{
 							Paths: []networkv1.HTTPIngressPath{
@@ -156,7 +144,7 @@ func DashboardIngress(apimanager *apimv1alpha1.APIManager) *v1beta1.Ingress {
 			TLS: []v1beta1.IngressTLS{
 				{
 					Hosts: []string{
-						"analytics.am.wso2.com",
+						x.Hostname,
 					},
 				},
 			},

@@ -22,6 +22,7 @@ package pattern2
 
 import (
 	"strconv"
+	"strings"
 
 	apimv1alpha1 "github.com/wso2/k8s-wso2am-operator/pkg/apis/apim/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -53,6 +54,12 @@ type configvalues struct {
 	SecurityContext      string
 	JvmMemOpts           string
 	EnvironmentVariables []string
+}
+
+type ingressConfigvalues struct {
+	Annotations map[string]string
+	Hostname    string
+	IngressName string
 }
 
 //AssignDevPubTmConfigMapValues is to assign config-map values...
@@ -772,6 +779,31 @@ func AssignApimAnalyticsWorkerConfigMapValues(apimanager *apimv1alpha1.APIManage
 	}
 	return cmvalues
 
+}
+
+func AssignIngressConfigMapValues(apimanager *apimv1alpha1.APIManager, configMap *v1.ConfigMap) *ingressConfigvalues {
+	ControlConfigData := configMap.Data
+
+	annotations := ControlConfigData["ingress.properties"]
+	ingressName := ControlConfigData["ingressResourceName"]
+	hostName := ControlConfigData["ingressHostName"]
+
+	annotationsArray := strings.Split(annotations, "\n")
+	annotationsMap := make(map[string]string)
+	for _, c := range annotationsArray {
+		mapObj := strings.Split(strings.TrimSpace(strings.ReplaceAll(c, " ", "")), ":")
+		if len(mapObj) > 1 {
+			annotationsMap[mapObj[0]] = mapObj[1]
+		}
+	}
+
+	ingressVals := &ingressConfigvalues{
+		Annotations: annotationsMap,
+		IngressName: ingressName,
+		Hostname:    hostName,
+	}
+
+	return ingressVals
 }
 
 //AssignMysqlConfigMapValues is to assign config-map values...
