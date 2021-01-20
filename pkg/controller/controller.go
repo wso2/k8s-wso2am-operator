@@ -902,6 +902,28 @@ func (c *Controller) syncHandler(key string) error {
 
 		for _, r := range apimanager.Spec.Profiles {
 
+			if apimanager.Spec.Expose == "Ingress" {
+				amingress, err := c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(patternX.ApimIngress(apimanager, &r))
+				if err != nil {
+					return err
+				}
+				gwingress, err := c.kubeclientset.ExtensionsV1beta1().Ingresses(apimanager.Namespace).Create(patternX.GatewayIngress(apimanager, &r))
+				if err != nil {
+					return err
+				}
+
+				if !metav1.IsControlledBy(amingress, apimanager) {
+					msg := fmt.Sprintf("apimananger ingress %q already exists and is not managed by APIManager", amingress.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+				if !metav1.IsControlledBy(gwingress, apimanager) {
+					msg := fmt.Sprintf("gateway ingress %q already exists and is not managed by APIManager", amingress.Name)
+					c.recorder.Event(apimanager, corev1.EventTypeWarning, "ErrResourceExists", msg)
+					return fmt.Errorf(msg)
+				}
+			}
+
 			if r.Type == "api-manager" {
 
 				apim1deploymentName := r.Name
