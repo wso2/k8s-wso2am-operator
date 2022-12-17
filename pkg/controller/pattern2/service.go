@@ -162,7 +162,7 @@ func WorkerService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	}
 }
 
-//WorkerHeadlessService is for...
+//WorkerHeadlessService is for creating a headless service
 func WorkerHeadlessService(apimanager *apimv1alpha1.APIManager) *corev1.Service {
 	labels := map[string]string{
 		"deployment": "wso2am-pattern-2-analytics-worker",
