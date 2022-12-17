@@ -512,10 +512,9 @@ func (c *Controller) syncHandler(key string) error {
 		if enableAnalytics {
 			// If the worker resource doesn't exist, we'll create it
 			if errors.IsNotFound(err1) {
-				y := pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
+				configValues := pattern1.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
 
-				// workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
-				workerdeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
+				workerdeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, configValues, worknum))
 				if err != nil {
 					return err
 				}
@@ -1548,7 +1547,6 @@ func pattern2Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		if errors.IsNotFound(err) {
 			y := pattern2.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
 
-			// workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
 			workerdeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Create(pattern2.WorkerDeployment(apimanager, y, worknum))
 			if err != nil {
 				return err
@@ -3126,7 +3124,6 @@ func pattern4Execution(apimanager *apimv1alpha1.APIManager, c *Controller, confi
 		if errors.IsNotFound(err) {
 			y := pattern4.AssignApimAnalyticsWorkerConfigMapValues(apimanager, configmap, worknum)
 
-			// workerdeployment, err = c.kubeclientset.AppsV1().Deployments(apimanager.Namespace).Create(pattern1.WorkerDeployment(apimanager, y, worknum))
 			workerdeployment, err = c.kubeclientset.AppsV1().StatefulSets(apimanager.Namespace).Create(pattern4.WorkerDeployment(apimanager, y, worknum))
 			if err != nil {
 				return err
