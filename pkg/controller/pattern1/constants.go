@@ -21,6 +21,12 @@
 package pattern1
 
 const (
-	deploymentKind = "Deployment"
-	depApiVersion  = "apps/v1"
+	deploymentKind           = "Deployment"
+	depApiVersion            = "apps/v1"
+	runAsUser                = "runAsUser"
+	runAsGroup               = "runAsGroup"
+	runAsNonRoot             = "runAsNonRoot"
+	privileged               = "privileged"
+	readOnlyRootFilesystem   = "readOnlyRootFilesystem"
+	allowPrivilegeEscalation = "allowPrivilegeEscalation"
 )
