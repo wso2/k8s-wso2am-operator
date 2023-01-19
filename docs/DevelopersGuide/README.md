@@ -74,6 +74,3 @@ go build github.com/google/go-licenses
 ./go-licenses csv <path-to-go-file> >> LICENSE.txt
 
 ```
-
-
-
