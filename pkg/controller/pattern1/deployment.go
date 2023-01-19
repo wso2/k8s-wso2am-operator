@@ -636,25 +636,25 @@ func WorkerDeployment(apimanager *apimv1alpha1.APIManager, y *configvalues, num 
 
 }
 
-// AssignSecurityContext is ..
+// AssignSecurityContext is to assign security context to the pod
 func AssignSecurityContext(securityContextString []string, securityContext *corev1.SecurityContext) {
-
-	if securityContextString[0] == "runAsUser" {
+	switch securityContextString[0] {
+	case runAsUser:
 		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
 		securityContext.RunAsUser = &securityContextVal
-	} else if securityContextString[0] == "runAsGroup" {
+	case runAsGroup:
 		securityContextVal, _ := strconv.ParseInt(securityContextString[1], 10, 64)
 		securityContext.RunAsGroup = &securityContextVal
-	} else if securityContextString[0] == "runAsNonRoot" {
+	case runAsNonRoot:
 		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
 		securityContext.RunAsNonRoot = &securityContextVal
-	} else if securityContextString[0] == "privileged" {
+	case privileged:
 		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
 		securityContext.Privileged = &securityContextVal
-	} else if securityContextString[0] == "readOnlyRootFilesystem" {
+	case readOnlyRootFilesystem:
 		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
 		securityContext.ReadOnlyRootFilesystem = &securityContextVal
-	} else if securityContextString[0] == "allowPrivilegeEscalation" {
+	case allowPrivilegeEscalation:
 		securityContextVal, _ := strconv.ParseBool(securityContextString[1])
 		securityContext.AllowPrivilegeEscalation = &securityContextVal
 	}
